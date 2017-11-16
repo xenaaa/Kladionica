@@ -18,8 +18,8 @@ namespace IntegrationPlatform
             this.payment = payment;
         }
 
-
-        private Dictionary<int, int> bets;
+        //<sifra utakmice,tip>---npr <3001,1>
+        private Dictionary<int, int> bets= new Dictionary<int, int>();
 
         [DataMember]
         public Dictionary<int, int> Bets

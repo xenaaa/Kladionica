@@ -16,6 +16,7 @@ namespace IntegrationPlatform
             this.home = home;
             this.id = id;
             this.odds = odds;
+
         }
 
         private string away;
