@@ -5,23 +5,47 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace BetServer
 {
-    public class BetService : ChannelFactory<IBetService>,IBetService,IDisposable
+    public class BetService : IBetService
     {
-        IBetService factory;
+        private static Dictionary<string, User> BetUsers = new Dictionary<string, User>();
+        public BetService()
+        { }
 
-        public BetService(NetTcpBinding binding, EndpointAddress address)
-			: base(binding, address)
-		{
-            factory = this.CreateChannel();
+        public bool Login(string username, string password)
+        {
+            if (BetUsers.Keys.Contains(username))
+            {
+                if (BetUsers[username].Password == password)
+                {
+                    Console.WriteLine("You successfully logged in!");
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("Your password is incorrect!");
+                    return false;
+                }
+            }
+            else
+            {
+
+                User user = new User(username, password, "User");
+                if (AddUser(user))
+                    return true;
+                else
+                    return false;
+            }
         }
-        private Dictionary<string, User> BetUsers = new Dictionary<string, User>();
+
 
         public bool AddUser(User user)
         {
-            if(!BetUsers.ContainsKey(user.Username))
+            if (!BetUsers.ContainsKey(user.Username))
             {
                 BetUsers.Add(user.Username, user);
                 Console.WriteLine("User {0} successfully added to BetUsers", user.Username);
@@ -40,7 +64,7 @@ namespace BetServer
             if (!BetUsers.ContainsKey(user.Username))
             {
                 Console.WriteLine("Error! There is no user {0} in BetService", user.Username);
-                return false;   
+                return false;
             }
             else
             {
@@ -59,9 +83,9 @@ namespace BetServer
             }
             else
             {
-                foreach(KeyValuePair<string,User> kvp in BetUsers)
+                foreach (KeyValuePair<string, User> kvp in BetUsers)
                 {
-                    if(kvp.Key == user.Username)
+                    if (kvp.Key == user.Username)
                     {
                         kvp.Value.BetAccount = user.BetAccount;
                         kvp.Value.Role = user.Role;
@@ -77,31 +101,27 @@ namespace BetServer
             throw new NotImplementedException();
         }
 
-        public bool SendOffers(List<BetOffer> offers)
-        {
-            bool sent = false;
-            try
-            {
-                sent = factory.SendOffers(offers);
-                Console.WriteLine("SendOffers() >> {0}",sent);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error while trying to SendOffers(). {0}", e.Message);
-            }
-
-            return sent;
-            
-        }
-
         public bool SendTicket(Ticket ticket, string username)
         {
             throw new NotImplementedException();
         }
 
-        public bool SendTicketResults()
-        {
-            throw new NotImplementedException();
-        }
+
+
+        //bool sent = false;
+        //try
+        //{
+        //    sent = factory.SendOffers(offers);
+        //    Console.WriteLine("SendOffers() >> {0}", sent);
+        //}
+        //catch (Exception e)
+        //{
+        //    Console.WriteLine("Error while trying to SendOffers(). {0}", e.Message);
+        //}
+
+        //return sent;
+
     }
 }
+
+

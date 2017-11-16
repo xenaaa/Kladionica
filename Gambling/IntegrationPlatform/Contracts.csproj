@@ -46,6 +46,7 @@
     <Compile Include="BetOffer.cs" />
     <Compile Include="IBankService.cs" />
     <Compile Include="IBetService.cs" />
+    <Compile Include="IClientHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ticket.cs" />
     <Compile Include="User.cs" />

@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankServer", "BankServer\Ba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetServer", "BetServer\BetServer.csproj", "{9CADFC6F-2F40-43EB-BC65-B5AA3D655561}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationPlatform", "IntegrationPlatform\IntegrationPlatform.csproj", "{1559299E-7348-4FD7-9D85-9F78B1988343}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "IntegrationPlatform\Contracts.csproj", "{1559299E-7348-4FD7-9D85-9F78B1988343}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
