@@ -78,22 +78,46 @@ namespace Client
 
         public bool SendGameResults(List<string> results)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Results:");
+            foreach (string str in results)
+            {
+                Console.WriteLine("Offer: {0}", str);
+            }
+            return true;
         }
+
+      
 
         public bool SendOffers(List<BetOffer> offers)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Offers:");
+            foreach (BetOffer offer in offers)
+            {
+                Console.WriteLine("Offer: {0}", offer);
+            }
+            return true;
         }
 
-        public bool SendTicket(Ticket ticket, string username)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public bool SendTicketResults()
         {
             throw new NotImplementedException();
+        }
+        public bool SendTicket(Ticket ticket, string username)
+        {
+            bool sent = false;
+            try
+            {
+                sent = factory.SendTicket(ticket,username);
+                Console.WriteLine("SendTicket() >> {0}", sent);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while trying to SendTicket(). {0}", e.Message);
+            }
+
+            return sent;
         }
     }
 }
