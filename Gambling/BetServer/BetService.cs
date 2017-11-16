@@ -29,7 +29,17 @@ namespace BetServer
 
         public bool DeleteUser(User user)
         {
-            throw new NotImplementedException();
+            if (!BetUsers.ContainsKey(user.Username))
+            {
+                Console.WriteLine("Error! There is no user {0} in BetService", user.Username);
+                return false;   
+            }
+            else
+            {
+                BetUsers.Remove(user.Username);
+                Console.WriteLine("User {0} removed from BetService", user.Username);
+                return true;
+            }
         }
 
         public bool EditUser(User user)
