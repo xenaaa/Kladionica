@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationPlatform
 {
-    public class Class1
+    public interface IBetService
     {
     }
 }
