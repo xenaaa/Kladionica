@@ -74,7 +74,18 @@ namespace BetServer
 
         public bool SendGameResults(List<string> results)
         {
-            throw new NotImplementedException();
+            bool sent = false;
+            try
+            {
+                sent = factory.SendGameResults(results);
+                Console.WriteLine("SendGameResults() >> {0}", sent);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while trying to SendGameResults(). {0}", e.Message);
+            }
+
+            return sent;
         }
 
         public bool SendOffers(List<BetOffer> offers)
@@ -93,8 +104,6 @@ namespace BetServer
             return sent;
             
         }
-
-       
 
         public bool SendTicketResults()
         {

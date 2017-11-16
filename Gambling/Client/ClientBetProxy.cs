@@ -62,7 +62,12 @@ namespace Client
 
         public bool SendGameResults(List<string> results)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("Results:");
+            foreach (string str in results)
+            {
+                Console.WriteLine("Offer: {0}", str);
+            }
+            return true;
         }
 
       
