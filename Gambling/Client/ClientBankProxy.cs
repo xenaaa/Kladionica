@@ -18,14 +18,32 @@ namespace Client
             factory = this.CreateChannel();
         }
 
-        public bool CreateAccount(User user)
+        public bool Login(string username, string password)
         {
-            throw new NotImplementedException();
+            try
+            {
+                factory.Login(username,password);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
         }
 
-        public bool Deposit(Account acc, User user)
+        public bool Deposit(Account acc, string username)
         {
-            throw new NotImplementedException();
+            try
+            {
+                factory.Deposit(acc,username);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
         }
     }
 }

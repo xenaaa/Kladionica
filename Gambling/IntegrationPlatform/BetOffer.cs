@@ -10,6 +10,8 @@ namespace IntegrationPlatform
     [DataContract]
     public class BetOffer
     {
+
+        public BetOffer() { }
         public BetOffer(string away,string home,int id, Dictionary<int, double> odds)
         {
             this.away = away;

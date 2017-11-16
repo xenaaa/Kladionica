@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="ClientBankProxy.cs" />
     <Compile Include="ClientBetProxy.cs" />
+    <Compile Include="ClientHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -61,9 +62,9 @@
       <Project>{9CADFC6F-2F40-43EB-BC65-B5AA3D655561}</Project>
       <Name>BetServer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\IntegrationPlatform\IntegrationPlatform.csproj">
+    <ProjectReference Include="..\IntegrationPlatform\Contracts.csproj">
       <Project>{1559299e-7348-4fd7-9d85-9f78b1988343}</Project>
-      <Name>IntegrationPlatform</Name>
+      <Name>Contracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

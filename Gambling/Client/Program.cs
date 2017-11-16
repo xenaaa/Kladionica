@@ -12,11 +12,25 @@ namespace Client
     {
         static void Main(string[] args)
         {
+            NetTcpBinding binding = new NetTcpBinding();
+            string address = "net.tcp://localhost:9997/ClientHelper";
+
+            ServiceHost host = new ServiceHost(typeof(ClientHelper));
+            host.AddServiceEndpoint(typeof(IClientHelper), binding, address);
+
+            host.Open();
+
+            Console.WriteLine("Client service is started.");
+            Console.WriteLine("Press <enter> to stop service...");
+
+
+            Console.ReadLine();
+            host.Close();
 
             bool error = false;
             int input = 0;
-            NetTcpBinding binding = new NetTcpBinding();
-            string address = "";
+         //   NetTcpBinding binding = new NetTcpBinding();
+         //   string address = "";
 
             do
             {
@@ -41,11 +55,26 @@ namespace Client
             {
                 case 1:
                     {
+                        Console.WriteLine("Enter username:");
+                        string username = Console.ReadLine();
+                        Console.WriteLine("Enter password:");
+                        string password = Console.ReadLine();
+
+                   //    User user = new User(username, password, "User");
+
                         address = "net.tcp://localhost:9999/BankService";
 
                         using (ClientBankProxy proxy = new ClientBankProxy(binding, address))
                         {
 
+                            proxy.Login(username, password);
+                            //User user = new User("marina", "la", "Admin");
+                            //User user2 = new User("david", "la", "Admin");
+                            //proxy.CreateAccount(user);
+                            //proxy.CreateAccount(user2);
+                            Account depAcc = new Account(3, 11);
+                            proxy.Deposit(depAcc, username);
+                            Console.ReadLine();
                         }
                         break;
                     }

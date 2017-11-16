@@ -11,6 +11,9 @@ namespace IntegrationPlatform
     public interface IBetService
     {
         [OperationContract]
+        bool Login(string username, string password);
+
+        [OperationContract]
         bool AddUser(User user);
 
         [OperationContract]
@@ -19,16 +22,8 @@ namespace IntegrationPlatform
         [OperationContract]
         bool EditUser(User user);
 
-        [OperationContract]
-        bool SendGameResults(List<string> results);
 
         [OperationContract]
-        bool SendOffers(List<BetOffer> offers);
-
-        [OperationContract]
-        bool SendTicket(Ticket ticket, string username);
-
-        [OperationContract]
-        bool SendTicketResults();
+        bool SendTicket(Ticket ticket, string username);    
     }
 }

@@ -18,6 +18,20 @@ namespace Client
             factory = this.CreateChannel();
         }
 
+        public bool Login(string username, string password)
+        {
+            try
+            {
+                factory.Login(username,password);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
+        }
+
         public bool AddUser(User user)
         {
             try
@@ -59,6 +73,8 @@ namespace Client
                 return false;
             }
         }
+
+    
 
         public bool SendGameResults(List<string> results)
         {

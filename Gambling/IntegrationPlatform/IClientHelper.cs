@@ -8,12 +8,16 @@ using System.Threading.Tasks;
 namespace IntegrationPlatform
 {
     [ServiceContract]
-    public interface IBankService
+    public interface IClientHelper
     {
-        [OperationContract]
-        bool Login(string username, string password);
 
         [OperationContract]
-        bool Deposit(Account acc,string username);
+        bool SendGameResults(List<string> results);
+
+        [OperationContract]
+        bool SendOffers(List<BetOffer> offers);
+
+        [OperationContract]
+        bool SendTicketResults();
     }
 }

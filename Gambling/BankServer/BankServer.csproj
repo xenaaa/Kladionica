@@ -44,7 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BankServerProxy.cs" />
     <Compile Include="BankService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -53,9 +52,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IntegrationPlatform\IntegrationPlatform.csproj">
+    <ProjectReference Include="..\IntegrationPlatform\Contracts.csproj">
       <Project>{1559299E-7348-4FD7-9D85-9F78B1988343}</Project>
-      <Name>IntegrationPlatform</Name>
+      <Name>Contracts</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

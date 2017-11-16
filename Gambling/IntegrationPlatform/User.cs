@@ -106,18 +106,19 @@ namespace IntegrationPlatform
             password = pass;
             role = r;
             bankAccount = new Account();
+            Random rnd = new Random();
             betAccount = new Account();
             tickets = new List<Ticket>();
         }
 
-        public User(string un, string pass, string r, Account bankAcc, Account betAcc, List<Ticket> ticks)
+        public User(string un, string pass, string r, Account bankAcc, Account betAcc)
         {
             username = un;
             password = pass;
             role = r;
             bankAccount = bankAcc;
             betAccount = betAcc;
-            tickets = ticks;
+            tickets = new List<Ticket>();
         }
     }
 }
