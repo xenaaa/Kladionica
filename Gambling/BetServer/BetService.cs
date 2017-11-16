@@ -103,7 +103,16 @@ namespace BetServer
 
         public bool SendTicket(Ticket ticket, string username)//kladionica salje klijentu
         {
-            throw new NotImplementedException();
+
+            if (BetUsers.ContainsKey(username))
+            {
+                BetUsers[username].Tickets.Add(ticket);
+            }
+            else
+                return false;
+
+            return true;
+
         }
     }
 }
