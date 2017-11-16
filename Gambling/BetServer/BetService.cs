@@ -96,14 +96,17 @@ namespace BetServer
             }
         }
 
-        public bool SendGameResults(List<string> results)
-        {
-            throw new NotImplementedException();
-        }
 
         public bool SendTicket(Ticket ticket, string username)
         {
-            throw new NotImplementedException();
+            if (BetUsers.ContainsKey(username))
+            {
+                BetUsers[username].Tickets.Add(ticket);
+            }
+            else
+                return false;
+
+            return true;
         }
 
 

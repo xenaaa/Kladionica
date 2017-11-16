@@ -76,34 +76,15 @@ namespace Client
 
     
 
-        public bool SendGameResults(List<string> results)
-        {
-            Console.WriteLine("Results:");
-            foreach (string str in results)
-            {
-                Console.WriteLine("Offer: {0}", str);
-            }
-            return true;
-        }
+     
 
       
 
-        public bool SendOffers(List<BetOffer> offers)
-        {
-            Console.WriteLine("Offers:");
-            foreach (BetOffer offer in offers)
-            {
-                Console.WriteLine("Offer: {0}", offer);
-            }
-            return true;
-        }
+       
 
         
 
-        public bool SendTicketResults()
-        {
-            throw new NotImplementedException();
-        }
+       
         public bool SendTicket(Ticket ticket, string username)
         {
             bool sent = false;
