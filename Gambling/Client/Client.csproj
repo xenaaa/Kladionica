@@ -53,6 +53,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BankServer\BankServer.csproj">
+      <Project>{3BD92843-43B1-4128-AE45-26299A377790}</Project>
+      <Name>BankServer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BetServer\BetServer.csproj">
       <Project>{9CADFC6F-2F40-43EB-BC65-B5AA3D655561}</Project>
       <Name>BetServer</Name>

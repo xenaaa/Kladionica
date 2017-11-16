@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IntegrationPlatform;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -15,7 +16,7 @@ namespace BankServer
             string address = "net.tcp://localhost:9999/BankService";
 
             ServiceHost host = new ServiceHost(typeof(BankService));
-            host.AddServiceEndpoint(typeof(BankService), binding, address);
+            host.AddServiceEndpoint(typeof(IBankService), binding, address);
 
             host.Open();
 

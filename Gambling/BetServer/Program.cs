@@ -1,4 +1,5 @@
 ﻿using BetServer;
+using IntegrationPlatform;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace BetServer
             string address = "net.tcp://localhost:9999/BetService";
 
             ServiceHost host = new ServiceHost(typeof(BetService));
-            host.AddServiceEndpoint(typeof(BetService), binding, address);
+            host.AddServiceEndpoint(typeof(IBetService), binding, address);
 
             host.Open();
 

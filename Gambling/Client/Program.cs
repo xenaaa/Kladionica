@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IntegrationPlatform;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -11,6 +12,7 @@ namespace Client
     {
         static void Main(string[] args)
         {
+
             bool error = false;
             int input = 0;
             NetTcpBinding binding = new NetTcpBinding();
@@ -54,7 +56,9 @@ namespace Client
 
                         using (ClientBetProxy proxy = new ClientBetProxy(binding, address))
                         {
-
+                            User user = new User("marina", "la", "Admin");
+                            proxy.AddUser(user);
+                            proxy.AddUser(user);
                         }
                         break;
                     }

@@ -20,20 +20,52 @@ namespace Client
 
         public bool AddUser(User user)
         {
-            throw new NotImplementedException();
+            try
+            {
+                factory.AddUser(user);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
         }
 
         public bool DeleteUser(User user)
         {
-            throw new NotImplementedException();
+            try
+            {
+                factory.DeleteUser(user);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
         }
 
         public bool EditUser(User user)
         {
-            throw new NotImplementedException();
+            try
+            {
+                factory.EditUser(user);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
         }
 
         public bool SendGameResults(List<string> results)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool SendOffers(List<BetOffer> offers)
         {
             throw new NotImplementedException();
         }
