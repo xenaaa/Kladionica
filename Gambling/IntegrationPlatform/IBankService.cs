@@ -10,5 +10,10 @@ namespace IntegrationPlatform
     [ServiceContract]
     public interface IBankService
     {
+        [OperationContract]
+        bool CreateAccount(User user);
+
+        [OperationContract]
+        bool Deposit(Account acc,User user);
     }
 }

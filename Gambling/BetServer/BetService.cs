@@ -2,13 +2,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BetServer
 {
-    public class BetService : IBetService
+    public class BetService : ChannelFactory<IBetService>,IBetService,IDisposable
     {
+        IBetService factory;
+
+        public BetService(NetTcpBinding binding, EndpointAddress address)
+			: base(binding, address)
+		{
+            factory = this.CreateChannel();
+        }
         private Dictionary<string, User> BetUsers = new Dictionary<string, User>();
 
         public bool AddUser(User user)
@@ -71,7 +79,19 @@ namespace BetServer
 
         public bool SendOffers(List<BetOffer> offers)
         {
-            throw new NotImplementedException();
+            bool sent = false;
+            try
+            {
+                sent = factory.SendOffers(offers);
+                Console.WriteLine("SendOffers() >> {0}",sent);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while trying to SendOffers(). {0}", e.Message);
+            }
+
+            return sent;
+            
         }
 
         public bool SendTicket(Ticket ticket, string username)
