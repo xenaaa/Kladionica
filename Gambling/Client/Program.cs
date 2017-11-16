@@ -11,12 +11,53 @@ namespace Client
     {
         static void Main(string[] args)
         {
+            bool error = false;
+            int input = 0;
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:9999/BetService";
+            string address = "";
 
-            using (ClientProxy proxy = new ClientProxy(binding, address))
+            do
             {
-               
+                Console.WriteLine("     MENU\n");
+                Console.WriteLine(" Press 1 - Bank service");
+                Console.WriteLine(" Press 2 - Bet service");
+
+                try
+                {
+                    input = Convert.ToInt32(Console.ReadLine());
+                    error = true;
+                }
+                catch
+                {
+                    Console.WriteLine("Wrong input. Try again.");
+                    error = false;
+                }
+            } while (!error);
+
+
+            switch (input)
+            {
+                case 1:
+                    {
+                        address = "net.tcp://localhost:9999/BankService";
+
+                        using (ClientBankProxy proxy = new ClientBankProxy(binding, address))
+                        {
+
+                        }
+                        break;
+                    }
+
+                case 2:
+                    {
+                        address = "net.tcp://localhost:9999/BetService";
+
+                        using (ClientBetProxy proxy = new ClientBetProxy(binding, address))
+                        {
+
+                        }
+                        break;
+                    }
             }
 
             Console.ReadLine();
