@@ -44,7 +44,24 @@ namespace BetServer
 
         public bool EditUser(User user)
         {
-            throw new NotImplementedException();
+            if (!BetUsers.ContainsKey(user.Username))
+            {
+                Console.WriteLine("Error! There is no user {0} in BetService", user.Username);
+                return false;
+            }
+            else
+            {
+                foreach(KeyValuePair<string,User> kvp in BetUsers)
+                {
+                    if(kvp.Key == user.Username)
+                    {
+                        kvp.Value.BetAccount = user.BetAccount;
+                        kvp.Value.Role = user.Role;
+                        kvp.Value.Password = user.Password;
+                    }
+                }
+                return true;
+            }
         }
 
         public bool SendGameResults(List<string> results)
