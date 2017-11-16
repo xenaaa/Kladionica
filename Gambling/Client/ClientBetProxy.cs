@@ -82,14 +82,26 @@ namespace Client
             return true;
         }
 
-        public bool SendTicket(Ticket ticket, string username)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public bool SendTicketResults()
         {
             throw new NotImplementedException();
+        }
+        public bool SendTicket(Ticket ticket, string username)
+        {
+            bool sent = false;
+            try
+            {
+                sent = factory.SendTicket(ticket,username);
+                Console.WriteLine("SendTicket() >> {0}", sent);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error while trying to SendTicket(). {0}", e.Message);
+            }
+
+            return sent;
         }
     }
 }
