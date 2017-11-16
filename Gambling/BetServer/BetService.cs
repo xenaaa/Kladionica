@@ -94,12 +94,14 @@ namespace BetServer
             
         }
 
-        public bool SendTicket(Ticket ticket, string username)
+       
+
+        public bool SendTicketResults()
         {
             throw new NotImplementedException();
         }
 
-        public bool SendTicketResults()
+        public bool SendTicket(Ticket ticket, string username)//kladionica salje klijentu
         {
             throw new NotImplementedException();
         }

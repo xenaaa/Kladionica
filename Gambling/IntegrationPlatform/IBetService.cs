@@ -22,8 +22,8 @@ namespace IntegrationPlatform
         [OperationContract]
         bool SendGameResults(List<string> results);
 
-        //[OperationContract]
-        //bool SendOffers(List<BetOffer> offers);
+        [OperationContract]
+        bool SendOffers(List<BetOffer> offers);
 
         [OperationContract]
         bool SendTicket(Ticket ticket, string username);

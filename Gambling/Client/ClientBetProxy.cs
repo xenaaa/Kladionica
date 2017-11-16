@@ -38,6 +38,16 @@ namespace Client
             throw new NotImplementedException();
         }
 
+        public bool SendOffers(List<BetOffer> offers)
+        {
+            Console.WriteLine("Offers:");
+            foreach (BetOffer offer in offers)
+            {
+                Console.WriteLine("Offer: {0}", offer);
+            }
+            return true;
+        }
+
         public bool SendTicket(Ticket ticket, string username)
         {
             throw new NotImplementedException();

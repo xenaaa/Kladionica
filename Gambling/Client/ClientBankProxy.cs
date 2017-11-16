@@ -17,5 +17,15 @@ namespace Client
         {
             factory = this.CreateChannel();
         }
+
+        public bool CreateAccount(User user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Deposit(Account acc, User user)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
