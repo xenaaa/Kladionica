@@ -100,24 +100,24 @@ namespace IntegrationPlatform
         public User()
         { }
 
-        public User(string username, string pass, string role)
+        public User(string un, string pass, string r)
         {
-            username = username;
+            username = un;
             password = pass;
-            role = role;
-            bankAccount = 0;
-            betAccount = 0;
+            role = r;
+            bankAccount = new Account();
+            betAccount = new Account();
             tickets = new List<Ticket>();
         }
 
-        public User(string username, string pass, string role, Account bankAcc, iAccountnt betAcc, List<ticket> tickets)
+        public User(string un, string pass, string r, Account bankAcc, Account betAcc, List<Ticket> ticks)
         {
-            username = username;
+            username = un;
             password = pass;
-            role = role;
+            role = r;
             bankAccount = bankAcc;
             betAccount = betAcc;
-            tickets = tickets;
+            tickets = ticks;
         }
     }
 }
