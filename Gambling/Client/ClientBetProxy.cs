@@ -1,14 +1,23 @@
-﻿using IntegrationPlatform;
+﻿using BetServer;
+using IntegrationPlatform;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BetServer
+namespace Client
 {
-    public class BetService : IBetService
+    public class ClientBetProxy : ChannelFactory<IBetService>, IBetService, IDisposable
     {
+        IBetService factory;
+
+        public ClientBetProxy(NetTcpBinding binding, string address) : base(binding, address)
+        {
+            factory = this.CreateChannel();
+        }
+
         public bool AddUser(User user)
         {
             throw new NotImplementedException();
@@ -28,11 +37,6 @@ namespace BetServer
         {
             throw new NotImplementedException();
         }
-
-        //public bool SendOffers(List<BetOffer> offers)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         public bool SendTicket(Ticket ticket, string username)
         {
