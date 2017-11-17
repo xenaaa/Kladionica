@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BankServer
@@ -21,37 +23,43 @@ namespace BankServer
         {
             return true;
         }
-        public bool Login(string username, string password)
+        public bool Login(string username, string password, int port)
         {
-            if (BankUsers.Keys.Contains(username))
+            WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+            if (identity.Name == username)
             {
-                if (BankUsers[username].Password == password)
+                if (BankUsers.Keys.Contains(username))
                 {
-                    Console.WriteLine("You successfully logged in!");
-                    return true;
+                    if (BankUsers[username].Password == password)
+                    {
+                        Console.WriteLine("You successfully logged in!");
+                        return true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Your password is incorrect!");
+                        return false;
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Your password is incorrect!");
-                    return false;
-                }
-            }
-            else
-            {
 
-                User user = new User(username, password, "User");
-                if (CreateAccount(user))
-                    return true;
-                else
-                    return false;
-            }
+                    User user = new User(username, password, "User");
+                    user.Port = port;
+                    if (CreateAccount(user))
+                        return true;
+                    else
+                        return false;
+                }
+            }        
+            return false;
         }
 
 
         private bool CreateAccount(User user)
         {
-
-            if (BankUsers.Equals(user.Username))
+            WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+            if (BankUsers.Keys.Contains(user.Username))
                 return false;
             else
             {
@@ -67,28 +75,37 @@ namespace BankServer
 
         }
 
-        public bool Deposit(Account acc, string username)
+        public bool Deposit(Account acc)
         {
-            KeyValuePair<string, User> user = BankUsers.Where(u => u.Value.BankAccount.Number == acc.Number).FirstOrDefault();
+            WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+            if (BankUsers.Keys.Contains(identity.Name))
+            {
+                KeyValuePair<string, User> user = BankUsers.Where(u => u.Value.BankAccount.Number == acc.Number).FirstOrDefault();
 
-            if (user.Key == null)
-            {
-                Console.WriteLine("Account number doesn't exist\n");
-                return false;
-            }
-            else
-            {
-                if (BankUsers[username].BankAccount.Amount - acc.Amount < 0)
+                if (user.Key == null)
                 {
-                    Console.WriteLine("There is not enough amount on your bank account");
+                    Console.WriteLine("Account number doesn't exist\n");
                     return false;
                 }
                 else
                 {
-                    BankUsers[user.Value.Username].BankAccount.Amount += acc.Amount; // povecavamo drugi
-                    BankUsers[username].BankAccount.Amount = BankUsers[username].BankAccount.Amount - acc.Amount; // smanjujemo onaj s kog prebacujemo
-                    return true;
+                    if (BankUsers[identity.Name].BankAccount.Amount - acc.Amount < 0)
+                    {
+                        Console.WriteLine("There is not enough amount on your bank account");
+                        return false;
+                    }
+                    else
+                    {
+                        BankUsers[user.Value.Username].BankAccount.Amount += acc.Amount; // povecavamo drugi
+                        BankUsers[identity.Name].BankAccount.Amount = BankUsers[identity.Name].BankAccount.Amount - acc.Amount; // smanjujemo onaj s kog prebacujemo
+                        return true;
+                    }
                 }
+            }
+            else
+            {
+                Console.WriteLine("User {0} doesn't exist", identity.Name);
+                return false;
             }
         }
     }

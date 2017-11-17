@@ -45,11 +45,11 @@ namespace Client
             }
         }
 
-        public bool Login(string username, string password)
+        public bool Login(string username, string password,int port)
         {
             try
             {
-                factory.Login(username,password);
+                factory.Login(username,password,port);
                 return true;
             }
             catch (Exception e)

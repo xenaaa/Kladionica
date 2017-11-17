@@ -32,11 +32,11 @@ namespace Client
             }
         }
 
-        public bool Login(string username, string password)
+        public bool Login(string username, string password,int port)
         {
             try
             {
-                factory.Login(username,password);
+                factory.Login(username,password,port);
                 return true;
             }
             catch (Exception e)
@@ -46,11 +46,11 @@ namespace Client
             }
         }
 
-        public bool Deposit(Account acc, string username)
+        public bool Deposit(Account acc)
         {
             try
             {
-                factory.Deposit(acc,username);
+                factory.Deposit(acc);
                 return true;
             }
             catch (Exception e)

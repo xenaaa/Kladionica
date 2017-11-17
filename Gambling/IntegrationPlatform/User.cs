@@ -17,6 +17,7 @@ namespace IntegrationPlatform
         Account bankAccount;
         Account betAccount;
         List<Ticket> tickets;
+        int port;
 
         [DataMember]
         public string Username
@@ -97,6 +98,19 @@ namespace IntegrationPlatform
             }
         }
 
+        [DataMember]
+        public int Port
+        {
+            get
+            {
+                return port;
+            }
+
+            set
+            {
+                port = value;
+            }
+        }
         public User()
         { }
 

@@ -7,28 +7,32 @@ using System.Threading.Tasks;
 
 namespace IntegrationPlatform
 {
+
+
     [DataContract]
     public class Ticket
     {
+
         //private Dictionary<int, int> bets = new Dictionary<int, int>();
 
-        public Ticket(Dictionary<int, int> bets, int payment)
+        public Ticket() { }
+
+        public Ticket(Dictionary<int, Game> bets, int payment)
         {
             this.bets = bets;
             this.payment = payment;
         }
 
         //<sifra utakmice,tip>---npr <3001,1>
-        private Dictionary<int, int> bets= new Dictionary<int, int>();
+        private Dictionary<int, Game> bets = new Dictionary<int, Game>();
 
         [DataMember]
-        public Dictionary<int, int> Bets
+        public Dictionary<int, Game> Bets
         {
             get { return bets; }
             set { bets = value; }
         }
 
-    
         private int payment;
 
         [DataMember]

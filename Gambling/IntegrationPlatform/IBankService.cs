@@ -13,9 +13,9 @@ namespace IntegrationPlatform
         [OperationContract]
         bool CheckIfAlive();
         [OperationContract]
-        bool Login(string username, string password);
+        bool Login(string username, string password,int port);
 
         [OperationContract]
-        bool Deposit(Account acc,string username);
+        bool Deposit(Account acc);
     }
 }

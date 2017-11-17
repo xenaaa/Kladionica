@@ -17,7 +17,7 @@ namespace IntegrationPlatform
         bool SendPort(int port);
         
         [OperationContract]
-        bool Login(string username, string password);
+        bool Login(string username, string password,int port);
 
         [OperationContract]
         bool AddUser(User user);

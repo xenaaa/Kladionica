@@ -15,7 +15,7 @@ namespace BetServer
         public BetServerProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
             factory = this.CreateChannel();
-            
+
         }
 
         public bool CheckIfAlive()
@@ -47,7 +47,7 @@ namespace BetServer
 
         }
 
-        public bool SendOffers(List<BetOffer> offers)
+        public bool SendOffers(Dictionary<int,BetOffer> offers)
         {
             try
             {
@@ -61,46 +61,12 @@ namespace BetServer
             }
         }
 
-        public bool SendTicketResults(Ticket tiket1, bool prosao)
+        public bool SendTicketResults(Ticket tiket, bool isPassed)
         {
             try
             {
 
-
-                if (BetService.BetUsers.Count > 0 && BetService.Rezultati.Count > 0)
-                {
-                    foreach (KeyValuePair<string, User> user in BetService.BetUsers)
-                    {
-                        foreach (Ticket tiket in user.Value.Tickets)
-                        {
-                            if (tiket.Bets.Count > 0)
-                                foreach (KeyValuePair<int, int> bet in tiket.Bets)
-                                {
-                                    if (BetService.Rezultati.ContainsKey(bet.Key))//ne sme biti prazan tiket
-                                    {
-                                        if (!BetService.Rezultati[bet.Key].ContainsKey(bet.Value))
-                                        {
-                                            factory.SendTicketResults(tiket, false);
-                                            break;
-                                        }
-
-                                    }
-                                }
-                            else
-                                continue;
-
-                            factory.SendTicketResults(tiket,true);
-                        }
-                        user.Value.Tickets.Clear();
-                    }
-                }
-
-
-
-
-
-
-               
+                factory.SendTicketResults(tiket, isPassed);
                 return true;
             }
             catch (Exception e)

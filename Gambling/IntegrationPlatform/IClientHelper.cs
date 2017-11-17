@@ -17,7 +17,7 @@ namespace IntegrationPlatform
         bool SendGameResults(List<string> results);
 
         [OperationContract]
-        bool SendOffers(List<BetOffer> offers);
+        bool SendOffers(Dictionary<int,BetOffer> offers);
 
         [OperationContract]
         bool SendTicketResults(Ticket tiket,bool prosao);

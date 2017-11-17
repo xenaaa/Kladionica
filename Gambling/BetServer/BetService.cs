@@ -13,10 +13,12 @@ using System.Xml.Serialization;
 namespace BetServer
 {
     public class BetService : IBetService
-    {
-      //  private static Dictionary<string, User> BetUsers = new Dictionary<string, User>();
+    { 
 
         private static Dictionary<string,User> betUsers=new Dictionary<string, User>();
+        private static Dictionary<int, Dictionary<int, double>> rezultati = new Dictionary<int, Dictionary<int, double>>();
+        private static List<int> ports = new List<int>();
+
 
         public static Dictionary<string,User> BetUsers
         {
@@ -24,17 +26,11 @@ namespace BetServer
             set { betUsers = value; }
         }
 
-        private static Dictionary<int, Dictionary<int, double>> rezultati=new Dictionary<int, Dictionary<int, double>>();
-
-        public static Dictionary<int, Dictionary<int, double>> Rezultati
+        public static Dictionary<int, Dictionary<int, double>> Rezultati // sifra utakmica, tip i kvota
         {
             get { return rezultati; }
             set { rezultati = value; }
         }
-
-
-    
-        private static List<int> ports = new List<int>();
 
         public List<int> Ports
         {
@@ -45,10 +41,7 @@ namespace BetServer
         }
 
         public BetService()
-        {
-
-
-        }
+        {   }
 
         public bool CheckIfAlive()
         {
@@ -61,30 +54,36 @@ namespace BetServer
             return true;
         }
 
-        public bool Login(string username, string password)
+        public bool Login(string username, string password, int port)
         {
-            if (BetUsers.Keys.Contains(username))
+            WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+            if (identity.Name == username)
             {
-                if (BetUsers[username].Password == password)
+                if (BetUsers.Keys.Contains(username))
                 {
-                    Console.WriteLine("You successfully logged in!");
-                    return true;
+                    if (BetUsers[username].Password == password)
+                    {
+                        Console.WriteLine("You successfully logged in!");
+                        return true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Your password is incorrect!");
+                        return false;
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Your password is incorrect!");
-                    return false;
-                }
-            }
-            else
-            {
 
-                User user = new User(username, password, "User");
-                if (AddUser(user))
-                    return true;
-                else
-                    return false;
+                    User user = new User(username, password, "User");
+                    user.Port = port;
+                    if (AddUser(user))
+                        return true;
+                    else
+                        return false;
+                }
             }
+            return false;
         }
 
 
@@ -173,11 +172,11 @@ namespace BetServer
 
 
         public bool SendTicket(Ticket ticket, string username)
-        { WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+        {
+            WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             Console.WriteLine("User {0} je pozvao SendTicket\n", identity.Name);
             if (BetUsers.ContainsKey(identity.Name))
             {
-
                 if (BetUsers.ContainsKey(username))
                 {
                     BetUsers[username].Tickets.Add(ticket);
