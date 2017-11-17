@@ -15,6 +15,22 @@ namespace BetServer
         public BetServerProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
             factory = this.CreateChannel();
+            
+        }
+
+        public bool CheckIfAlive()
+        {
+            try
+            {
+                factory.CheckIfAlive();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
+
         }
         public bool SendGameResults(List<string> results)
         {

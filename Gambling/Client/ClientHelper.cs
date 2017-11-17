@@ -21,6 +21,11 @@ namespace Client
             return true;
         }
 
+        public bool CheckIfAlive()
+        {
+            return true;
+        }
+
         public bool SendOffers(List<BetOffer> offers)        
         {
             Console.WriteLine("                   1   X   2");

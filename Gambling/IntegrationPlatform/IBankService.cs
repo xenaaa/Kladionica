@@ -11,6 +11,8 @@ namespace IntegrationPlatform
     public interface IBankService
     {
         [OperationContract]
+        bool CheckIfAlive();
+        [OperationContract]
         bool Login(string username, string password);
 
         [OperationContract]

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,27 +12,9 @@ namespace Client
     {
         static void Main(string[] args)
         {
-
-
             NetTcpBinding binding = new NetTcpBinding();
-            binding.Security.Mode = SecurityMode.Transport;
-            binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
-            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
-            string address = "net.tcp://localhost:9997/ClientHelper";
-
-            WindowsIdentity identitetKlijenta = WindowsIdentity.GetCurrent();
-            Console.WriteLine("IME: {0} User: {1}\nAuthenticationType: {2}\nGrupra: {3}", identitetKlijenta.Name, identitetKlijenta.User, identitetKlijenta.AuthenticationType, identitetKlijenta.Groups);
-
-
-
-
-
-
-
-
-
-            //NetTcpBinding binding = new NetTcpBinding();
-            //string address = "net.tcp://localhost:9997/ClientHelper";
+            int port = Convert.ToInt32(args[0]);
+            string address = "net.tcp://localhost:"+port+"/ClientHelper";
 
             ServiceHost host = new ServiceHost(typeof(ClientHelper));
             host.AddServiceEndpoint(typeof(IClientHelper), binding, address);
@@ -41,11 +22,7 @@ namespace Client
             host.Open();
 
             Console.WriteLine("Client service is started.");
-            Console.WriteLine("Press <enter> to stop service...");
-
-
-            Console.ReadLine();
-            host.Close();
+            Console.WriteLine("Press <enter> to stop service...");      
 
             bool error = false;
             int input = 0;
@@ -54,71 +31,75 @@ namespace Client
 
             do
             {
-                do
+                Console.WriteLine("     MENU\n");
+                Console.WriteLine(" Press 1 - Bank service");
+                Console.WriteLine(" Press 2 - Bet service");
+
+                try
                 {
-                    Console.WriteLine("     MENU\n");
-                    Console.WriteLine(" Press 1 - Bank service");
-                    Console.WriteLine(" Press 2 - Bet service");
-
-                    try
-                    {
-                        input = Convert.ToInt32(Console.ReadLine());
-                        error = true;
-                    }
-                    catch
-                    {
-                        Console.WriteLine("Wrong input. Try again.");
-                        error = false;
-                    }
+                    input = Convert.ToInt32(Console.ReadLine());
+                    error = true;
                 }
-                while (!error);
-
-
-                switch (input)
+                catch
                 {
-                    case 1:
-                        {
-                            Console.WriteLine("Enter username:");
-                            string username = Console.ReadLine();
-                            Console.WriteLine("Enter password:");
-                            string password = Console.ReadLine();
-
-                            //    User user = new User(username, password, "User");
-
-                            address = "net.tcp://localhost:9999/BankService";
-
-
-                            using (ClientBankProxy proxy = new ClientBankProxy(binding, address))
-                            {
-
-                                proxy.Login(username, password);
-                                //User user = new User("marina", "la", "Admin");
-                                //User user2 = new User("david", "la", "Admin");
-                                //proxy.CreateAccount(user);
-                                //proxy.CreateAccount(user2);
-                                Account depAcc = new Account(3, 11);
-                                proxy.Deposit(depAcc, username);
-                                Console.ReadLine();
-                            }
-                            break;
-                        }
-
-                    case 2:
-                        {
-                            address = "net.tcp://localhost:9999/BetService";
-
-                            using (ClientBetProxy proxy = new ClientBetProxy(binding, address))
-                            {
-                                User user = new User("marina", "la", "Admin");
-                                proxy.AddUser(user);
-                                proxy.AddUser(user);
-                            }
-                            break;
-                        }
+                    Console.WriteLine("Wrong input. Try again.");
+                    error = false;
                 }
+            } while (!error);
+
+
+            switch (input)
+            {
+                case 1:
+                    {
+                        Console.WriteLine("Enter username:");
+                        string username = Console.ReadLine();
+                        Console.WriteLine("Enter password:");
+                        string password = Console.ReadLine();
+
+                        //    User user = new User(username, password, "User");
+
+                        address = "net.tcp://localhost:9999/BankService";
+
+                        ClientBankProxy proxy = new ClientBankProxy(binding, address);
+
+                        if (proxy.CheckIfAlive())
+                        {
+                            proxy.Login(username, password);
+                            //User user = new User("marina", "la", "Admin");
+                            //User user2 = new User("david", "la", "Admin");
+                            //proxy.CreateAccount(user);
+                            //proxy.CreateAccount(user2);
+                            Account depAcc = new Account(3, 11);
+                            proxy.Deposit(depAcc, username);
+                        }
+                        else
+                            Console.WriteLine("Server is down");
+                        break;
+                    }
+
+                case 2:
+                    {
+                        address = "net.tcp://localhost:9999/BetService";
+
+                        ClientBetProxy proxy = new ClientBetProxy(binding, address);
+
+                        if (proxy.CheckIfAlive())
+                        {
+                            proxy.SendPort(port);
+
+                            User user = new User("marina", "la", "Admin");
+                            proxy.AddUser(user);
+                            proxy.AddUser(user);
+                        }
+                        else
+                            Console.WriteLine("Server is down");
+                        break;
+                    }
             }
-            while (true);
+
             Console.ReadLine();
+            host.Close();
         }
     }
 }

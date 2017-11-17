@@ -10,6 +10,8 @@ namespace IntegrationPlatform
     [ServiceContract]
     public interface IClientHelper
     {
+        [OperationContract]
+        bool CheckIfAlive();
 
         [OperationContract]
         bool SendGameResults(List<string> results);
