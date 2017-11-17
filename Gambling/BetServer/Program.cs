@@ -55,14 +55,18 @@ namespace BetServer
 
             address = "net.tcp://localhost:9997/ClientHelper";
 
-            while (true)
+           /*while (true)
             {
-                using (BetServerProxy proxy = new BetServerProxy(binding, address))
+                try
                 {
-                    proxy.SendOffers(offers);
+                    using (BetServerProxy proxy = new BetServerProxy(binding, address))
+                    {
+                        proxy.SendOffers(offers);
+                    }
+                    Thread.Sleep(4000);
                 }
-                Thread.Sleep(4000);
-            }
+                catch { }
+            }*/
 
             Console.ReadLine();
             host.Close();
