@@ -13,7 +13,8 @@ namespace Client
         static void Main(string[] args)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:9997/ClientHelper";
+            int port = Convert.ToInt32(args[0]);
+            string address = "net.tcp://localhost:"+port+"/ClientHelper";
 
             ServiceHost host = new ServiceHost(typeof(ClientHelper));
             host.AddServiceEndpoint(typeof(IClientHelper), binding, address);
@@ -21,16 +22,12 @@ namespace Client
             host.Open();
 
             Console.WriteLine("Client service is started.");
-            Console.WriteLine("Press <enter> to stop service...");
-
-
-            Console.ReadLine();
-            host.Close();
+            Console.WriteLine("Press <enter> to stop service...");      
 
             bool error = false;
             int input = 0;
-         //   NetTcpBinding binding = new NetTcpBinding();
-         //   string address = "";
+            //   NetTcpBinding binding = new NetTcpBinding();
+            //   string address = "";
 
             do
             {
@@ -60,13 +57,14 @@ namespace Client
                         Console.WriteLine("Enter password:");
                         string password = Console.ReadLine();
 
-                   //    User user = new User(username, password, "User");
+                        //    User user = new User(username, password, "User");
 
                         address = "net.tcp://localhost:9999/BankService";
 
-                        using (ClientBankProxy proxy = new ClientBankProxy(binding, address))
-                        {
+                        ClientBankProxy proxy = new ClientBankProxy(binding, address);
 
+                        if (proxy.CheckIfAlive())
+                        {
                             proxy.Login(username, password);
                             //User user = new User("marina", "la", "Admin");
                             //User user2 = new User("david", "la", "Admin");
@@ -74,8 +72,9 @@ namespace Client
                             //proxy.CreateAccount(user2);
                             Account depAcc = new Account(3, 11);
                             proxy.Deposit(depAcc, username);
-                            Console.ReadLine();
                         }
+                        else
+                            Console.WriteLine("Server is down");
                         break;
                     }
 
@@ -83,17 +82,24 @@ namespace Client
                     {
                         address = "net.tcp://localhost:9999/BetService";
 
-                        using (ClientBetProxy proxy = new ClientBetProxy(binding, address))
+                        ClientBetProxy proxy = new ClientBetProxy(binding, address);
+
+                        if (proxy.CheckIfAlive())
                         {
+                            proxy.SendPort(port);
+
                             User user = new User("marina", "la", "Admin");
                             proxy.AddUser(user);
                             proxy.AddUser(user);
                         }
+                        else
+                            Console.WriteLine("Server is down");
                         break;
                     }
             }
 
             Console.ReadLine();
+            host.Close();
         }
     }
 }

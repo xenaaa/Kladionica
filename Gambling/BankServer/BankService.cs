@@ -17,6 +17,10 @@ namespace BankServer
 
         }
 
+        public bool CheckIfAlive()
+        {
+            return true;
+        }
         public bool Login(string username, string password)
         {
             if (BankUsers.Keys.Contains(username))

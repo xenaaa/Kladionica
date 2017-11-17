@@ -11,6 +11,12 @@ namespace IntegrationPlatform
     public interface IBetService
     {
         [OperationContract]
+        bool CheckIfAlive();
+
+        [OperationContract]
+        bool SendPort(int port);
+        
+        [OperationContract]
         bool Login(string username, string password);
 
         [OperationContract]

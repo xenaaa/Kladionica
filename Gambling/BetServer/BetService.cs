@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
@@ -13,8 +14,21 @@ namespace BetServer
     public class BetService : IBetService
     {
         private static Dictionary<string, User> BetUsers = new Dictionary<string, User>();
+        private static List<int> ports = new List<int>();
         public BetService()
         { }
+
+
+        public bool CheckIfAlive()
+        {
+            return true;
+        }
+
+        public bool SendPort(int port)
+        {
+            ports.Add(port);
+            return true;
+        }
 
         public bool Login(string username, string password)
         {
@@ -110,20 +124,52 @@ namespace BetServer
         }
 
 
+        public void SendOffers()
+        {
+            NetTcpBinding binding = new NetTcpBinding();
+            string address = "";
 
-        //bool sent = false;
-        //try
-        //{
-        //    sent = factory.SendOffers(offers);
-        //    Console.WriteLine("SendOffers() >> {0}", sent);
-        //}
-        //catch (Exception e)
-        //{
-        //    Console.WriteLine("Error while trying to SendOffers(). {0}", e.Message);
-        //}
+            List<BetOffer> offers = new List<BetOffer>();
 
-        //return sent;
+            XmlDocument xmlDoc = new XmlDocument(); // Create an XML document object
 
+            while (true)
+            {
+                xmlDoc.Load("lista.xml"); // Load the XML document from the specified file
+
+                // Get elements
+                XmlNodeList id = xmlDoc.GetElementsByTagName("ID");
+                XmlNodeList home = xmlDoc.GetElementsByTagName("DOMACIN");
+                XmlNodeList away = xmlDoc.GetElementsByTagName("GOST");
+                XmlNodeList kec = xmlDoc.GetElementsByTagName("KEC");
+                XmlNodeList iks = xmlDoc.GetElementsByTagName("IKS");
+                XmlNodeList dvojka = xmlDoc.GetElementsByTagName("DVOJKA");
+
+                Dictionary<int, double> odds = new Dictionary<int, double>();
+                odds.Add(1, Convert.ToDouble(kec[0].InnerText));
+                odds.Add(0, Convert.ToDouble(iks[0].InnerText));
+                odds.Add(2, Convert.ToDouble(dvojka[0].InnerText));
+
+                for (int i = 0; i < id.Count; i++)
+                {
+                    BetOffer bo = new BetOffer(home[i].InnerText, away[i].InnerText, Convert.ToInt32(id[i].InnerText), odds);
+                    offers.Add(bo);
+                }
+
+                foreach (var port in ports)
+                {
+                    address = "net.tcp://localhost:" + port + "/ClientHelper";
+                    BetServerProxy proxy = new BetServerProxy(binding, address);
+                    {
+                        if (proxy.CheckIfAlive())
+                            proxy.SendOffers(offers);
+
+
+                    }
+                }
+                Thread.Sleep(4000);
+            }
+        }
     }
 }
 

@@ -18,8 +18,6 @@ namespace BankServer
             ServiceHost host = new ServiceHost(typeof(BankService));
             host.AddServiceEndpoint(typeof(IBankService), binding, address);
 
-          //  BankService.GetInstance();
-
             host.Open();
 
             Console.WriteLine("Bank service is started.");
