@@ -36,9 +36,27 @@ namespace Client
             return true;
         }
 
-        public bool SendTicketResults()
+        public bool SendTicketResults(Ticket tiket,bool prosao)
         {
-            throw new NotImplementedException();
+            if (prosao) {
+                Console.WriteLine("                   TIKET DOBITNI");
+                foreach (KeyValuePair<int, int> item in tiket.Bets)
+                {
+
+                    Console.WriteLine("Sifra utakmic: {0}, tip: {1}\n", item.Key, item.Value);
+                    //ne bi bilo lose da se vidi koliko se dobilo na tiketu
+                }
+               
+            }
+            else
+            {
+                Console.WriteLine("                   TIKET GUBITNI");
+                foreach (KeyValuePair<int, int> item in tiket.Bets)
+                {
+                    Console.WriteLine("Sifra utakmic: {0}, tip: {1}\n", item.Key, item.Value);
+                }
+            }
+            return true;
         }
     }
 }

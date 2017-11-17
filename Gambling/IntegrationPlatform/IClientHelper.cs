@@ -20,6 +20,6 @@ namespace IntegrationPlatform
         bool SendOffers(List<BetOffer> offers);
 
         [OperationContract]
-        bool SendTicketResults();
+        bool SendTicketResults(Ticket tiket,bool prosao);
     }
 }
