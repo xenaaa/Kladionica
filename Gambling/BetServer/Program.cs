@@ -40,20 +40,112 @@ namespace BetServer
             //  new Thread(() =>
             //  {
             //  Thread.CurrentThread.IsBackground = true;
+            while(BetService.BetUsers.Count<1)
+            {
+                Thread.Sleep(1000);
+            }
             SendGameResults(bs.Ports);
             //   }).Start();
 
             Thread.Sleep(5000);
 
+            //while (true)
+            //{
+            //    SendTicketResults();
+            //    Thread.Sleep(2000);
+            //}
             while (true)
             {
-                SendTicketResults();
+                CheckUserGames();
                 Thread.Sleep(2000);
             }
 
             Console.ReadLine();
             host.Close();
         }
+        private static bool CheckUserGames()//svake 2 sekunde proverava da li su se zavrsile sve utakmice na tiketima za svakog User-a pojedinacno. Ako su sve utakmice na tiketu zavrsene tikes se salje na proveru i brise
+        {
+            bool allGamesDone = true;
+            Ticket t = new Ticket();
+
+            if (BetService.BetUsers.Count > 0 && BetService.Rezultati.Count > 0)
+            {
+                foreach (KeyValuePair<string, User> user in BetService.BetUsers)
+                {
+                    if (user.Value.Tickets.Count > 0)
+
+                        foreach (Ticket tiket in user.Value.Tickets)
+                        {
+                            if (tiket.Bets.Count > 0)
+                                foreach (KeyValuePair<int, Game> bet in tiket.Bets)
+                                {
+                                    if (BetService.Rezultati.ContainsKey(bet.Key))
+                                    {
+                                        continue;//utakmica zavrsena
+                                    }
+                                    else
+                                    {
+                                        //utakmica nije gotova
+                                        allGamesDone = false;
+                                        break;//prelazi se na sledeci tiket istog User-a
+                                    }
+                                }
+                            else
+                                continue;
+                            if (allGamesDone)
+                            {
+                                //sendticketresoults za tog User-a i taj tiket...
+                                new Thread(() =>
+                                {
+                                    Thread.CurrentThread.IsBackground = true;
+                                    SendTicketResults2(user.Value, tiket);
+                                }).Start();
+                                user.Value.Tickets.Remove(tiket);//uklanja se tiket
+
+                                if (user.Value.Tickets.Count == 0)//ako obrise i poslednji tiket
+                                    break;
+                            }
+                        }
+                }
+            }
+            return true;
+        }
+        private static bool SendTicketResults2(User user, Ticket tiket)//sve utakmice na tiketu gotove, salje se ishod
+        {
+            bool won = true;
+            Ticket t = new Ticket();
+
+
+
+            foreach (KeyValuePair<int, Game> bet in tiket.Bets)
+            {
+
+                if (!BetService.Rezultati[bet.Key].ContainsKey(bet.Value.Tip))
+                {
+                    bet.Value.Won = false;
+                    won = false;
+                }
+                else
+                    bet.Value.Won = true;
+            }
+
+            t = tiket;
+
+
+            NetTcpBinding binding = new NetTcpBinding();
+            string address = "net.tcp://localhost:" + user.Port + "/ClientHelper";
+            BetServerProxy proxy = new BetServerProxy(binding, address);
+            {
+                if (proxy.CheckIfAlive())//ako vrati false obrisati tog user-a?
+                    proxy.SendTicketResults(t, won);
+            }
+
+            //user.Tickets.Clear();
+
+
+            return true;
+        }
+
 
         private static void SendOffers(List<int> ports) //slanje ponude kijentu svakih 5 minuta
         {
@@ -86,62 +178,70 @@ namespace BetServer
 
             while (true)
             {
-                foreach (var port in ports)
+                lock (BetService.PortLock)
                 {
-                    address = "net.tcp://localhost:" + port + "/ClientHelper";
-                    BetServerProxy proxy = new BetServerProxy(binding, address);
+                    foreach (var port in ports)
                     {
-                        if (proxy.CheckIfAlive())
-                            proxy.SendOffers(Offers);
+                        address = "net.tcp://localhost:" + port + "/ClientHelper";
+                        BetServerProxy proxy = new BetServerProxy(binding, address);
+                        {
+                            if (proxy.CheckIfAlive())
+                                proxy.SendOffers(Offers);
+                        }
                     }
                 }
                 Thread.Sleep(3000);
             }
         }
 
-        private static bool SendTicketResults()
-        {
-            bool won = true;
-            Ticket t = new Ticket();
+        //private static bool SendTicketResults()
+        //{
+        //    bool won = true;
+        //    Ticket t = new Ticket();
 
-            if (BetService.BetUsers.Count > 0 && BetService.Rezultati.Count > 0)
-            {
-                foreach (KeyValuePair<string, User> user in BetService.BetUsers)
-                {
-                    foreach (Ticket tiket in user.Value.Tickets)
-                    {
-                        if (tiket.Bets.Count > 0)
-                            foreach (KeyValuePair<int, Game> bet in tiket.Bets)
-                            {
-                                if (BetService.Rezultati.ContainsKey(bet.Key))//ne sme biti prazan tiket
-                                {
-                                    if (!BetService.Rezultati[bet.Key].ContainsKey(bet.Value.Tip))
-                                    {
-                                        bet.Value.Won = false;
-                                        won = false;
-                                    }
-                                    else
-                                        bet.Value.Won = true;
-                                }
-                            }
-                        else
-                            continue;
-                        t = tiket;
-                    }
+        //    if (BetService.BetUsers.Count > 0 && BetService.Rezultati.Count > 0)
+        //    {
+        //        foreach (KeyValuePair<string, User> user in BetService.BetUsers)
+        //        {
+        //            foreach (Ticket tiket in user.Value.Tickets)
+        //            {
+        //                if (tiket.Bets.Count > 0)
+        //                    foreach (KeyValuePair<int, Game> bet in tiket.Bets)
+        //                    {
+        //                        if (BetService.Rezultati.ContainsKey(bet.Key))//ne sme biti prazan tiket
+        //                        {
+        //                            if (!BetService.Rezultati[bet.Key].ContainsKey(bet.Value.Tip))
+        //                            {
+        //                                bet.Value.Won = false;
+        //                                won = false;
+        //                            }
+        //                            else
+        //                                bet.Value.Won = true;
+        //                        }
+        //                        else
+        //                        {
+        //                            //utakmica nije gotova
+        //                        }
 
-                    NetTcpBinding binding = new NetTcpBinding();
-                    string address = "net.tcp://localhost:" + user.Value.Port + "/ClientHelper";
-                    BetServerProxy proxy = new BetServerProxy(binding, address);
-                    {
-                        if (proxy.CheckIfAlive())
-                            proxy.SendTicketResults(t, won);
-                    }
+        //                    }
+        //                else
+        //                    continue;
+        //                t = tiket;
+        //            }
 
-                    user.Value.Tickets.Clear();
-                }
-            }
-            return true;
-        }
+        //            NetTcpBinding binding = new NetTcpBinding();
+        //            string address = "net.tcp://localhost:" + user.Value.Port + "/ClientHelper";
+        //            BetServerProxy proxy = new BetServerProxy(binding, address);
+        //            {
+        //                if (proxy.CheckIfAlive())
+        //                    proxy.SendTicketResults(t, won);
+        //            }
+
+        //            user.Value.Tickets.Clear();
+        //        }
+        //    }
+        //    return true;
+        //}
 
         private static bool SendGameResults(List<int> ports)
         {

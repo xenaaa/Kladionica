@@ -12,6 +12,7 @@ namespace Client
 {
     class Program
     {
+        
         static void Main(string[] args)
         {
             NetTcpBinding binding = new NetTcpBinding();
@@ -83,7 +84,7 @@ namespace Client
 
                         if (proxy.CheckIfAlive())
                         {
-                            proxy.Login(clientIdentity.Name, password,port);
+                            proxy.Login(clientIdentity.Name, password, port);
                             //User user = new User("marina", "la", "Admin");
                             //User user2 = new User("david", "la", "Admin");
                             //proxy.CreateAccount(user);
@@ -91,7 +92,7 @@ namespace Client
                             Account depAcc = new Account(3, 11);
                             proxy.Deposit(depAcc);
 
-                            
+
                         }
                         else
                             Console.WriteLine("Server is down");
@@ -112,10 +113,71 @@ namespace Client
                         {
                             proxy.SendPort(port);
 
-                            if (proxy.Login(clientIdentity.Name, password,port))
+                            if (proxy.Login(clientIdentity.Name, password, port))
                             {
+                                Dictionary<int, Game> bets;
+                                Game g;
+                                int code;
                                 Thread.Sleep(4000);
-                                MakeTicket(proxy);
+                                int choice;
+                                while (true)
+                                {
+                                    while (ClientHelper.Offers.Count < 1)
+                                        Thread.Sleep(2000);
+
+                                    while (true)
+                                    {
+                                        if (Console.ReadKey(true).Key == ConsoleKey.Enter && Monitor.TryEnter(ClientHelper.PrintLock))//kada se stisne Enter pravi se novi tiket
+                                        {
+                                            bets = new Dictionary<int, Game>();
+                                            lock (ClientHelper.PrintLock)
+                                            {
+                                                do
+                                                {
+                                                    Console.WriteLine("\n1.\tAdd tip\n2.\t Exit");
+                                                    choice = Convert.ToInt32(Console.ReadLine());
+                                                    switch (choice)
+                                                    {
+                                                        case 1:
+
+                                                            g = new Game();
+                                                            Console.WriteLine("\nGame code: ");
+                                                            code = Convert.ToInt32(Console.ReadLine());
+                                                            if (!ClientHelper.Offers.ContainsKey(code))
+                                                            {
+                                                                Console.WriteLine("\nThis code doesn't exist!");
+
+                                                                continue;
+                                                            }
+
+                                                            Console.WriteLine("\nTip: ");
+                                                            g.Tip = Convert.ToInt32(Console.ReadLine());
+                                                            g.Odds = ClientHelper.Offers[code].Odds[g.Tip];
+                                                            bets.Add(code, g);//proveriti ako dodaje istu utakmicu
+                                                            break;
+
+                                                    }
+                                                    if (choice == 2)
+                                                    {
+                                                        MakeTicket(proxy, bets);
+                                                        break;
+                                                    }
+
+                                                } while (true);
+
+                                                Monitor.Exit(ClientHelper.PrintLock);
+                                                break;
+                                            }
+
+                                        }
+                                        else
+                                        {
+                                            Monitor.Exit(ClientHelper.PrintLock);
+                                            continue;
+                                        }
+                                    }
+                                }
+
                             }
                         }
                         else
@@ -127,31 +189,35 @@ namespace Client
             Console.ReadLine();
             host.Close();
         }
+      
 
-
-        private static void MakeTicket(ClientBetProxy proxy)
+        private static void MakeTicket(ClientBetProxy proxy, Dictionary<int, Game> bets)
         {
             WindowsIdentity clientIdentity = WindowsIdentity.GetCurrent();
             Ticket t = new Ticket();
             t.Payment = 5;
-            Dictionary<int, Game> bets = new Dictionary<int, Game>();
+           // Dictionary<int, Game> bets = new Dictionary<int, Game>();
 
-            Game g = new Game();
+            
+
+           /* Game g = new Game();
+           
             g.Odds = ClientHelper.Offers[1001].Odds[1];
             g.Tip = 1;
             g.Won = false;
             bets.Add(1001, g);
+            g = new Game();
             g.Odds = ClientHelper.Offers[2002].Odds[0];
             g.Tip = 0;
             g.Won = false;
             bets.Add(2002, g);
+            g = new Game();
             g.Odds = ClientHelper.Offers[3002].Odds[2];
             g.Tip = 2;
             g.Won = false;
-            bets.Add(3002, g);
-
+            bets.Add(3002, g);*/
             t.Bets = bets;
-
+            
             proxy.SendTicket(t, clientIdentity.Name);
         }
     }

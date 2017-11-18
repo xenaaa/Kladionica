@@ -18,6 +18,7 @@ namespace IntegrationPlatform
         Account betAccount;
         List<Ticket> tickets;
         int port;
+       
 
         [DataMember]
         public string Username
@@ -111,6 +112,7 @@ namespace IntegrationPlatform
                 port = value;
             }
         }
+       
         public User()
         { }
 

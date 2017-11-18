@@ -19,6 +19,14 @@ namespace BetServer
         private static Dictionary<int, Dictionary<int, double>> rezultati = new Dictionary<int, Dictionary<int, double>>();
         private static List<int> ports = new List<int>();
 
+        private static object portLock= new object();
+
+        public static object PortLock
+        {
+            get { return portLock; }
+            set { portLock = value; }
+        }
+
 
         public static Dictionary<string,User> BetUsers
         {
@@ -50,11 +58,14 @@ namespace BetServer
 
         public bool SendPort(int port)
         {
-            ports.Add(port);
+            lock (PortLock)
+            {
+                ports.Add(port);
+            }
             return true;
         }
 
-        public bool Login(string username, string password, int port)
+        public bool Login(string username, string password, int port)//da li dopustiti istom User-u da se loguje na vise klijenata?
         {
             WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             if (identity.Name == username)
@@ -63,6 +74,8 @@ namespace BetServer
                 {
                     if (BetUsers[username].Password == password)
                     {
+                        //ako je dozvoljeno logovanje sa vise klijenata treba umesto jednog porta implementirati listu portova i svaki put ovde dodati novi port
+                        //takodje kad vec postoji i log in dodati i log-out?
                         Console.WriteLine("You successfully logged in!");
                         return true;
                     }
@@ -95,7 +108,10 @@ namespace BetServer
             {
                 if (!BetUsers.ContainsKey(user.Username))
                 {
-                    BetUsers.Add(user.Username, user);
+                    lock (PortLock)
+                    {
+                        BetUsers.Add(user.Username, user);
+                    }
                     Console.WriteLine("User {0} successfully added to BetUsers", user.Username);
                     return true;
                 }
@@ -106,10 +122,28 @@ namespace BetServer
                     return false;
                 }
             }
-            else
+            else//menjano!!!!!!!!!!!! nikad se ne doda novi korisnik, samo za testiranje... 
             {
-                Console.WriteLine("User {0} doesn't exist", identity.Name);
-                return false;
+
+                if (!BetUsers.ContainsKey(user.Username))//obrisati posle testiranja
+                {
+                    lock (PortLock)
+                    {
+                        BetUsers.Add(user.Username, user);
+                       
+                    }
+                    Console.WriteLine("User {0} successfully added to BetUsers", user.Username);
+                    return true;
+                }
+                else//obrisati posle testiranja
+                {
+
+                    Console.WriteLine("User {0} already exists.", user.Username);
+                    return false;
+                }
+
+                //Console.WriteLine("User {0} doesn't exist", identity.Name); odkomentarisati ova 2 reda kada se obrisu delovi iznad
+                //return false;
             }
         }
 
