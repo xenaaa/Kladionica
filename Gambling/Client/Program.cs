@@ -12,7 +12,7 @@ namespace Client
 {
     class Program
     {
-        
+
         static void Main(string[] args)
         {
             NetTcpBinding binding = new NetTcpBinding();
@@ -35,7 +35,6 @@ namespace Client
 
             do
             {
-                Console.WriteLine("     MENU\n");
                 Console.WriteLine(" Press 1 - Bank service");
                 Console.WriteLine(" Press 2 - Bet service");
 
@@ -76,8 +75,6 @@ namespace Client
                         Console.WriteLine("Enter password:");
                         string password = Console.ReadLine();
 
-                        //    User user = new User(username, password, "User");
-
                         address = "net.tcp://localhost:9999/BankService";
 
                         ClientBankProxy proxy = new ClientBankProxy(binding, address);
@@ -85,14 +82,9 @@ namespace Client
                         if (proxy.CheckIfAlive())
                         {
                             proxy.Login(clientIdentity.Name, password, port);
-                            //User user = new User("marina", "la", "Admin");
-                            //User user2 = new User("david", "la", "Admin");
-                            //proxy.CreateAccount(user);
-                            //proxy.CreateAccount(user2);
+
                             Account depAcc = new Account(3, 11);
                             proxy.Deposit(depAcc);
-
-
                         }
                         else
                             Console.WriteLine("Server is down");
@@ -152,8 +144,11 @@ namespace Client
 
                                                             Console.WriteLine("\nTip: ");
                                                             g.Tip = Convert.ToInt32(Console.ReadLine());
-                                                            g.Odds = ClientHelper.Offers[code].Odds[g.Tip];
-                                                            bets.Add(code, g);//proveriti ako dodaje istu utakmicu
+                                                            g.BetOffer = ClientHelper.Offers[code];
+                                                            // g.Odds = ClientHelper.Offers[code].Odds[g.Tip];
+                                                          //  g.Odds = betoffer.Odds[g.Tip];
+                                                            if (!bets.ContainsKey(code))
+                                                                bets.Add(code, g);//proveriti ako dodaje istu utakmicu
                                                             break;
 
                                                     }
@@ -189,35 +184,35 @@ namespace Client
             Console.ReadLine();
             host.Close();
         }
-      
+
 
         private static void MakeTicket(ClientBetProxy proxy, Dictionary<int, Game> bets)
         {
             WindowsIdentity clientIdentity = WindowsIdentity.GetCurrent();
-            Ticket t = new Ticket();
-            t.Payment = 5;
-           // Dictionary<int, Game> bets = new Dictionary<int, Game>();
+            Ticket t = new Ticket(bets,5);
+          //  t.Payment = 5;
+            // Dictionary<int, Game> bets = new Dictionary<int, Game>();
 
-            
 
-           /* Game g = new Game();
-           
-            g.Odds = ClientHelper.Offers[1001].Odds[1];
-            g.Tip = 1;
-            g.Won = false;
-            bets.Add(1001, g);
-            g = new Game();
-            g.Odds = ClientHelper.Offers[2002].Odds[0];
-            g.Tip = 0;
-            g.Won = false;
-            bets.Add(2002, g);
-            g = new Game();
-            g.Odds = ClientHelper.Offers[3002].Odds[2];
-            g.Tip = 2;
-            g.Won = false;
-            bets.Add(3002, g);*/
-            t.Bets = bets;
-            
+
+            /* Game g = new Game();
+
+             g.Odds = ClientHelper.Offers[1001].Odds[1];
+             g.Tip = 1;
+             g.Won = false;
+             bets.Add(1001, g);
+             g = new Game();
+             g.Odds = ClientHelper.Offers[2002].Odds[0];
+             g.Tip = 0;
+             g.Won = false;
+             bets.Add(2002, g);
+             g = new Game();
+             g.Odds = ClientHelper.Offers[3002].Odds[2];
+             g.Tip = 2;
+             g.Won = false;
+             bets.Add(3002, g);*/
+           // t.Bets = bets;
+
             proxy.SendTicket(t, clientIdentity.Name);
         }
     }

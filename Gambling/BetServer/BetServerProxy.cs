@@ -61,12 +61,11 @@ namespace BetServer
             }
         }
 
-        public bool SendTicketResults(Ticket tiket, bool isPassed)
+        public bool SendTicketResults(Ticket ticket, bool isPassed, List<string> results)
         {
             try
             {
-
-                factory.SendTicketResults(tiket, isPassed);
+                factory.SendTicketResults(ticket, isPassed, results);
                 return true;
             }
             catch (Exception e)

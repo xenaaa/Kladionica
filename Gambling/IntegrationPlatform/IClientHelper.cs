@@ -20,6 +20,6 @@ namespace IntegrationPlatform
         bool SendOffers(Dictionary<int,BetOffer> offers);
 
         [OperationContract]
-        bool SendTicketResults(Ticket tiket,bool prosao);
+        bool SendTicketResults(Ticket tiket,bool prosao, List<string> results);
     }
 }

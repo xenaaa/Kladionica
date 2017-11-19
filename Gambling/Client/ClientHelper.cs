@@ -33,7 +33,7 @@ namespace Client
                     Console.WriteLine("***************Results:***************\n");
                     foreach (string str in results)
                     {
-                        Console.WriteLine("Offer: {0}", str);
+                        Console.WriteLine("{0}", str);
                     }
                     Console.WriteLine("**************************************\n");
                 }
@@ -51,23 +51,16 @@ namespace Client
 
         public bool SendOffers(Dictionary<int, BetOffer> offers)
         {
-
             if (Monitor.TryEnter(PrintLock))
             {
                 lock (PrintLock)
                 {
                     Console.WriteLine("\n*******************************************************");
-                    //Console.WriteLine("                   1   X   2");
+                    Console.WriteLine("                             1   X   2");
                     foreach (var item in offers)
                     {
-                        Console.WriteLine("\t-------------------------------------------------------");
-                        Console.WriteLine("\t**{0}**\n\t\tHome: {1}\n\t\tAway: {2}", item.Value.Id, item.Value.Home, item.Value.Away);
-                        //Console.WriteLine("\t\t      ");
-                        Console.WriteLine("\t\t|1|: {0}   |x|: {1}   |2|: {2}", item.Value.Odds[1], item.Value.Odds[0], item.Value.Odds[2]);
-                        
-
+                        Console.WriteLine("{0}  {1}     {2}     {3}     {4}     {5}  ",item.Key,item.Value.Home,item.Value.Away,item.Value.Odds[1], item.Value.Odds[0],item.Value.Odds[2]);                                        
                     }
-                    Console.WriteLine("\t-------------------------------------------------------");
                     Console.WriteLine("*******************************************************");
                     Console.WriteLine("Press Enter for new ticket");
                 }
@@ -79,10 +72,9 @@ namespace Client
             return false;
         }
 
-        public bool SendTicketResults(Ticket tiket, bool prosao)
+        public bool SendTicketResults(Ticket tiket, bool prosao, List<string> results)
         {
-            double cashPrize = 1;
-
+            int counter = 0;
             if (prosao)
             {
                 if (Monitor.TryEnter(PrintLock))
@@ -93,11 +85,11 @@ namespace Client
                         foreach (KeyValuePair<int, Game> item in tiket.Bets)
                         {
                             //SVE ZELENO
-                            Console.WriteLine("Sifra utakmic: {0}, tip: {1}\n", item.Key, item.Value.Tip);
-                            cashPrize *= item.Value.Odds;
+                            Console.WriteLine("{0}     {1}  :  {2}      {3}      -   {4}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away,results[counter], item.Value.Tip);
+                            counter++;
                         }
-                        cashPrize *= tiket.Payment;
-                        Console.WriteLine("Dobitak: " + cashPrize);
+
+                        Console.WriteLine("Dobitak: " + tiket.CashPrize);
                         Console.WriteLine("\n*******************************************************");
                     }
                     Monitor.Exit(PrintLock);
@@ -111,14 +103,15 @@ namespace Client
                     lock (PrintLock)
                     {
                         Console.WriteLine("\n*********************TIKET GUBITNI*********************");
-                        
+
                         foreach (KeyValuePair<int, Game> item in tiket.Bets)
                         {
                             if (item.Value.Won)//crvena boja
-                                Console.WriteLine("Sifra utakmic: {0}, tip: {1}\n", item.Key, item.Value.Tip);
+                                Console.WriteLine("{0}     {1}  :  {2}      {3}      -     {4}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, results[counter], item.Value.Tip);
                             else //zelena boja
-                                Console.WriteLine("Sifra utakmic: {0}, tip: {1}\n", item.Key, item.Value.Tip);
-                        }
+                                Console.WriteLine("{0}     {1}  :  {2}      {3}      -     {4}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, results[counter], item.Value.Tip);
+                            counter++;
+                        }                       
                         Console.WriteLine("\n*******************************************************");
                     }
                     Monitor.Exit(PrintLock);

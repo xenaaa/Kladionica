@@ -13,13 +13,13 @@ using System.Xml.Serialization;
 namespace BetServer
 {
     public class BetService : IBetService
-    { 
+    {
 
-        private static Dictionary<string,User> betUsers=new Dictionary<string, User>();
-        private static Dictionary<int, Dictionary<int, double>> rezultati = new Dictionary<int, Dictionary<int, double>>();
+        private static Dictionary<string, User> betUsers = new Dictionary<string, User>();
+        private static Dictionary<int, Game> rezultati = new Dictionary<int, Game>();
         private static List<int> ports = new List<int>();
 
-        private static object portLock= new object();
+        private static object portLock = new object();
 
         public static object PortLock
         {
@@ -28,13 +28,13 @@ namespace BetServer
         }
 
 
-        public static Dictionary<string,User> BetUsers
+        public static Dictionary<string, User> BetUsers
         {
             get { return betUsers; }
             set { betUsers = value; }
         }
 
-        public static Dictionary<int, Dictionary<int, double>> Rezultati // sifra utakmica, tip i kvota
+        public static Dictionary<int, Game> Rezultati // sifra utakmica i rezultat
         {
             get { return rezultati; }
             set { rezultati = value; }
@@ -49,7 +49,7 @@ namespace BetServer
         }
 
         public BetService()
-        {   }
+        { }
 
         public bool CheckIfAlive()
         {
@@ -104,7 +104,7 @@ namespace BetServer
         {
             WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             Console.WriteLine("User {0} je pozvao AddUser\n", identity.Name);
-            if (BetUsers.ContainsKey(identity.Name) )
+            if (!BetUsers.ContainsKey(identity.Name))
             {
                 if (!BetUsers.ContainsKey(user.Username))
                 {
@@ -121,30 +121,10 @@ namespace BetServer
                     Console.WriteLine("User {0} already exists.", user.Username);
                     return false;
                 }
-            }
-            else//menjano!!!!!!!!!!!! nikad se ne doda novi korisnik, samo za testiranje... 
-            {
+            }       
+            Console.WriteLine("User {0} already exists", identity.Name); 
+            return false;
 
-                if (!BetUsers.ContainsKey(user.Username))//obrisati posle testiranja
-                {
-                    lock (PortLock)
-                    {
-                        BetUsers.Add(user.Username, user);
-                       
-                    }
-                    Console.WriteLine("User {0} successfully added to BetUsers", user.Username);
-                    return true;
-                }
-                else//obrisati posle testiranja
-                {
-
-                    Console.WriteLine("User {0} already exists.", user.Username);
-                    return false;
-                }
-
-                //Console.WriteLine("User {0} doesn't exist", identity.Name); odkomentarisati ova 2 reda kada se obrisu delovi iznad
-                //return false;
-            }
         }
 
         public bool DeleteUser(User user)

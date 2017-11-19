@@ -8,11 +8,33 @@ using System.Threading.Tasks;
 namespace IntegrationPlatform
 {
     [DataContract]
-    public  class Game
+    public class Game
     {
-        private bool won;
+        private BetOffer betOffer;
+        //private int homeGoalScored;
+        //private int awayGoalScored;
+        private string result;
         private int tip;
-        private double odds;
+        private bool won;
+
+        public Game()
+        {
+            //  betOffer = new BetOffer();
+            //  homeGoalScored = 0;
+            // awayGoalScored = 0;
+            // won = false;
+        }
+
+        public Game(BetOffer betOffer, string result, int tip)
+        {
+            this.betOffer = betOffer;
+            this.result = result;
+            //homeGoalScored = home;
+            //awayGoalScored = away;
+            this.tip = tip;
+            this.won = false;
+        }
+
 
         [DataMember]
         public bool Won
@@ -31,10 +53,42 @@ namespace IntegrationPlatform
 
 
         [DataMember]
-        public double Odds
+        public BetOffer BetOffer
         {
-            get { return odds; }
-            set { odds = value; }
+            get { return betOffer; }
+            set { betOffer = value; }
+        }
+
+        //public int AwayGoalScored
+        //{
+        //    get
+        //    {
+        //        return awayGoalScored;
+        //    }
+
+        //    set
+        //    {
+        //        awayGoalScored = value;
+        //    }
+        //}
+
+        //public int HomeGoalScored
+        //{
+        //    get
+        //    {
+        //        return homeGoalScored;
+        //    }
+
+        //    set
+        //    {
+        //        homeGoalScored = value;
+        //    }
+        //}
+
+        public string Result
+        {
+            get { return result; }
+            set { result = value; }
         }
     }
 }

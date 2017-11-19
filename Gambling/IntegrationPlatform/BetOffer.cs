@@ -10,18 +10,21 @@ namespace IntegrationPlatform
     [DataContract]
     public class BetOffer
     {
+        private string away;
+        private string home;
+        private int id;
+        private Dictionary<int, double> odds;
 
         public BetOffer() { }
-        public BetOffer(string away,string home,int id, Dictionary<int, double> odds)
+        public BetOffer(string home, string away, int id, Dictionary<int, double> odds)
         {
             this.away = away;
             this.home = home;
             this.id = id;
             this.odds = odds;
-
         }
 
-        private string away;
+
         [DataMember]
         public string Away
         {
@@ -29,7 +32,7 @@ namespace IntegrationPlatform
             set { away = value; }
         }
 
-        private string home;
+
         [DataMember]
         public string Home
         {
@@ -37,7 +40,7 @@ namespace IntegrationPlatform
             set { home = value; }
         }
 
-        private int id;
+
         [DataMember]
         public int Id
         {
@@ -45,9 +48,9 @@ namespace IntegrationPlatform
             set { id = value; }
         }
 
-        private Dictionary<int ,double > odds;
+
         [DataMember]
-        public Dictionary<int ,double > Odds
+        public Dictionary<int, double> Odds
         {
             get { return odds; }
             set { odds = value; }
