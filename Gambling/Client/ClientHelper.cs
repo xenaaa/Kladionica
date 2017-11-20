@@ -26,20 +26,21 @@ namespace Client
 
         public bool SendGameResults(List<string> results, int port)
         {
-            if (Monitor.TryEnter(PrintLock))
-            {
-                lock (PrintLock)
-                {
-                    Console.WriteLine("***************Results:***************\n");
-                    foreach (string str in results)
-                    {
-                        Console.WriteLine("{0}", str);
-                    }
-                    Console.WriteLine("**************************************\n");
-                }
-                Monitor.Exit(PrintLock);
+            //if (Monitor.TryEnter(PrintLock))
+            //{
+            //    lock (PrintLock)
+            //    {
+            //        Console.ForegroundColor = ConsoleColor.White;
+            //        Console.WriteLine("\n*******************Results:**********************\n");
+            //        foreach (string str in results)
+            //        {
+            //            Console.WriteLine("{0}", str);
+            //        }
+            //        Console.WriteLine("***************************************************\n");
+            //    }
+            //    Monitor.Exit(PrintLock);
 
-            }
+            //}
            
             return true;
         }
@@ -53,17 +54,20 @@ namespace Client
         {
             if (Monitor.TryEnter(PrintLock))
             {
-                lock (PrintLock)
-                {
-                    Console.WriteLine("\n*******************************************************");
-                    Console.WriteLine("                             1   X   2");
-                    foreach (var item in offers)
-                    {
-                        Console.WriteLine("{0}  {1}     {2}     {3}     {4}     {5}  ",item.Key,item.Value.Home,item.Value.Away,item.Value.Odds[1], item.Value.Odds[0],item.Value.Odds[2]);                                        
-                    }
-                    Console.WriteLine("*******************************************************");
-                    Console.WriteLine("Press Enter for new ticket");
-                }
+                //lock (PrintLock)
+                //{
+                //    Console.ForegroundColor = ConsoleColor.White;
+                //    Console.WriteLine("--------------------------------------------------------------------------------------------");
+                //    Console.WriteLine("ID |       HOME        |       AWAY        |       1       |       X       |       2       ");
+                //    Console.WriteLine("--------------------------------------------------------------------------------------------");
+
+                //    foreach (var item in offers)
+                //    {
+                //        Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}              {3,-5}           {4,-5}           {5,-5}  ", item.Key, item.Value.Home, item.Value.Away, item.Value.Odds[1], item.Value.Odds[0], item.Value.Odds[2]));
+                //    }
+                //    Console.WriteLine("**********************************************************************************************");
+                //    Console.WriteLine("Press Enter for new ticket");
+                //}
                 Monitor.Exit(PrintLock);
                 Offers = offers;
                 return true;
@@ -85,10 +89,13 @@ namespace Client
                         foreach (KeyValuePair<int, Game> item in tiket.Bets)
                         {
                             //SVE ZELENO
+                            Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine("{0}     {1}  :  {2}      {3}      -   {4}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away,results[counter], item.Value.Tip);
+                            Console.ForegroundColor = ConsoleColor.White;
                             counter++;
                         }
 
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("Dobitak: " + tiket.CashPrize);
                         Console.WriteLine("\n*******************************************************");
                     }
@@ -102,17 +109,28 @@ namespace Client
                 {
                     lock (PrintLock)
                     {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.WriteLine("\n*********************TIKET GUBITNI*********************");
 
                         foreach (KeyValuePair<int, Game> item in tiket.Bets)
                         {
-                            if (item.Value.Won)//crvena boja
+                            if (item.Value.Won)//zelena boja
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("{0}     {1}  :  {2}      {3}      -     {4}  \n", item.Key,item.Value.BetOffer.Home,item.Value.BetOffer.Away,results[counter],item.Value.Tip);
+                            }
+                            else //crvena boja
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
                                 Console.WriteLine("{0}     {1}  :  {2}      {3}      -     {4}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, results[counter], item.Value.Tip);
-                            else //zelena boja
-                                Console.WriteLine("{0}     {1}  :  {2}      {3}      -     {4}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, results[counter], item.Value.Tip);
+                               
+                            }
+                            Console.ForegroundColor = ConsoleColor.White;
                             counter++;
-                        }                       
-                        Console.WriteLine("\n*******************************************************");
+
+                        }
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("*******************************************************");
                     }
                     Monitor.Exit(PrintLock);
                 }

@@ -1,6 +1,8 @@
 ﻿using Contracts;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.ServiceModel;
@@ -15,6 +17,19 @@ namespace Client
 
         static void Main(string[] args)
         {
+            //proveriti da lie je jedan vec otvoren
+            Process p = new Process();
+            string path = Directory.GetCurrentDirectory();
+            path = path.Replace("Client", "ClientPrint");
+            p.StartInfo.WorkingDirectory = @path;
+            p.StartInfo.FileName = @path + @"\ClientPrint.exe";
+
+            p.StartInfo.UseShellExecute = true;
+
+
+            p.StartInfo.CreateNoWindow = false;
+            p.Start();
+
             NetTcpBinding binding = new NetTcpBinding();
             int port = Convert.ToInt32(Console.ReadLine());
             //int port = Convert.ToInt32(args[0]);
@@ -116,7 +131,7 @@ namespace Client
                                 {
                                     while (ClientHelper.Offers.Count < 1)
                                         Thread.Sleep(2000);
-
+                                    Console.WriteLine("Press Enter for new ticket");
                                     while (true)
                                     {
                                         if (Console.ReadKey(true).Key == ConsoleKey.Enter && Monitor.TryEnter(ClientHelper.PrintLock))//kada se stisne Enter pravi se novi tiket
@@ -167,7 +182,7 @@ namespace Client
                                         }
                                         else
                                         {
-                                            Monitor.Exit(ClientHelper.PrintLock);
+                                           // Monitor.Exit(ClientHelper.PrintLock);
                                             continue;
                                         }
                                     }

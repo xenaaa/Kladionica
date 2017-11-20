@@ -70,15 +70,16 @@ namespace BetServer
 
                     XmlNode node = xmlDoc.SelectSingleNode("descendant::OFFER");
 
-                    if (node.ChildNodes.Count > 0)
-                    {
-                        // Get elements
-                        XmlNodeList id = xmlDoc.GetElementsByTagName("ID");
-                        XmlNodeList home = xmlDoc.GetElementsByTagName("HOME");
-                        XmlNodeList away = xmlDoc.GetElementsByTagName("AWAY");
-                        XmlNodeList kec = xmlDoc.GetElementsByTagName("ONE");
-                        XmlNodeList iks = xmlDoc.GetElementsByTagName("X");
-                        XmlNodeList dvojka = xmlDoc.GetElementsByTagName("TWO");
+
+                        if (node.ChildNodes.Count > 0)
+                        {
+                            // Get elements
+                            XmlNodeList id = xmlDoc.GetElementsByTagName("ID");
+                            XmlNodeList home = xmlDoc.GetElementsByTagName("HOME");
+                            XmlNodeList away = xmlDoc.GetElementsByTagName("AWAY");
+                            XmlNodeList kec = xmlDoc.GetElementsByTagName("ONE");
+                            XmlNodeList iks = xmlDoc.GetElementsByTagName("X");
+                            XmlNodeList dvojka = xmlDoc.GetElementsByTagName("TWO");
 
                       
                         for (int i = 0; i < id.Count; i++)
@@ -103,11 +104,18 @@ namespace BetServer
                                     if (proxy.CheckIfAlive(port))
                                         proxy.SendOffers(Offers,port); //treba ports da mu proslijedi
                                 }
+                                address = "net.tcp://localhost:" + 10011 + "/ClientPrint";
+                                proxy = new BetServerProxy(binding, address);
+                                {
+                                    if (proxy.CheckIfAlive())
+                                        proxy.SendOffers(Offers);
+                                }
                             }
                         }
                     }
 
                 }
+            
                 Thread.Sleep(5000);
             }
         }
@@ -287,9 +295,17 @@ namespace BetServer
                     {
                         foreach (var port in ports)
                         {
+                            //NetTcpBinding binding = new NetTcpBinding();
+                            //string address = "net.tcp://localhost:" + port + "/ClientHelper";
+                            //BetServerProxy proxy = new BetServerProxy(binding, address);
+                            //{
+                            //    if (proxy.CheckIfAlive())
+                            //        proxy.SendGameResults(results);
+                            //}
                             NetTcpBinding binding = new NetTcpBinding();
                           //  string address = "net.tcp://localhost:" + port + "/ClientHelper";
                             string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
+                        //    string address = "net.tcp://localhost:" + 10011 + "/ClientPrint";  moramo dodati novi proxy
 
                             BetServerProxy proxy = new BetServerProxy(binding, address);
                             {
