@@ -1,4 +1,4 @@
-﻿using IntegrationPlatform;
+﻿using Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ namespace ClientPrint
         static void Main(string[] args)
         {
             
-            string address = "net.tcp://localhost:" + 10011 + "/ClientPrint";
+            string address = "net.tcp://localhost:" + 9995 + "/ClientPrint";
 
             NetTcpBinding binding = new NetTcpBinding();
             ServiceHost host = new ServiceHost(typeof(ClientPrint));

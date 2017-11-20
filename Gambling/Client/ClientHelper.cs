@@ -24,7 +24,7 @@ namespace Client
         }
 
 
-        public bool SendGameResults(List<string> results, int port)
+        public bool SendGameResults(List<Game> results, int port)
         {
             //if (Monitor.TryEnter(PrintLock))
             //{
@@ -76,7 +76,7 @@ namespace Client
             return false;
         }
 
-        public bool SendTicketResults(Ticket tiket, bool prosao, List<string> results, int port)
+        public bool SendTicketResults(Ticket tiket, bool prosao, int port)
         {
             int counter = 0;
             if (prosao)
@@ -90,7 +90,7 @@ namespace Client
                         {
                             //SVE ZELENO
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("{0}     {1}  :  {2}      {3}      -   {4}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away,results[counter], item.Value.Tip);
+                            Console.WriteLine("{0}     {1}  :  {2}      {3} : {4}     -   {5}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away,item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip);
                             Console.ForegroundColor = ConsoleColor.White;
                             counter++;
                         }
@@ -117,13 +117,13 @@ namespace Client
                             if (item.Value.Won)//zelena boja
                             {
                                 Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("{0}     {1}  :  {2}      {3}      -     {4}  \n", item.Key,item.Value.BetOffer.Home,item.Value.BetOffer.Away,results[counter],item.Value.Tip);
+                                Console.WriteLine("{0}     {1}  :  {2}      {3} : {4}     -   {5}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip);
                             }
                             else //crvena boja
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("{0}     {1}  :  {2}      {3}      -     {4}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, results[counter], item.Value.Tip);
-                               
+                                Console.WriteLine("{0}     {1}  :  {2}      {3} : {4}     -   {5}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip);
+
                             }
                             Console.ForegroundColor = ConsoleColor.White;
                             counter++;

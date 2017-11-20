@@ -14,12 +14,12 @@ namespace Contracts
         bool CheckIfAlive(int port);
 
         [OperationContract]
-        bool SendGameResults(List<string> results, int port);
+        bool SendGameResults(List<Game> results, int port);
 
         [OperationContract]
         bool SendOffers(Dictionary<int,BetOffer> offers, int port);
 
         [OperationContract]
-        bool SendTicketResults(Ticket ticket,bool isPassed, List<string> results, int port);
+        bool SendTicketResults(Ticket ticket,bool isPassed, int port);
     }
 }

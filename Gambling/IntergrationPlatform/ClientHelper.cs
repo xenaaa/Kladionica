@@ -25,7 +25,7 @@ namespace IntergrationPlatform
             return proxy.CheckIfAlive(port);
         }
 
-        public bool SendGameResults(List<string> results, int port)
+        public bool SendGameResults(List<Game> results, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://localhost:" + port + "/ClientHelper";
@@ -41,12 +41,12 @@ namespace IntergrationPlatform
             return proxy.SendOffers(offers, port);
         }
 
-        public bool SendTicketResults(Ticket ticket, bool isPassed, List<string> results, int port)
+        public bool SendTicketResults(Ticket ticket, bool isPassed, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://localhost:" + port + "/ClientHelper";
             proxy = new ClientProxy(binding, address);
-            return proxy.SendTicketResults(ticket, isPassed, results, port);
+            return proxy.SendTicketResults(ticket, isPassed, port);
         }
     }
 }

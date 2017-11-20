@@ -1,4 +1,4 @@
-﻿using IntegrationPlatform;
+﻿using Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,28 +9,42 @@ namespace ClientPrint
 {
     public class ClientPrint : IClientHelper
     {
-        public bool SendGameResults(List<string> results)
+        public bool SendGameResults(List<Game> results, int port)
         {
+
+            //Console.ForegroundColor = ConsoleColor.White;
+            //Console.WriteLine("\n*******************Results:**********************\n");
+            //foreach (string str in results)
+            //{
+            //    Console.WriteLine("{0}", str);
+            //}
+            //Console.WriteLine("***************************************************\n");
+
+
+            //return true;
+
 
 
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("\n*******************Results:**********************\n");
-            foreach (string str in results)
-            {
-                Console.WriteLine("{0}", str);
-            }
-            Console.WriteLine("***************************************************\n");
+            Console.WriteLine("\n\n-------------------------------------RESULTS------------------------------------------------\n");
+            Console.WriteLine("ID |       HOME        |       AWAY        |         RESULT        ");
+            Console.WriteLine("--------------------------------------------------------------------------------------------");
 
+            foreach (var item in results)
+            {
+                Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}       {3,-2}   :    {4,-5} ", item.BetOffer.Id, item.BetOffer.Home, item.BetOffer.Away, item.HomeGoalScored, item.AwayGoalScored));
+            }
+            Console.WriteLine("**********************************************************************************************\n\n");
 
             return true;
         }
 
 
-        public bool CheckIfAlive()
+        public bool CheckIfAlive(int port)
         {
             return true;
         }
-        public bool SendOffers(Dictionary<int, BetOffer> offers)
+        public bool SendOffers(Dictionary<int, BetOffer> offers,int port)
         {
 
             Console.ForegroundColor = ConsoleColor.White;
@@ -42,16 +56,13 @@ namespace ClientPrint
             {
                 Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}              {3,-5}           {4,-5}           {5,-5}  ", item.Key, item.Value.Home, item.Value.Away, item.Value.Odds[1], item.Value.Odds[0], item.Value.Odds[2]));
             }
-            Console.WriteLine("**********************************************************************************************");
-            Console.WriteLine("Press Enter for new ticket");
-
-
+            Console.WriteLine("**********************************************************************************************");;
 
             return true;
 
         }
 
-        public bool SendTicketResults(Ticket tiket, bool prosao, List<string> results)
+        public bool SendTicketResults(Ticket tiket, bool prosao, int port)
         {
             throw new NotImplementedException();
         }

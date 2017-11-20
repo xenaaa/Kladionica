@@ -33,7 +33,7 @@ namespace IntergrationPlatform
             }
         }
 
-        public bool SendGameResults(List<string> results,int port)
+        public bool SendGameResults(List<Game> results,int port)
         {
             try
             {
@@ -61,11 +61,11 @@ namespace IntergrationPlatform
             }
         }
 
-        public bool SendTicketResults(Ticket ticket, bool isPassed, List<string> results,int port)
+        public bool SendTicketResults(Ticket ticket, bool isPassed,int port)
         {
             try
             {
-                factory.SendTicketResults(ticket,isPassed,results,port);
+                factory.SendTicketResults(ticket,isPassed,port);
                 return true;
             }
             catch (Exception e)

@@ -104,11 +104,11 @@ namespace BetServer
                                     if (proxy.CheckIfAlive(port))
                                         proxy.SendOffers(Offers,port); //treba ports da mu proslijedi
                                 }
-                                address = "net.tcp://localhost:" + 10011 + "/ClientPrint";
+                                address = "net.tcp://localhost:" + 9995 + "/ClientPrint";
                                 proxy = new BetServerProxy(binding, address);
                                 {
-                                    if (proxy.CheckIfAlive())
-                                        proxy.SendOffers(Offers);
+                                    if (proxy.CheckIfAlive(port))
+                                        proxy.SendOffers(Offers,port);
                                 }
                             }
                         }
@@ -177,13 +177,16 @@ namespace BetServer
         {
             bool won = true;
 
-            List<string> results = new List<string>();
+         //   List<string> results = new List<string>();
 
             foreach (KeyValuePair<int, Game> bet in ticket.Bets)
             {
-           
-                bet.Value.Result = BetService.Rezultati[bet.Key].Result;
-                results.Add(BetService.Rezultati[bet.Key].Result);
+
+                //   bet.Value.Result = BetService.Rezultati[bet.Key].Result;
+                //  results.Add(BetService.Rezultati[bet.Key].Result);
+                bet.Value.HomeGoalScored = BetService.Rezultati[bet.Key].HomeGoalScored;
+                bet.Value.AwayGoalScored = BetService.Rezultati[bet.Key].AwayGoalScored;
+
 
                 if (BetService.Rezultati[bet.Key].Tip != bet.Value.Tip)
                 {
@@ -200,7 +203,7 @@ namespace BetServer
             BetServerProxy proxy = new BetServerProxy(binding, address);
             {
                 if (proxy.CheckIfAlive(user.Port))//ako vrati false obrisati tog user-a?
-                    proxy.SendTicketResults(ticket, won, results, user.Port); // treba port od klijenta kom salje
+                    proxy.SendTicketResults(ticket, won, user.Port); // treba port od klijenta kom salje
             }
             //user.Tickets.Clear();
             return true;
@@ -210,7 +213,7 @@ namespace BetServer
 
         private static bool SendGameResults(List<int> ports)
         {
-            List<string> results = new List<string>();
+            List<Game> results = new List<Game>();
             List<int> gameIDs = new List<int>();
             BetOffer betOffer = new BetOffer();
             List<int> indexToDelete = new List<int>();
@@ -268,18 +271,16 @@ namespace BetServer
                         home = r.Next(0, 5); //broj datih golova
                         away = r.Next(0, 5);
 
-                        string res = betOffer.Id.ToString() + "     " + betOffer.Home.ToString() + "  :  " + betOffer.Away.ToString() + "  -  " + home + "  :  " + away;
-                        results.Add(res);
-
                         tip = 0; //provjera ko je pobijedio
                         if (home > away)
                             tip = 1;
                         else if (home < away)
                             tip = 2;
    
-                        string result = home.ToString() + ":" + away.ToString();
-                        Game game = new Game(betOffer, result, tip);
-                     
+                        Game game = new Game(betOffer, home,away, tip);
+
+                        results.Add(game);
+
                         BetService.Rezultati.Add(betOffer.Id, game); //dodajemo utakmicu u listu zavrsenih utakmica                           
 
                         DeleteFinishedGame(betOffer.Id);
@@ -304,8 +305,8 @@ namespace BetServer
                             //}
                             NetTcpBinding binding = new NetTcpBinding();
                           //  string address = "net.tcp://localhost:" + port + "/ClientHelper";
-                            string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
-                        //    string address = "net.tcp://localhost:" + 10011 + "/ClientPrint";  moramo dodati novi proxy
+                           // string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
+                            string address = "net.tcp://localhost:" + 9995 + "/ClientPrint";  //moramo dodati novi proxy
 
                             BetServerProxy proxy = new BetServerProxy(binding, address);
                             {
