@@ -5,21 +5,21 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IntegrationPlatform
+namespace Contracts
 {
     [ServiceContract]
     public interface IClientHelper
     {
         [OperationContract]
-        bool CheckIfAlive();
+        bool CheckIfAlive(int port);
 
         [OperationContract]
-        bool SendGameResults(List<string> results);
+        bool SendGameResults(List<string> results, int port);
 
         [OperationContract]
-        bool SendOffers(Dictionary<int,BetOffer> offers);
+        bool SendOffers(Dictionary<int,BetOffer> offers, int port);
 
         [OperationContract]
-        bool SendTicketResults(Ticket tiket,bool prosao, List<string> results);
+        bool SendTicketResults(Ticket ticket,bool isPassed, List<string> results, int port);
     }
 }

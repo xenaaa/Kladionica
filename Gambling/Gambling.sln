@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetServer", "BetServer\BetS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "IntegrationPlatform\Contracts.csproj", "{1559299E-7348-4FD7-9D85-9F78B1988343}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntergrationPlatform", "IntergrationPlatform\IntergrationPlatform.csproj", "{37997F47-FC86-4542-87A8-68AA71341FFC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{1559299E-7348-4FD7-9D85-9F78B1988343}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1559299E-7348-4FD7-9D85-9F78B1988343}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1559299E-7348-4FD7-9D85-9F78B1988343}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37997F47-FC86-4542-87A8-68AA71341FFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37997F47-FC86-4542-87A8-68AA71341FFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37997F47-FC86-4542-87A8-68AA71341FFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37997F47-FC86-4542-87A8-68AA71341FFC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

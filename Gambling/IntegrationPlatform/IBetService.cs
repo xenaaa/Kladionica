@@ -5,7 +5,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IntegrationPlatform
+namespace Contracts
 {
     [ServiceContract]
     public interface IBetService
@@ -17,7 +17,7 @@ namespace IntegrationPlatform
         bool SendPort(int port);
         
         [OperationContract]
-        bool Login(string username, string password,int port);
+        bool BetLogin(string username, string password,int port);
 
         [OperationContract]
         bool AddUser(User user);

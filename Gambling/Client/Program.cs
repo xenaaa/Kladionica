@@ -1,4 +1,4 @@
-﻿using IntegrationPlatform;
+﻿using Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,13 +75,13 @@ namespace Client
                         Console.WriteLine("Enter password:");
                         string password = Console.ReadLine();
 
-                        address = "net.tcp://localhost:9999/BankService";
+                        address = "net.tcp://localhost:9991/BankIntegrationPlatform";
 
                         ClientBankProxy proxy = new ClientBankProxy(binding, address);
 
                         if (proxy.CheckIfAlive())
                         {
-                            proxy.Login(clientIdentity.Name, password, port);
+                            proxy.BankLogin(clientIdentity.Name, password, port);
 
                             Account depAcc = new Account(3, 11);
                             proxy.Deposit(depAcc);
@@ -97,7 +97,7 @@ namespace Client
                         Console.WriteLine("Enter password:");
                         string password = Console.ReadLine();
 
-                        address = "net.tcp://localhost:9998/BetService";
+                        address = "net.tcp://localhost:9991/BetIntegrationPlatform";
 
                         ClientBetProxy proxy = new ClientBetProxy(binding, address);
 
@@ -105,7 +105,7 @@ namespace Client
                         {
                             proxy.SendPort(port);
 
-                            if (proxy.Login(clientIdentity.Name, password, port))
+                            if (proxy.BetLogin(clientIdentity.Name, password, port))
                             {
                                 Dictionary<int, Game> bets;
                                 Game g;

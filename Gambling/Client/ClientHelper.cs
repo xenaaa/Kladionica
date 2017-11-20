@@ -1,4 +1,4 @@
-﻿using IntegrationPlatform;
+﻿using Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace Client
         }
 
 
-        public bool SendGameResults(List<string> results)
+        public bool SendGameResults(List<string> results, int port)
         {
             if (Monitor.TryEnter(PrintLock))
             {
@@ -44,12 +44,12 @@ namespace Client
             return true;
         }
 
-        public bool CheckIfAlive()
+        public bool CheckIfAlive(int port)
         {
             return true;
         }
 
-        public bool SendOffers(Dictionary<int, BetOffer> offers)
+        public bool SendOffers(Dictionary<int, BetOffer> offers,int port)
         {
             if (Monitor.TryEnter(PrintLock))
             {
@@ -72,7 +72,7 @@ namespace Client
             return false;
         }
 
-        public bool SendTicketResults(Ticket tiket, bool prosao, List<string> results)
+        public bool SendTicketResults(Ticket tiket, bool prosao, List<string> results, int port)
         {
             int counter = 0;
             if (prosao)

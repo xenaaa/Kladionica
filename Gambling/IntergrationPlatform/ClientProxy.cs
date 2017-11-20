@@ -6,13 +6,14 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BetServer
+namespace IntergrationPlatform
 {
-    public class BetServerProxy : ChannelFactory<IClientHelper>, IClientHelper, IDisposable
+    public class ClientProxy : ChannelFactory<IClientHelper>, IClientHelper, IDisposable
     {
         IClientHelper factory;
 
-        public BetServerProxy(NetTcpBinding binding, string address) : base(binding, address)
+        public ClientProxy() { }
+        public ClientProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
             factory = this.CreateChannel();
 
@@ -30,8 +31,8 @@ namespace BetServer
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
-
         }
+
         public bool SendGameResults(List<string> results,int port)
         {
             try
@@ -44,10 +45,9 @@ namespace BetServer
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
-
         }
 
-        public bool SendOffers(Dictionary<int,BetOffer> offers, int port)
+        public bool SendOffers(Dictionary<int, BetOffer> offers,int port)
         {
             try
             {
@@ -61,11 +61,11 @@ namespace BetServer
             }
         }
 
-        public bool SendTicketResults(Ticket ticket, bool isPassed, List<string> results, int port)
+        public bool SendTicketResults(Ticket ticket, bool isPassed, List<string> results,int port)
         {
             try
             {
-                factory.SendTicketResults(ticket, isPassed, results,port);
+                factory.SendTicketResults(ticket,isPassed,results,port);
                 return true;
             }
             catch (Exception e)

@@ -1,4 +1,5 @@
-﻿using IntegrationPlatform;
+﻿
+using Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,8 @@ namespace BankServer
         {
             return true;
         }
-        public bool Login(string username, string password, int port)
+
+        public bool BankLogin(string username, string password, int port)
         {
             WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             if (identity.Name == username)

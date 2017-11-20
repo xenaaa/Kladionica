@@ -5,7 +5,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IntegrationPlatform
+namespace Contracts
 {
     [ServiceContract]
     public interface IBankService
@@ -13,7 +13,7 @@ namespace IntegrationPlatform
         [OperationContract]
         bool CheckIfAlive();
         [OperationContract]
-        bool Login(string username, string password,int port);
+        bool BankLogin(string username, string password,int port);
 
         [OperationContract]
         bool Deposit(Account acc);

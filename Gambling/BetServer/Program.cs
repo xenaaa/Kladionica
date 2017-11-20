@@ -1,5 +1,5 @@
 ﻿using BetServer;
-using IntegrationPlatform;
+using Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -80,13 +80,14 @@ namespace BetServer
                         XmlNodeList iks = xmlDoc.GetElementsByTagName("X");
                         XmlNodeList dvojka = xmlDoc.GetElementsByTagName("TWO");
 
-                        Dictionary<int, double> odds = new Dictionary<int, double>();
-                        odds.Add(1, Convert.ToDouble(kec[0].InnerText));
-                        odds.Add(0, Convert.ToDouble(iks[0].InnerText));
-                        odds.Add(2, Convert.ToDouble(dvojka[0].InnerText));
-
+                      
                         for (int i = 0; i < id.Count; i++)
                         {
+                            Dictionary<int, double> odds = new Dictionary<int, double>();
+                            odds.Add(1, Convert.ToDouble(kec[i].InnerText));
+                            odds.Add(0, Convert.ToDouble(iks[i].InnerText));
+                            odds.Add(2, Convert.ToDouble(dvojka[i].InnerText));
+
                             BetOffer bo = new BetOffer(home[i].InnerText, away[i].InnerText, Convert.ToInt32(id[i].InnerText), odds);
                             if (!Offers.ContainsKey(bo.Id))
                                 Offers.Add(bo.Id, bo);
@@ -96,11 +97,11 @@ namespace BetServer
                         {
                             foreach (var port in ports)
                             {
-                                address = "net.tcp://localhost:" + port + "/ClientHelper";
+                                address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
                                 BetServerProxy proxy = new BetServerProxy(binding, address);
                                 {
-                                    if (proxy.CheckIfAlive())
-                                        proxy.SendOffers(Offers);
+                                    if (proxy.CheckIfAlive(port))
+                                        proxy.SendOffers(Offers,port); //treba ports da mu proslijedi
                                 }
                             }
                         }
@@ -186,11 +187,12 @@ namespace BetServer
             }
 
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:" + user.Port + "/ClientHelper";
+            //    string address = "net.tcp://localhost:" + user.Port + "/ClientHelper";
+            string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
             BetServerProxy proxy = new BetServerProxy(binding, address);
             {
-                if (proxy.CheckIfAlive())//ako vrati false obrisati tog user-a?
-                    proxy.SendTicketResults(ticket, won, results);
+                if (proxy.CheckIfAlive(user.Port))//ako vrati false obrisati tog user-a?
+                    proxy.SendTicketResults(ticket, won, results, user.Port); // treba port od klijenta kom salje
             }
             //user.Tickets.Clear();
             return true;
@@ -286,11 +288,13 @@ namespace BetServer
                         foreach (var port in ports)
                         {
                             NetTcpBinding binding = new NetTcpBinding();
-                            string address = "net.tcp://localhost:" + port + "/ClientHelper";
+                          //  string address = "net.tcp://localhost:" + port + "/ClientHelper";
+                            string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
+
                             BetServerProxy proxy = new BetServerProxy(binding, address);
                             {
-                                if (proxy.CheckIfAlive())
-                                    proxy.SendGameResults(results);
+                                if (proxy.CheckIfAlive(port))
+                                    proxy.SendGameResults(results,port); //treba i port da se salje
                             }
                         }
                     }

@@ -1,5 +1,4 @@
-﻿using BetServer;
-using Contracts;
+﻿using Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,56 +6,16 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Client
+namespace IntergrationPlatform
 {
-    public class ClientBetProxy : ChannelFactory<IBetService>, IBetService, IDisposable
+    public class BetServiceProxy : ChannelFactory<IBetService>, IBetService, IDisposable
     {
         IBetService factory;
 
-        public ClientBetProxy(NetTcpBinding binding, string address) : base(binding, address)
+        public BetServiceProxy() { }
+        public BetServiceProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
-            factory = this.CreateChannel();
-        }
-        public bool CheckIfAlive()
-        {
-            try
-            {
-                factory.CheckIfAlive();
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error {0}", e.Message);
-                return false;
-            }
-        }
-
-        public bool SendPort(int port)
-        {
-            try
-            {
-                factory.SendPort(port);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error {0}", e.Message);
-                return false;
-            }
-        }
-
-        public bool BetLogin(string username, string password,int port)
-        {
-            try
-            {
-                factory.BetLogin(username,password,port);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error {0}", e.Message);
-                return false;
-            }
+            factory = this.CreateChannel();       
         }
 
         public bool AddUser(User user)
@@ -72,6 +31,7 @@ namespace Client
                 return false;
             }
         }
+
 
         public bool DeleteUser(User user)
         {
@@ -100,13 +60,13 @@ namespace Client
                 return false;
             }
         }
-       
+
         public bool SendTicket(Ticket ticket, string username)
         {
             bool sent = false;
             try
             {
-                sent = factory.SendTicket(ticket,username);
+                sent = factory.SendTicket(ticket, username);
                 Console.WriteLine("SendTicket() >> {0}", sent);
             }
             catch (Exception e)
@@ -115,6 +75,51 @@ namespace Client
             }
 
             return sent;
+        }
+
+        public bool BetLogin(string username, string password, int port)
+        {
+            try
+            {
+                factory.BetLogin(username,password,port);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
+        }
+
+        public bool CheckIfAlive()
+        {
+            
+            try
+            {
+                factory.CheckIfAlive();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
+        }
+
+
+
+        public bool SendPort(int port)
+        {
+            try
+            {
+                factory.SendPort(port);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
         }
     }
 }

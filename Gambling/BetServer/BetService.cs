@@ -1,4 +1,4 @@
-﻿using IntegrationPlatform;
+﻿using Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,7 +65,7 @@ namespace BetServer
             return true;
         }
 
-        public bool Login(string username, string password, int port)//da li dopustiti istom User-u da se loguje na vise klijenata?
+        public bool BetLogin(string username, string password, int port)//da li dopustiti istom User-u da se loguje na vise klijenata?
         {
             WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             if (identity.Name == username)

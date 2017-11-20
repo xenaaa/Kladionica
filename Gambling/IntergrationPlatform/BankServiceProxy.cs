@@ -6,23 +6,25 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Client
+namespace IntergrationPlatform
 {
-
-    public class ClientBankProxy : ChannelFactory<IBankService>, IBankService, IDisposable
+    public class BankServiceProxy : ChannelFactory<IBankService>, IBankService, IDisposable
     {
         IBankService factory;
 
-        public ClientBankProxy(NetTcpBinding binding, string address) : base(binding, address)
+        public BankServiceProxy() { }
+       
+        public BankServiceProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
             factory = this.CreateChannel();
+
         }
 
-        public bool CheckIfAlive()
+        public bool BankLogin(string username, string password, int port)
         {
             try
             {
-                factory.CheckIfAlive();
+                factory.BankLogin(username,password,port);
                 return true;
             }
             catch (Exception e)
@@ -32,11 +34,11 @@ namespace Client
             }
         }
 
-        public bool BankLogin(string username, string password,int port)
+        public bool CheckIfAlive()
         {
             try
             {
-                factory.BankLogin(username,password,port);
+                factory.CheckIfAlive();
                 return true;
             }
             catch (Exception e)
