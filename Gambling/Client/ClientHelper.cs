@@ -65,20 +65,6 @@ namespace Client
                     {
                         Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}              {3,-5}           {4,-5}           {5,-5}  ", item.Key, item.Value.Home, item.Value.Away, item.Value.Odds[1], item.Value.Odds[0], item.Value.Odds[2]));
                     }
-
-                    //Console.WriteLine(String.Format("{0,-10} | {1,-10} | {2,5}", "Bill", "Gates", 51));
-                    //Console.WriteLine(String.Format("{0,-10} | {1,-10} | {2,5}", "Edna", "Parker", 114));
-                    //Console.WriteLine(String.Format("{0,-10} | {1,-10} | {2,5}", "Johnny", "Depp", 44));
-                    //Console.WriteLine("-------------------------------");
-
-
-                    //Console.ForegroundColor = ConsoleColor.White;
-                    //Console.WriteLine("\n*******************************************************");
-                    //Console.WriteLine("                             1   X   2");
-                    //foreach (var item in offers)
-                    //{
-                    //    Console.WriteLine("{0}  {1}     {2}     {3}     {4}     {5}  ",item.Key,item.Value.Home,item.Value.Away,item.Value.Odds[1], item.Value.Odds[0],item.Value.Odds[2]);                                        
-                    //}
                     Console.WriteLine("**********************************************************************************************");
                     Console.WriteLine("Press Enter for new ticket");
                 }
