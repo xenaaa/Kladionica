@@ -26,21 +26,21 @@ namespace Client
 
         public bool SendGameResults(List<string> results)
         {
-            if (Monitor.TryEnter(PrintLock))
-            {
-                lock (PrintLock)
-                {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("\n*******************Results:**********************\n");
-                    foreach (string str in results)
-                    {
-                        Console.WriteLine("{0}", str);
-                    }
-                    Console.WriteLine("***************************************************\n");
-                }
-                Monitor.Exit(PrintLock);
+            //if (Monitor.TryEnter(PrintLock))
+            //{
+            //    lock (PrintLock)
+            //    {
+            //        Console.ForegroundColor = ConsoleColor.White;
+            //        Console.WriteLine("\n*******************Results:**********************\n");
+            //        foreach (string str in results)
+            //        {
+            //            Console.WriteLine("{0}", str);
+            //        }
+            //        Console.WriteLine("***************************************************\n");
+            //    }
+            //    Monitor.Exit(PrintLock);
 
-            }
+            //}
            
             return true;
         }
@@ -54,20 +54,20 @@ namespace Client
         {
             if (Monitor.TryEnter(PrintLock))
             {
-                lock (PrintLock)
-                {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("--------------------------------------------------------------------------------------------");
-                    Console.WriteLine("ID |       HOME        |       AWAY        |       1       |       X       |       2       ");
-                    Console.WriteLine("--------------------------------------------------------------------------------------------");
+                //lock (PrintLock)
+                //{
+                //    Console.ForegroundColor = ConsoleColor.White;
+                //    Console.WriteLine("--------------------------------------------------------------------------------------------");
+                //    Console.WriteLine("ID |       HOME        |       AWAY        |       1       |       X       |       2       ");
+                //    Console.WriteLine("--------------------------------------------------------------------------------------------");
 
-                    foreach (var item in offers)
-                    {
-                        Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}              {3,-5}           {4,-5}           {5,-5}  ", item.Key, item.Value.Home, item.Value.Away, item.Value.Odds[1], item.Value.Odds[0], item.Value.Odds[2]));
-                    }
-                    Console.WriteLine("**********************************************************************************************");
-                    Console.WriteLine("Press Enter for new ticket");
-                }
+                //    foreach (var item in offers)
+                //    {
+                //        Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}              {3,-5}           {4,-5}           {5,-5}  ", item.Key, item.Value.Home, item.Value.Away, item.Value.Odds[1], item.Value.Odds[0], item.Value.Odds[2]));
+                //    }
+                //    Console.WriteLine("**********************************************************************************************");
+                //    Console.WriteLine("Press Enter for new ticket");
+                //}
                 Monitor.Exit(PrintLock);
                 Offers = offers;
                 return true;

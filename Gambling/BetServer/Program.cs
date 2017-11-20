@@ -103,7 +103,13 @@ namespace BetServer
                                         if (proxy.CheckIfAlive())
                                             proxy.SendOffers(Offers);
                                     }
+                                address = "net.tcp://localhost:" + 10011 + "/ClientPrint";
+                                proxy = new BetServerProxy(binding, address);
+                                {
+                                    if (proxy.CheckIfAlive())
+                                        proxy.SendOffers(Offers);
                                 }
+                            }
                             }
                         }
                     
@@ -287,8 +293,15 @@ namespace BetServer
                     {
                         foreach (var port in ports)
                         {
+                            //NetTcpBinding binding = new NetTcpBinding();
+                            //string address = "net.tcp://localhost:" + port + "/ClientHelper";
+                            //BetServerProxy proxy = new BetServerProxy(binding, address);
+                            //{
+                            //    if (proxy.CheckIfAlive())
+                            //        proxy.SendGameResults(results);
+                            //}
                             NetTcpBinding binding = new NetTcpBinding();
-                            string address = "net.tcp://localhost:" + port + "/ClientHelper";
+                            string address = "net.tcp://localhost:" + 10011 + "/ClientPrint";
                             BetServerProxy proxy = new BetServerProxy(binding, address);
                             {
                                 if (proxy.CheckIfAlive())
