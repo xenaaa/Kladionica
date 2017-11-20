@@ -15,7 +15,16 @@ namespace BetServer
 {
     class Program
     {
+
         private static Dictionary<int, BetOffer> Offers = new Dictionary<int, BetOffer>();
+
+        private static object xmlLock = new object();
+
+        public static object XMLLock
+        {
+            get { return xmlLock; }
+            set { xmlLock = value; }
+        }
         static void Main(string[] args)
         {
             NetTcpBinding binding = new NetTcpBinding();
@@ -40,10 +49,10 @@ namespace BetServer
             Thread.Sleep(15000);
 
             new Thread(() =>
-        {
-            Thread.CurrentThread.IsBackground = true;
-            SendGameResults(bs.Ports);
-        }).Start();
+            {
+                Thread.CurrentThread.IsBackground = true;
+                SendGameResults(bs.Ports);
+            }).Start();
 
 
             while (true)
@@ -64,11 +73,13 @@ namespace BetServer
 
             while (true)
             {
-                if (File.Exists("offer.xml"))
+                lock (XMLLock)
                 {
-                    xmlDoc.Load("offer.xml");
+                    if (File.Exists("offer.xml"))
+                    {
+                        xmlDoc.Load("offer.xml");
 
-                    XmlNode node = xmlDoc.SelectSingleNode("descendant::OFFER");
+                        XmlNode node = xmlDoc.SelectSingleNode("descendant::OFFER");
 
 
                         if (node.ChildNodes.Count > 0)
@@ -81,41 +92,45 @@ namespace BetServer
                             XmlNodeList iks = xmlDoc.GetElementsByTagName("X");
                             XmlNodeList dvojka = xmlDoc.GetElementsByTagName("TWO");
 
-                      
-                        for (int i = 0; i < id.Count; i++)
-                        {
-                            Dictionary<int, double> odds = new Dictionary<int, double>();
-                            odds.Add(1, Convert.ToDouble(kec[i].InnerText));
-                            odds.Add(0, Convert.ToDouble(iks[i].InnerText));
-                            odds.Add(2, Convert.ToDouble(dvojka[i].InnerText));
 
-                            BetOffer bo = new BetOffer(home[i].InnerText, away[i].InnerText, Convert.ToInt32(id[i].InnerText), odds);
-                            if (!Offers.ContainsKey(bo.Id))
-                                Offers.Add(bo.Id, bo);
-                        }
-
-                        lock (BetService.PortLock)
-                        {
-                            foreach (var port in ports)
+                            for (int i = 0; i < id.Count; i++)
                             {
-                                address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
-                                BetServerProxy proxy = new BetServerProxy(binding, address);
+                                Dictionary<int, double> odds = new Dictionary<int, double>();
+                                odds.Add(1, Convert.ToDouble(kec[i].InnerText));
+                                odds.Add(0, Convert.ToDouble(iks[i].InnerText));
+                                odds.Add(2, Convert.ToDouble(dvojka[i].InnerText));
+
+                                BetOffer bo = new BetOffer(home[i].InnerText, away[i].InnerText, Convert.ToInt32(id[i].InnerText), odds);
+                                if (!Offers.ContainsKey(bo.Id))
+                                    Offers.Add(bo.Id, bo);
+                            }
+
+                            lock (BetService.PortLock)
+                            {
+                                BetServerProxy proxy;
+                                foreach (var port in ports)
                                 {
-                                    if (proxy.CheckIfAlive(port))
-                                        proxy.SendOffers(Offers,port); //treba ports da mu proslijedi
+                                    address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
+                                    proxy = new BetServerProxy(binding, address);
+                                    {
+                                        if (proxy.CheckIfAlive(port))
+                                            proxy.SendOffers(Offers, port); //treba ports da mu proslijedi
+                                    }
+
                                 }
                                 address = "net.tcp://localhost:" + 9995 + "/ClientPrint";
                                 proxy = new BetServerProxy(binding, address);
                                 {
-                                    if (proxy.CheckIfAlive(port))
-                                        proxy.SendOffers(Offers,port);
+                                    //if (proxy.CheckIfAlive(port))
+                                    //    proxy.SendOffers(Offers, port);
+                                    if (proxy.CheckIfAlive(9995))
+                                        proxy.SendOffers(Offers, 9995);
                                 }
                             }
                         }
-                    }
 
+                    }
                 }
-            
                 Thread.Sleep(5000);
             }
         }
@@ -177,7 +192,7 @@ namespace BetServer
         {
             bool won = true;
 
-         //   List<string> results = new List<string>();
+            //   List<string> results = new List<string>();
 
             foreach (KeyValuePair<int, Game> bet in ticket.Bets)
             {
@@ -276,8 +291,8 @@ namespace BetServer
                             tip = 1;
                         else if (home < away)
                             tip = 2;
-   
-                        Game game = new Game(betOffer, home,away, tip);
+
+                        Game game = new Game(betOffer, home, away, tip);
 
                         results.Add(game);
 
@@ -294,25 +309,36 @@ namespace BetServer
                     //saljemo svima rezultate gotovih utakmica
                     lock (BetService.PortLock)
                     {
-                        foreach (var port in ports)
-                        {
-                            //NetTcpBinding binding = new NetTcpBinding();
-                            //string address = "net.tcp://localhost:" + port + "/ClientHelper";
-                            //BetServerProxy proxy = new BetServerProxy(binding, address);
-                            //{
-                            //    if (proxy.CheckIfAlive())
-                            //        proxy.SendGameResults(results);
-                            //}
-                            NetTcpBinding binding = new NetTcpBinding();
-                          //  string address = "net.tcp://localhost:" + port + "/ClientHelper";
-                           // string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
-                            string address = "net.tcp://localhost:" + 9995 + "/ClientPrint";  //moramo dodati novi proxy
+                        //foreach (var port in ports)//ne treba jer salje samo jednom zapravo
+                        //{
+                        //    //NetTcpBinding binding = new NetTcpBinding();
+                        //    //string address = "net.tcp://localhost:" + port + "/ClientHelper";
+                        //    //BetServerProxy proxy = new BetServerProxy(binding, address);
+                        //    //{
+                        //    //    if (proxy.CheckIfAlive())
+                        //    //        proxy.SendGameResults(results);
+                        //    //}
+                        //    NetTcpBinding binding = new NetTcpBinding();
+                        //  //  string address = "net.tcp://localhost:" + port + "/ClientHelper";
+                        //   // string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
+                        //    string address = "net.tcp://localhost:" + 9995 + "/ClientPrint";  //moramo dodati novi proxy
 
-                            BetServerProxy proxy = new BetServerProxy(binding, address);
-                            {
-                                if (proxy.CheckIfAlive(port))
-                                    proxy.SendGameResults(results,port); //treba i port da se salje
-                            }
+                        //    BetServerProxy proxy = new BetServerProxy(binding, address);
+                        //    {
+                        //        if (proxy.CheckIfAlive(port))
+                        //            proxy.SendGameResults(results,port); //treba i port da se salje
+                        //    }
+                        //}
+
+                        NetTcpBinding binding = new NetTcpBinding();
+                        //  string address = "net.tcp://localhost:" + port + "/ClientHelper";
+                        // string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
+                        string address = "net.tcp://localhost:" + 9995 + "/ClientPrint";  //moramo dodati novi proxy
+
+                        BetServerProxy proxy = new BetServerProxy(binding, address);
+                        {
+                            if (proxy.CheckIfAlive(9995))
+                                proxy.SendGameResults(results, 9995); //treba i port da se salje
                         }
                     }
                     Thread.Sleep(15000);
@@ -324,21 +350,23 @@ namespace BetServer
         private static void DeleteFinishedGame(int game)
         {
             XmlDocument xmlDoc = new XmlDocument(); // Create an XML document object
-
-            if (File.Exists("offer.xml"))
+            lock (XMLLock)
             {
-                xmlDoc.Load("offer.xml");
-
-                Offers.Remove(game); //brisemo utakmicu iz liste ponuda
-                XmlNode node = xmlDoc.SelectSingleNode("descendant::PAIR[ID=" + game + "]");
-
-                if (node != null)
+                if (File.Exists("offer.xml"))
                 {
-                    XmlNode parent = node.ParentNode;
-                    parent.RemoveChild(node);
-                }
+                    xmlDoc.Load("offer.xml");
 
-                xmlDoc.Save("offer.xml");
+                    Offers.Remove(game); //brisemo utakmicu iz liste ponuda
+                    XmlNode node = xmlDoc.SelectSingleNode("descendant::PAIR[ID=" + game + "]");
+
+                    if (node != null)
+                    {
+                        XmlNode parent = node.ParentNode;
+                        parent.RemoveChild(node);
+                    }
+
+                    xmlDoc.Save("offer.xml");
+                }
             }
         }
     }

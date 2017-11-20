@@ -44,7 +44,7 @@ namespace ClientPrint
         {
             return true;
         }
-        public bool SendOffers(Dictionary<int, BetOffer> offers,int port)
+        public bool SendOffers(Dictionary<int, BetOffer> offers, int port)
         {
 
             Console.ForegroundColor = ConsoleColor.White;
@@ -56,7 +56,7 @@ namespace ClientPrint
             {
                 Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}              {3,-5}           {4,-5}           {5,-5}  ", item.Key, item.Value.Home, item.Value.Away, item.Value.Odds[1], item.Value.Odds[0], item.Value.Odds[2]));
             }
-            Console.WriteLine("**********************************************************************************************");;
+            Console.WriteLine("**********************************************************************************************"); ;
 
             return true;
 
