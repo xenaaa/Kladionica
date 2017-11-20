@@ -97,7 +97,7 @@ namespace Client
                         Console.WriteLine("Enter password:");
                         string password = Console.ReadLine();
 
-                        address = "net.tcp://localhost:9998/BetService";
+                        address = "net.tcp://localhost:12208/BetService";
 
                         ClientBetProxy proxy = new ClientBetProxy(binding, address);
 
@@ -167,7 +167,7 @@ namespace Client
                                         }
                                         else
                                         {
-                                            Monitor.Exit(ClientHelper.PrintLock);
+                                           // Monitor.Exit(ClientHelper.PrintLock);
                                             continue;
                                         }
                                     }

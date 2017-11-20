@@ -19,7 +19,7 @@ namespace BetServer
         static void Main(string[] args)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:9998/BetService";
+            string address = "net.tcp://localhost:12208/BetService";
 
             ServiceHost host = new ServiceHost(typeof(BetService));
             host.AddServiceEndpoint(typeof(IBetService), binding, address);
@@ -70,43 +70,45 @@ namespace BetServer
 
                     XmlNode node = xmlDoc.SelectSingleNode("descendant::OFFER");
 
-                    if (node.ChildNodes.Count > 0)
-                    {
-                        // Get elements
-                        XmlNodeList id = xmlDoc.GetElementsByTagName("ID");
-                        XmlNodeList home = xmlDoc.GetElementsByTagName("HOME");
-                        XmlNodeList away = xmlDoc.GetElementsByTagName("AWAY");
-                        XmlNodeList kec = xmlDoc.GetElementsByTagName("ONE");
-                        XmlNodeList iks = xmlDoc.GetElementsByTagName("X");
-                        XmlNodeList dvojka = xmlDoc.GetElementsByTagName("TWO");
 
-                        Dictionary<int, double> odds = new Dictionary<int, double>();
-                        odds.Add(1, Convert.ToDouble(kec[0].InnerText));
-                        odds.Add(0, Convert.ToDouble(iks[0].InnerText));
-                        odds.Add(2, Convert.ToDouble(dvojka[0].InnerText));
-
-                        for (int i = 0; i < id.Count; i++)
+                        if (node.ChildNodes.Count > 0)
                         {
-                            BetOffer bo = new BetOffer(home[i].InnerText, away[i].InnerText, Convert.ToInt32(id[i].InnerText), odds);
-                            if (!Offers.ContainsKey(bo.Id))
-                                Offers.Add(bo.Id, bo);
-                        }
+                            // Get elements
+                            XmlNodeList id = xmlDoc.GetElementsByTagName("ID");
+                            XmlNodeList home = xmlDoc.GetElementsByTagName("HOME");
+                            XmlNodeList away = xmlDoc.GetElementsByTagName("AWAY");
+                            XmlNodeList kec = xmlDoc.GetElementsByTagName("ONE");
+                            XmlNodeList iks = xmlDoc.GetElementsByTagName("X");
+                            XmlNodeList dvojka = xmlDoc.GetElementsByTagName("TWO");
 
-                        lock (BetService.PortLock)
-                        {
-                            foreach (var port in ports)
+                            Dictionary<int, double> odds = new Dictionary<int, double>();
+                            odds.Add(1, Convert.ToDouble(kec[0].InnerText));
+                            odds.Add(0, Convert.ToDouble(iks[0].InnerText));
+                            odds.Add(2, Convert.ToDouble(dvojka[0].InnerText));
+
+                            for (int i = 0; i < id.Count; i++)
                             {
-                                address = "net.tcp://localhost:" + port + "/ClientHelper";
-                                BetServerProxy proxy = new BetServerProxy(binding, address);
+                                BetOffer bo = new BetOffer(home[i].InnerText, away[i].InnerText, Convert.ToInt32(id[i].InnerText), odds);
+                                if (!Offers.ContainsKey(bo.Id))
+                                    Offers.Add(bo.Id, bo);
+                            }
+
+                            lock (BetService.PortLock)
+                            {
+                                foreach (var port in ports)
                                 {
-                                    if (proxy.CheckIfAlive())
-                                        proxy.SendOffers(Offers);
+                                    address = "net.tcp://localhost:" + port + "/ClientHelper";
+                                    BetServerProxy proxy = new BetServerProxy(binding, address);
+                                    {
+                                        if (proxy.CheckIfAlive())
+                                            proxy.SendOffers(Offers);
+                                    }
                                 }
                             }
                         }
-                    }
-
+                    
                 }
+            
                 Thread.Sleep(5000);
             }
         }
