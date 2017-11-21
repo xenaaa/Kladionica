@@ -1,7 +1,9 @@
-﻿using Contracts;
+﻿using CertificateManager;
+using Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +16,21 @@ namespace IntergrationPlatform
 
         public BankServiceProxy() { }
 
-        public BankServiceProxy(NetTcpBinding binding, string address) : base(binding, address)
+        public BankServiceProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
-            factory = this.CreateChannel();
+            /// cltCertCN.SubjectName should be set to the client's username. .NET WindowsIdentity class provides information about Windows user running the given process
+            string cltCertCN = "bankservice";
 
+            this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
+            // this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new ClientCertValidator();
+            this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+
+            /// Set appropriate client's certificate on the channel. Use CertManager class to obtain the certificate based on the "cltCertCN"
+            this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
+
+            factory = this.CreateChannel();
         }
+
 
         public bool BankLogin(string username, string password, int port)
         {

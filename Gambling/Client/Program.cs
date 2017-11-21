@@ -164,25 +164,29 @@ namespace Client
              bets.Add(3002, g);*/
             // t.Bets = bets;
 
-            proxy.SendTicket(ticket, clientIdentity.Name.Split('\\')[1]);
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("\n************************************TICKET**************************************\n");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("-----------------------------------------------------------------------------------");
-            Console.WriteLine("ID |       HOME        |       AWAY        |       ODDS      |       TIP       ");
-            Console.WriteLine("-----------------------------------------------------------------------------------");
-
-            foreach (KeyValuePair<int, Game> item in ticket.Bets)
+            if (proxy.SendTicket(ticket, clientIdentity.Name.Split('\\')[1]))
             {
-                Console.WriteLine(String.Format("{0,-10} {1,-10}          {2,-10}             {3,-5}           {4,-5}  ", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.BetOffer.Odds[item.Value.Tip], item.Value.Tip));
+
+
+
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\n************************************TICKET**************************************\n");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("-----------------------------------------------------------------------------------");
+                Console.WriteLine("ID |       HOME        |       AWAY        |       ODDS      |       TIP       ");
+                Console.WriteLine("-----------------------------------------------------------------------------------");
+
+                foreach (KeyValuePair<int, Game> item in ticket.Bets)
+                {
+                    Console.WriteLine(String.Format("{0,-10} {1,-10}          {2,-10}             {3,-5}           {4,-5}  ", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.BetOffer.Odds[item.Value.Tip], item.Value.Tip));
+                }
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\nPossible win: " + ticket.CashPrize);
+                Console.WriteLine("\n*********************************************************************************");
+                Console.ForegroundColor = ConsoleColor.White;
             }
-
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("\nPossible win: " + ticket.CashPrize);
-            Console.WriteLine("\n*********************************************************************************");
-            Console.ForegroundColor = ConsoleColor.White;
-
         }
 
         private static void BankService(WindowsIdentity clientIdentity, int port)

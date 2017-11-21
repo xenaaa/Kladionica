@@ -16,6 +16,7 @@ namespace SecurityManager
 
 		static Audit()
 		{
+
 			try
 			{
                 /// create customLog handle
@@ -54,9 +55,11 @@ namespace SecurityManager
 		}
         public static void AuthorizationSuccess(string userName, string serviceName)
 		{
-            string UserAuthorizationSuccess = AuditEvents.UserAuthorizationSuccess;
-            UserAuthorizationSuccess = string.Format(UserAuthorizationSuccess, userName, serviceName);
-            customLog.WriteEntry(UserAuthorizationSuccess);
+            
+                string UserAuthorizationSuccess = AuditEvents.UserAuthorizationSuccess;
+                UserAuthorizationSuccess = string.Format(UserAuthorizationSuccess, userName, serviceName);
+                customLog.WriteEntry(UserAuthorizationSuccess);
+            
         }
 
 		/// <summary>

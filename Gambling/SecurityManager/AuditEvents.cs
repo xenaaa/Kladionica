@@ -8,68 +8,68 @@ using System.Text;
 
 namespace SecurityManager
 {
-	public enum AuditEventTypes
-	{
-		UserAuthenticationSuccess = 0,
-		UserAuthorizationSuccess = 1,
-		UserAuthorizationFailed = 2,
-        TicketSent=3,
-        TicketSentFailed=4,
-        AddUser=5,
-        AddUserFailed=6,
-        DeleteUser=7,
-        DeleteUserFailed=8,
-        EditUser=9,
-        EditUserFailed=10,
-        Deposit=11,
-        DepositFailed=12,
-        CreateAccount=13,
-        CreateAccountFailed=14
+    public enum AuditEventTypes
+    {
+        UserAuthenticationSuccess = 0,
+        UserAuthorizationSuccess = 1,
+        UserAuthorizationFailed = 2,
+        TicketSent = 3,
+        TicketSentFailed = 4,
+        AddUser = 5,
+        AddUserFailed = 6,
+        DeleteUser = 7,
+        DeleteUserFailed = 8,
+        EditUser = 9,
+        EditUserFailed = 10,
+        Deposit = 11,
+        DepositFailed = 12,
+        CreateAccount = 13,
+        CreateAccountFailed = 14
     }
 
-	public class AuditEvents
-	{
-		private static ResourceManager resourceManager = null;
-		private static object resourceLock = new object();
+    public class AuditEvents
+    {
+        private static ResourceManager resourceManager = null;
+        private static object resourceLock = new object();
 
-		private static ResourceManager ResourceMgr
-		{
-			get
-			{
-				lock (resourceLock)
-				{
-					if (resourceManager == null)
-					{
-						resourceManager = new ResourceManager(typeof(AuditEventsFile).FullName, Assembly.GetExecutingAssembly());
-					}
-					return resourceManager;
-				}
-			}
-		}
+        private static ResourceManager ResourceMgr
+        {
+            get
+            {
+                lock (resourceLock)
+                {
+                    if (resourceManager == null)
+                    {
+                        resourceManager = new ResourceManager(typeof(AuditEventsFile).FullName, Assembly.GetExecutingAssembly());
+                    }
+                    return resourceManager;
+                }
+            }
+        }
 
-		public static string UserAuthenticationSuccess
-		{
-			get
-			{
-				return ResourceMgr.GetString(AuditEventTypes.UserAuthenticationSuccess.ToString());
-			}
-		}
+        public static string UserAuthenticationSuccess
+        {
+            get
+            {
+                return ResourceMgr.GetString(AuditEventTypes.UserAuthenticationSuccess.ToString());
+            }
+        }
 
-		public static string UserAuthorizationSuccess
-		{
-			get
-			{
-				return ResourceMgr.GetString(AuditEventTypes.UserAuthorizationSuccess.ToString());
-			}
-		}
+        public static string UserAuthorizationSuccess
+        {
+            get
+            {
+                return ResourceMgr.GetString(AuditEventTypes.UserAuthorizationSuccess.ToString());
+            }
+        }
 
-		public static string UserAuthorizationFailed
-		{
-			get
-			{
-				return ResourceMgr.GetString(AuditEventTypes.UserAuthorizationFailed.ToString());
-			}
-		}
+        public static string UserAuthorizationFailed
+        {
+            get
+            {
+                return ResourceMgr.GetString(AuditEventTypes.UserAuthorizationFailed.ToString());
+            }
+        }
 
         public static string TicketSent
         {
@@ -164,8 +164,6 @@ namespace SecurityManager
                 return ResourceMgr.GetString(AuditEventTypes.CreateAccountFailed.ToString());
             }
         }
-
-
     }
-   }
+}
 

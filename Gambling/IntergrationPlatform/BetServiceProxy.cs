@@ -1,8 +1,10 @@
-﻿using Contracts;
+﻿using CertificateManager;
+using Contracts;
 using SecurityManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.Text;
 using System.Threading;
@@ -15,8 +17,17 @@ namespace IntergrationPlatform
         IBetService factory;
 
         public BetServiceProxy() { }
-        public BetServiceProxy(NetTcpBinding binding, string address) : base(binding, address)
+        public BetServiceProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
+            /// cltCertCN.SubjectName should be set to the client's username. .NET WindowsIdentity class provides information about Windows user running the given process
+            string cltCertCN = "betservice";
+
+            this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
+            this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+
+            /// Set appropriate client's certificate on the channel. Use CertManager class to obtain the certificate based on the "cltCertCN"
+            this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
+            //  Console.WriteLine(this.Credentials.ClientCertificate.Certificate.ToString());
             factory = this.CreateChannel();
         }
 

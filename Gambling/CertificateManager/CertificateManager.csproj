@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{37997F47-FC86-4542-87A8-68AA71341FFC}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{5035DC62-7965-4BC7-96FD-ADDBD1786FAE}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IntergrationPlatform</RootNamespace>
-    <AssemblyName>IntergrationPlatform</AssemblyName>
+    <RootNamespace>CertificateManager</RootNamespace>
+    <AssemblyName>CertificateManager</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -35,8 +32,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.IdentityModel" />
-    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,31 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BankService.cs" />
-    <Compile Include="BankServiceProxy.cs" />
-    <Compile Include="BetService.cs" />
-    <Compile Include="BetServiceProxy.cs" />
-    <Compile Include="ClientHelper.cs" />
-    <Compile Include="ClientProxy.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="CertManager.cs" />
+    <Compile Include="Formatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CertificateManager\CertificateManager.csproj">
-      <Project>{5035dc62-7965-4bc7-96fd-addbd1786fae}</Project>
-      <Name>CertificateManager</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\IntegrationPlatform\Contracts.csproj">
-      <Project>{1559299E-7348-4FD7-9D85-9F78B1988343}</Project>
-      <Name>Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SecurityManager\SecurityManager.csproj">
-      <Project>{62a54f0a-8e5a-4300-819f-d1625ef865c8}</Project>
-      <Name>SecurityManager</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -11,20 +11,6 @@ namespace ClientPrint
     {
         public bool SendGameResults(List<Game> results, int port)
         {
-
-            //Console.ForegroundColor = ConsoleColor.White;
-            //Console.WriteLine("\n*******************Results:**********************\n");
-            //foreach (string str in results)
-            //{
-            //    Console.WriteLine("{0}", str);
-            //}
-            //Console.WriteLine("***************************************************\n");
-
-
-            //return true;
-
-
-
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\n\n-------------------------------------RESULTS------------------------------------------------\n");
             Console.WriteLine("ID |       HOME        |       AWAY        |         RESULT        ");
@@ -32,7 +18,7 @@ namespace ClientPrint
 
             foreach (var item in results)
             {
-                Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}           {3,-2} : {4,-5} ", item.BetOffer.Id, item.BetOffer.Home, item.BetOffer.Away, item.HomeGoalScored, item.AwayGoalScored));
+                Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}                 {3,-2}:{4,-5} ", item.BetOffer.Id, item.BetOffer.Home, item.BetOffer.Away, item.HomeGoalScored, item.AwayGoalScored));
             }
             Console.WriteLine("**********************************************************************************************\n\n");
             Console.ForegroundColor = ConsoleColor.White;
@@ -48,7 +34,7 @@ namespace ClientPrint
         {
 
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("--------------------------------------------------------------------------------------------");
+            Console.WriteLine("------------------------------------DAILY OFFER------------------------------------------------\n");
             Console.WriteLine("ID |       HOME        |       AWAY        |       1       |       X       |       2       ");
             Console.WriteLine("--------------------------------------------------------------------------------------------");
 
@@ -56,7 +42,7 @@ namespace ClientPrint
             {
                 Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}              {3,-5}           {4,-5}           {5,-5}  ", item.Key, item.Value.Home, item.Value.Away, item.Value.Odds[1], item.Value.Odds[0], item.Value.Odds[2]));
             }
-            Console.WriteLine("**********************************************************************************************"); ;
+            Console.WriteLine("**********************************************************************************************\n\n"); ;
 
             return true;
 

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{A2E97254-709A-4D51-AD19-3B72FC2CE926}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientPrint", "ClientPrint\ClientPrint.csproj", "{302981CB-E6AB-4978-8FFC-EABE20596DA0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecurityManager", "SecurityManager\SecurityManager.csproj", "{62A54F0A-8E5A-4300-819F-D1625EF865C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CertificateManager", "CertificateManager\CertificateManager.csproj", "{5035DC62-7965-4BC7-96FD-ADDBD1786FAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{62A54F0A-8E5A-4300-819F-D1625EF865C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62A54F0A-8E5A-4300-819F-D1625EF865C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62A54F0A-8E5A-4300-819F-D1625EF865C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5035DC62-7965-4BC7-96FD-ADDBD1786FAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5035DC62-7965-4BC7-96FD-ADDBD1786FAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5035DC62-7965-4BC7-96FD-ADDBD1786FAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5035DC62-7965-4BC7-96FD-ADDBD1786FAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

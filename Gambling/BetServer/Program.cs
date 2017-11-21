@@ -1,10 +1,13 @@
 ﻿using BetServer;
+using CertificateManager;
 using Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using System.ServiceModel.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,12 +30,24 @@ namespace BetServer
 
         static void Main(string[] args)
         {
+            string srvCertCN = "betservice";
+
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:12208/BetService";
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+            string address = "net.tcp://localhost:9998/BetService";
 
             ServiceHost host = new ServiceHost(typeof(BetService));
             host.AddServiceEndpoint(typeof(IBetService), binding, address);
 
+
+            //sertifikacija
+            host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
+            host.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+
+            ///Set appropriate service's certificate on the host. Use CertManager class to obtain the certificate based on the "srvCertCN"
+            host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+
+        
             host.Open();
 
             Console.WriteLine("Bet service is started.");
@@ -67,7 +82,6 @@ namespace BetServer
         private static void SendOffers(List<int> ports) //slanje ponude kijentu svakih 5 minuta
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "";
 
             XmlDocument xmlDoc = new XmlDocument(); // Create an XML document object
 
@@ -109,19 +123,41 @@ namespace BetServer
 
                             lock (BetService.PortLock)
                             {
+                                string srvCertCN = "betserviceintegration";
+                                binding = new NetTcpBinding();
+                                binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+                                //   string address = "net.tcp://localhost:9998/BetService";
+
+                                X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+                                EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9991/ClientIntegrationPlatform"),
+                                                          new X509CertificateEndpointIdentity(srvCert));
+
                                 BetServerProxy proxy;
+                                //  string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
+                                proxy = new BetServerProxy(binding, address);
+
+
                                 foreach (var port in ports)
                                 {
-                                    address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
-                                    proxy = new BetServerProxy(binding, address);
+                                    //string srvCertCN = "betservice"; //betserviceintegration
+                                    //binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
+                                    ///// Use CertManager class to obtain the certificate based on the "srvCertCN" representing the expected service identity.
+                                    //X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+                                    //EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9991/ClientIntegrationPlatform"),
+                                    //                          new X509CertificateEndpointIdentity(srvCert));
+
                                     {
                                         if (proxy.CheckIfAlive(port))
-                                            proxy.SendOffers(Offers, port); //treba ports da mu proslijedi
+                                            proxy.SendOffers(Offers, port);
                                     }
 
                                 }
-                                address = "net.tcp://localhost:" + 9995 + "/ClientPrint";
-                                proxy = new BetServerProxy(binding, address);
+
+                                binding = new NetTcpBinding();
+
+                                string address2 = "net.tcp://localhost:" + 9995 + "/ClientPrint";
+                                proxy = new BetServerProxy(binding, address2);
                                 {
                                     //if (proxy.CheckIfAlive(port))
                                     //    proxy.SendOffers(Offers, port);
@@ -130,7 +166,7 @@ namespace BetServer
                                 }
                             }
                         }
-                    }
+                    }              
                 }
             }
         }
@@ -223,7 +259,28 @@ namespace BetServer
 
             NetTcpBinding binding = new NetTcpBinding();
             //    string address = "net.tcp://localhost:" + user.Port + "/ClientHelper";
-            string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
+            // string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
+
+            //string srvCertCN = "betserviceintegration";
+            //binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
+            ///// Use CertManager class to obtain the certificate based on the "srvCertCN" representing the expected service identity.
+            //X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+            //EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9991/ClientIntegrationPlatform"),
+            //                          new X509CertificateEndpointIdentity(srvCert));
+
+          //  string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
+
+
+            string srvCertCN = "betserviceintegration";
+            binding = new NetTcpBinding();
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+            //   string address = "net.tcp://localhost:9998/BetService";
+
+            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9991/ClientIntegrationPlatform"),
+                                      new X509CertificateEndpointIdentity(srvCert));
+
             BetServerProxy proxy = new BetServerProxy(binding, address);
             {
                 if (proxy.CheckIfAlive(user.Port))//ako vrati false obrisati tog user-a?
