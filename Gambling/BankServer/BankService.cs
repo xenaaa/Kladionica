@@ -43,24 +43,24 @@ namespace BankServer
                         return false;
                     }
                 }
-                else
-                {
+                //else
+                //{
 
-                    User user = new User(username, password, "User");
-                    user.Port = port;
-                    if (CreateAccount(user))
-                        return true;
-                    else
-                        return false;
-                }
-            }        
+                //    User user = new User(username, password, "User");
+                //    user.Port = port;
+                //    if (CreateAccount(user))
+                //        return true;
+                //    else
+                //        return false;
+                //}
+            }
             return false;
         }
 
 
-        private bool CreateAccount(User user)
+        public bool CreateAccount(User user)
         {
-            WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+            //  WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             if (BankUsers.Keys.Contains(user.Username))
                 return false;
             else
@@ -77,38 +77,38 @@ namespace BankServer
 
         }
 
-        public bool Deposit(Account acc)
+        public bool Deposit(Account acc, string username)
         {
-            WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
-            if (BankUsers.Keys.Contains(identity.Name))
-            {
-                KeyValuePair<string, User> user = BankUsers.Where(u => u.Value.BankAccount.Number == acc.Number).FirstOrDefault();
+            //WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+            //if (BankUsers.Keys.Contains(identity.Name))
+            //{
+            KeyValuePair<string, User> user = BankUsers.Where(u => u.Value.BankAccount.Number == acc.Number).FirstOrDefault();
 
-                if (user.Key == null)
+            if (user.Key == null)
+            {
+                Console.WriteLine("Account number doesn't exist\n");
+                return false;
+            }
+            else
+            {
+                if (BankUsers[username].BankAccount.Amount - acc.Amount < 0)
                 {
-                    Console.WriteLine("Account number doesn't exist\n");
+                    Console.WriteLine("There is not enough amount on your bank account");
                     return false;
                 }
                 else
                 {
-                    if (BankUsers[identity.Name].BankAccount.Amount - acc.Amount < 0)
-                    {
-                        Console.WriteLine("There is not enough amount on your bank account");
-                        return false;
-                    }
-                    else
-                    {
-                        BankUsers[user.Value.Username].BankAccount.Amount += acc.Amount; // povecavamo drugi
-                        BankUsers[identity.Name].BankAccount.Amount = BankUsers[identity.Name].BankAccount.Amount - acc.Amount; // smanjujemo onaj s kog prebacujemo
-                        return true;
-                    }
+                    BankUsers[user.Value.Username].BankAccount.Amount += acc.Amount; // povecavamo drugi
+                    BankUsers[username].BankAccount.Amount = BankUsers[username].BankAccount.Amount - acc.Amount; // smanjujemo onaj s kog prebacujemo
+                    return true;
                 }
             }
-            else
-            {
-                Console.WriteLine("User {0} doesn't exist", identity.Name);
-                return false;
-            }
+            //}
+            //else
+            //{
+            //    Console.WriteLine("User {0} doesn't exist", identity.Name);
+            //    return false;
+            //}
         }
     }
 }

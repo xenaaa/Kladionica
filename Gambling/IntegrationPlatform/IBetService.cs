@@ -14,22 +14,22 @@ namespace Contracts
         bool CheckIfAlive();
 
         [OperationContract]
-        bool SendPort(int port);
-        
+        bool SendPort(string username, int port);
+
         [OperationContract]
-        bool BetLogin(string username, string password,int port);
+        bool BetLogin(string username, string password, int port);
 
         [OperationContract]
         bool AddUser(User user);
 
         [OperationContract]
-        bool DeleteUser(User user);
+        bool DeleteUser(string username);
 
         [OperationContract]
         bool EditUser(User user);
 
 
         [OperationContract]
-        bool SendTicket(Ticket ticket, string username);    
+        bool SendTicket(Ticket ticket, string username);
     }
 }

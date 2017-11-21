@@ -41,7 +41,7 @@ namespace Client
             //    Monitor.Exit(PrintLock);
 
             //}
-           
+
             return true;
         }
 
@@ -50,7 +50,7 @@ namespace Client
             return true;
         }
 
-        public bool SendOffers(Dictionary<int, BetOffer> offers,int port)
+        public bool SendOffers(Dictionary<int, BetOffer> offers, int port)
         {
             if (Monitor.TryEnter(PrintLock))
             {
@@ -72,36 +72,43 @@ namespace Client
                 Offers = offers;
                 return true;
             }
-          
+
             return false;
         }
 
-        public bool SendTicketResults(Ticket tiket, bool prosao, int port)
+        public bool SendTicketResults(Ticket ticket, bool prosao, int port)
         {
-            int counter = 0;
             if (prosao)
             {
                 if (Monitor.TryEnter(PrintLock))
                 {
                     lock (PrintLock)
                     {
-                        Console.WriteLine("\n*********************TIKET DOBITNI*********************");
-                        foreach (KeyValuePair<int, Game> item in tiket.Bets)
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("\n**********************************TICKET WON************************************\n");
+                        Console.WriteLine("-----------------------------------------------------------------------------------");
+                        Console.WriteLine("ID |       HOME        |       AWAY        |       RESULT      |       TIP       ");
+                        Console.WriteLine("-----------------------------------------------------------------------------------");
+
+                        foreach (KeyValuePair<int, Game> item in ticket.Bets)
                         {
                             //SVE ZELENO
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("{0}     {1}  :  {2}      {3} : {4}     -   {5}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away,item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip);
-                            Console.ForegroundColor = ConsoleColor.White;
-                            counter++;
+                            Console.WriteLine(String.Format("{0,-10} {1,-10}          {2,-10}             {3,-1} : {4,-4}           {5,-5}  ", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip));
+                            //   Console.ForegroundColor = ConsoleColor.White;
                         }
 
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("Dobitak: " + tiket.CashPrize);
-                        Console.WriteLine("\n*******************************************************");
+                        Console.WriteLine("\nWin: " + ticket.CashPrize);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("\n*********************************************************************************");
+
+
+
                     }
                     Monitor.Exit(PrintLock);
                 }
-                
+
             }
             else
             {
@@ -109,32 +116,32 @@ namespace Client
                 {
                     lock (PrintLock)
                     {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("\n*********************TIKET GUBITNI*********************");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("\n**********************************TICKET LOST************************************\n");
+                        Console.WriteLine("-----------------------------------------------------------------------------------");
+                        Console.WriteLine("ID |       HOME        |       AWAY        |       RESULT      |       TIP       ");
+                        Console.WriteLine("-----------------------------------------------------------------------------------");
 
-                        foreach (KeyValuePair<int, Game> item in tiket.Bets)
+                        foreach (KeyValuePair<int, Game> item in ticket.Bets)
                         {
                             if (item.Value.Won)//zelena boja
                             {
                                 Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("{0}     {1}  :  {2}      {3} : {4}     -   {5}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip);
+                                Console.WriteLine(String.Format("{0,-10} {1,-10}          {2,-10}           {3,-1} : {4,-4}           {5,-5}  ", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip));
                             }
                             else //crvena boja
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("{0}     {1}  :  {2}      {3} : {4}     -   {5}  \n", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip);
-
+                                Console.WriteLine(String.Format("{0,-10} {1,-10}          {2,-10}           {3,-1} : {4,-4}           {5,-5}  ", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip));
                             }
-                            Console.ForegroundColor = ConsoleColor.White;
-                            counter++;
-
                         }
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("*******************************************************");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("\nWin: 0");
+                        Console.WriteLine("**********************************************************************************"); ;
                     }
                     Monitor.Exit(PrintLock);
                 }
-               
+
             }
             return true;
         }

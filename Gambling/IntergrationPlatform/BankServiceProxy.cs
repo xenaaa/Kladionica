@@ -13,7 +13,7 @@ namespace IntergrationPlatform
         IBankService factory;
 
         public BankServiceProxy() { }
-       
+
         public BankServiceProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
             factory = this.CreateChannel();
@@ -24,7 +24,7 @@ namespace IntergrationPlatform
         {
             try
             {
-                factory.BankLogin(username,password,port);
+                factory.BankLogin(username, password, port);
                 return true;
             }
             catch (Exception e)
@@ -48,11 +48,25 @@ namespace IntergrationPlatform
             }
         }
 
-        public bool Deposit(Account acc)
+        public bool CreateAccount(User user)
         {
             try
             {
-                factory.Deposit(acc);
+                factory.CreateAccount(user);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
+        }
+
+        public bool Deposit(Account acc, string username)
+        {
+            try
+            {
+                factory.Deposit(acc, username);
                 return true;
             }
             catch (Exception e)

@@ -17,9 +17,9 @@ namespace Contracts
         bool SendGameResults(List<Game> results, int port);
 
         [OperationContract]
-        bool SendOffers(Dictionary<int,BetOffer> offers, int port);
+        bool SendOffers(Dictionary<int, BetOffer> offers, int port);
 
         [OperationContract]
-        bool SendTicketResults(Ticket ticket,bool isPassed, int port);
+        bool SendTicketResults(Ticket ticket, bool isPassed, int port);
     }
 }

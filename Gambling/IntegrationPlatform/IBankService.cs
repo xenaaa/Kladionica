@@ -13,9 +13,11 @@ namespace Contracts
         [OperationContract]
         bool CheckIfAlive();
         [OperationContract]
-        bool BankLogin(string username, string password,int port);
-
+        bool BankLogin(string username, string password, int port);
         [OperationContract]
-        bool Deposit(Account acc);
+        bool Deposit(Account acc, string username);
+        [OperationContract]
+        bool CreateAccount(User user);
+
     }
 }

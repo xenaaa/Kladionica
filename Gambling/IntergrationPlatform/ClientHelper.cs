@@ -12,10 +12,7 @@ namespace IntergrationPlatform
     {
         ClientProxy proxy;
 
-        public ClientHelper()
-        {
-
-        }
+        public ClientHelper() { }
 
         public bool CheckIfAlive(int port)
         {

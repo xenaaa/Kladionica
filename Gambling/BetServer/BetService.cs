@@ -56,10 +56,11 @@ namespace BetServer
             return true;
         }
 
-        public bool SendPort(int port)
+        public bool SendPort(string username, int port)
         {
             lock (PortLock)
             {
+                BetUsers[username].Port = port;
                 ports.Add(port);
             }
             return true;
@@ -85,16 +86,16 @@ namespace BetServer
                         return false;
                     }
                 }
-                else
-                {
+                //else
+                //{
 
-                    User user = new User(username, password, "User");
-                    user.Port = port;
-                    if (AddUser(user))
-                        return true;
-                    else
-                        return false;
-                }
+                //    User user = new User(username, password, "User");
+                //    user.Port = port;
+                //    if (AddUser(user))
+                //        return true;
+                //    else
+                //        return false;
+                //}
             }
             return false;
         }
@@ -121,90 +122,90 @@ namespace BetServer
                     Console.WriteLine("User {0} already exists.", user.Username);
                     return false;
                 }
-            }       
-            Console.WriteLine("User {0} already exists", identity.Name); 
+            }
+            Console.WriteLine("User {0} already exists", identity.Name);
             return false;
 
         }
 
-        public bool DeleteUser(User user)
+        public bool DeleteUser(string username)
         {
-            WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
-            Console.WriteLine("User {0} je pozvao DeleteUser\n", identity.Name);
-            if (BetUsers.ContainsKey(identity.Name))
+            //WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+            //Console.WriteLine("User {0} je pozvao DeleteUser\n", identity.Name);
+            //if (BetUsers.ContainsKey(identity.Name))
+            //{
+            if (!BetUsers.ContainsKey(username))
             {
-                if (!BetUsers.ContainsKey(user.Username))
-                {
-                    Console.WriteLine("Error! There is no user {0} in BetService", user.Username);
-                    return false;
-                }
-                else
-                {
-                    BetUsers.Remove(user.Username);
-                    Console.WriteLine("User {0} removed from BetService", user.Username);
-                    return true;
-                }
+                Console.WriteLine("Error! There is no user {0} in BetService", username);
+                return false;
             }
             else
             {
-                Console.WriteLine("User {0} doesn't exist", identity.Name);
-                return false;
+                BetUsers.Remove(username);
+                Console.WriteLine("User {0} removed from BetService", username);
+                return true;
             }
+            //  }
+            //else
+            //{
+            //    Console.WriteLine("User {0} doesn't exist", identity.Name);
+            //    return false;
+            //}
         }
 
         public bool EditUser(User user)
         {
-            WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
-            Console.WriteLine("User {0} je pozvao EditUser\n", identity.Name);
-            if (BetUsers.ContainsKey(identity.Name))
+            //WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+            //Console.WriteLine("User {0} je pozvao EditUser\n", identity.Name);
+            //if (BetUsers.ContainsKey(identity.Name))
+            //{
+            if (!BetUsers.ContainsKey(user.Username))
             {
-                if (!BetUsers.ContainsKey(user.Username))
-                {
-                    Console.WriteLine("Error! There is no user {0} in BetService", user.Username);
-                    return false;
-                }
-                else
-                {
-                    foreach (KeyValuePair<string, User> kvp in BetUsers)
-                    {
-                        if (kvp.Key == user.Username)
-                        {
-                            kvp.Value.BetAccount = user.BetAccount;
-                            kvp.Value.Role = user.Role;
-                            kvp.Value.Password = user.Password;
-                        }
-                    }
-                    return true;
-                }
+                Console.WriteLine("Error! There is no user {0} in BetService", user.Username);
+                return false;
             }
             else
             {
-                Console.WriteLine("User {0} doesn't exist", identity.Name);
-                return false;
+                foreach (KeyValuePair<string, User> kvp in BetUsers)
+                {
+                    if (kvp.Key == user.Username)
+                    {
+                        kvp.Value.BetAccount = user.BetAccount;
+                        kvp.Value.Role = user.Role;
+                        kvp.Value.Password = user.Password;
+                    }
+                }
+                return true;
             }
+            //}
+            //else
+            //{
+            //    Console.WriteLine("User {0} doesn't exist", identity.Name);
+            //    return false;
+            //}
         }
 
 
         public bool SendTicket(Ticket ticket, string username)
         {
-            WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
-            Console.WriteLine("User {0} je pozvao SendTicket\n", identity.Name);
-            if (BetUsers.ContainsKey(identity.Name))
+            //WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+            //Console.WriteLine("User {0} je pozvao SendTicket\n", identity.Name);
+            //  if (BetUsers.ContainsKey(identity.Name))
+            //{
+            if (BetUsers.ContainsKey(username))
             {
-                if (BetUsers.ContainsKey(username))
-                {
-                    BetUsers[username].Tickets.Add(ticket);
-                    return true;
-                }
-                else
-                    return false;
-
+                BetUsers[username].Tickets.Add(ticket);
+                return true;
             }
             else
-            {
-                Console.WriteLine("User {0} doesn't exist", identity.Name);
                 return false;
-            }
+
+            //}
+            //else
+            //{
+            //    Console.WriteLine("User {0} doesn't exist", identity.Name);
+            //    return false;
+            //}
         }
     }
 }

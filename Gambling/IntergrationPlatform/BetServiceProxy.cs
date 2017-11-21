@@ -15,7 +15,7 @@ namespace IntergrationPlatform
         public BetServiceProxy() { }
         public BetServiceProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
-            factory = this.CreateChannel();       
+            factory = this.CreateChannel();
         }
 
         public bool AddUser(User user)
@@ -33,11 +33,11 @@ namespace IntergrationPlatform
         }
 
 
-        public bool DeleteUser(User user)
+        public bool DeleteUser(string username)
         {
             try
             {
-                factory.DeleteUser(user);
+                factory.DeleteUser(username);
                 return true;
             }
             catch (Exception e)
@@ -81,7 +81,7 @@ namespace IntergrationPlatform
         {
             try
             {
-                factory.BetLogin(username,password,port);
+                factory.BetLogin(username, password, port);
                 return true;
             }
             catch (Exception e)
@@ -93,7 +93,7 @@ namespace IntergrationPlatform
 
         public bool CheckIfAlive()
         {
-            
+
             try
             {
                 factory.CheckIfAlive();
@@ -108,11 +108,11 @@ namespace IntergrationPlatform
 
 
 
-        public bool SendPort(int port)
+        public bool SendPort(string username, int port)
         {
             try
             {
-                factory.SendPort(port);
+                factory.SendPort(username, port);
                 return true;
             }
             catch (Exception e)

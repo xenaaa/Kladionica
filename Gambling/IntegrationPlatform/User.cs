@@ -18,7 +18,7 @@ namespace Contracts
         Account betAccount;
         List<Ticket> tickets;
         int port;
-       
+
 
         [DataMember]
         public string Username
@@ -112,7 +112,7 @@ namespace Contracts
                 port = value;
             }
         }
-       
+
         public User()
         { }
 
@@ -136,5 +136,8 @@ namespace Contracts
             betAccount = betAcc;
             tickets = new List<Ticket>();
         }
+
+
+
     }
 }

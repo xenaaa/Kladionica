@@ -13,7 +13,7 @@ namespace BankServer
         static void Main(string[] args)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:9999/BankService";
+            string address = "net.tcp://localhost:8888/BankService";
 
             ServiceHost host = new ServiceHost(typeof(BankService));
             host.AddServiceEndpoint(typeof(IBankService), binding, address);

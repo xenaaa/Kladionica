@@ -17,7 +17,7 @@ namespace Contracts
         {
 
         }
-        public Account(double amount,int number)
+        public Account(double amount, int number)
         {
             this.amount = amount;
             this.number = number;

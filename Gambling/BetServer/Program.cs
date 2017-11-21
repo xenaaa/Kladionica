@@ -15,7 +15,6 @@ namespace BetServer
 {
     class Program
     {
-
         private static Dictionary<int, BetOffer> Offers = new Dictionary<int, BetOffer>();
 
         private static object xmlLock = new object();
@@ -25,6 +24,7 @@ namespace BetServer
             get { return xmlLock; }
             set { xmlLock = value; }
         }
+
         static void Main(string[] args)
         {
             NetTcpBinding binding = new NetTcpBinding();
@@ -46,7 +46,7 @@ namespace BetServer
                 SendOffers(bs.Ports);
             }).Start();
 
-            Thread.Sleep(15000);
+            //Thread.Sleep(15000);
 
             new Thread(() =>
             {
@@ -58,7 +58,7 @@ namespace BetServer
             while (true)
             {
                 CheckUserGames();
-                Thread.Sleep(2000);
+                Thread.Sleep(3000);
             }
 
             host.Close();
@@ -75,9 +75,11 @@ namespace BetServer
             {
                 lock (XMLLock)
                 {
-                    if (File.Exists("offer.xml"))
+                    Thread.Sleep(15000);
+
+                    if (File.Exists("offers.xml"))
                     {
-                        xmlDoc.Load("offer.xml");
+                        xmlDoc.Load("offers.xml");
 
                         XmlNode node = xmlDoc.SelectSingleNode("descendant::OFFER");
 
@@ -128,10 +130,8 @@ namespace BetServer
                                 }
                             }
                         }
-
                     }
                 }
-                Thread.Sleep(5000);
             }
         }
 
@@ -140,6 +140,7 @@ namespace BetServer
             bool allGamesDone = true;
             Ticket t = new Ticket();
 
+            List<Ticket> tickets = new List<Ticket>(); //lista tiketa koji se brisu iz liste
 
             if (BetService.BetUsers.Count > 0 && BetService.Rezultati.Count > 0)
             {
@@ -170,17 +171,25 @@ namespace BetServer
 
                             if (allGamesDone)
                             {
-                                //sendticketresoults za tog User-a i taj tiket...
-                                new Thread(() =>
-                                {
-                                    Thread.CurrentThread.IsBackground = true;
-                                    SendTicketResults2(user.Value, ticket);
-                                }).Start();
-                                user.Value.Tickets.Remove(ticket);//uklanja se tiket
+                                SendTicketResults2(user.Value, ticket);
+                                tickets.Add(ticket);
 
-                                if (user.Value.Tickets.Count == 0)//ako obrise i poslednji tiket
-                                    break;
+                                //   //sendticketresoults za tog User-a i taj tiket...
+                                //   new Thread(() =>
+                                //   {
+                                //       Thread.CurrentThread.IsBackground = true;
+                                //       SendTicketResults2(user.Value, ticket);
+                                //   }).Start();
+                                ////   user.Value.Tickets.Remove(ticket);//uklanja se tiket
+
+                                //   if (user.Value.Tickets.Count == 0)//ako obrise i poslednji tiket
+                                //       break;
                             }
+                        }
+
+                        foreach (var item in tickets)
+                        {
+                            user.Value.Tickets.Remove(item);
                         }
                     }
                 }
@@ -220,6 +229,15 @@ namespace BetServer
                 if (proxy.CheckIfAlive(user.Port))//ako vrati false obrisati tog user-a?
                     proxy.SendTicketResults(ticket, won, user.Port); // treba port od klijenta kom salje
             }
+
+            if (won)
+            {
+                User changeUser = user;
+                changeUser.BetAccount.Amount += ticket.CashPrize;
+                BetService betService = new BetService();
+                betService.EditUser(changeUser);
+            }
+
             //user.Tickets.Clear();
             return true;
         }
@@ -243,6 +261,8 @@ namespace BetServer
 
             while (true)
             {
+                Thread.Sleep(40000);
+
                 j = 0;
                 if (Offers.Count > 0)
                 {
@@ -263,7 +283,7 @@ namespace BetServer
                     }
 
                     Random r = new Random();
-                    finished = r.Next(1, 5);  //broj utakmica koje ce se zavrsiti
+                    finished = r.Next(1, 6);  //broj utakmica koje ce se zavrsiti
                     if (finished > Offers.Count)
                         finished = Offers.Count;
 
@@ -341,7 +361,6 @@ namespace BetServer
                                 proxy.SendGameResults(results, 9995); //treba i port da se salje
                         }
                     }
-                    Thread.Sleep(15000);
                 }
             }
             return true;
@@ -352,9 +371,9 @@ namespace BetServer
             XmlDocument xmlDoc = new XmlDocument(); // Create an XML document object
             lock (XMLLock)
             {
-                if (File.Exists("offer.xml"))
+                if (File.Exists("offers.xml"))
                 {
-                    xmlDoc.Load("offer.xml");
+                    xmlDoc.Load("offers.xml");
 
                     Offers.Remove(game); //brisemo utakmicu iz liste ponuda
                     XmlNode node = xmlDoc.SelectSingleNode("descendant::PAIR[ID=" + game + "]");
@@ -365,7 +384,7 @@ namespace BetServer
                         parent.RemoveChild(node);
                     }
 
-                    xmlDoc.Save("offer.xml");
+                    xmlDoc.Save("offers.xml");
                 }
             }
         }

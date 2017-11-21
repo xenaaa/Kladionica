@@ -99,7 +99,7 @@ namespace Client
                             proxy.BankLogin(clientIdentity.Name, password, port);
 
                             Account depAcc = new Account(3, 11);
-                            proxy.Deposit(depAcc);
+                      //      proxy.Deposit(depAcc);
                         }
                         else
                             Console.WriteLine("Server is down");
@@ -118,7 +118,7 @@ namespace Client
 
                         if (proxy.CheckIfAlive())
                         {
-                            proxy.SendPort(port);
+                         //   proxy.SendPort(port);
 
                             if (proxy.BetLogin(clientIdentity.Name, password, port))
                             {

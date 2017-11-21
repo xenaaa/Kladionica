@@ -1,9 +1,11 @@
 ﻿using Contracts;
+using SecurityManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IntergrationPlatform
@@ -18,41 +20,91 @@ namespace IntergrationPlatform
             string address = "net.tcp://localhost:9998/BetService";
             proxy = new BetServiceProxy(binding, address);
         }
-    
+
         public bool AddUser(User user)
         {
-            return proxy.AddUser(user);
-           
+            bool allowed = false;
+
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
+            if (principal.IsInRole("BetAdmin"))
+            {
+                proxy.AddUser(user);
+                allowed = true;
+            }
+            else
+                Console.WriteLine("AddUser() failed for user {0}.", principal.Identity.Name);
+            return allowed;
         }
 
         public bool BetLogin(string username, string password, int port)
         {
-            return proxy.BetLogin(username, password, port);
+            bool allowed = false;
+
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
+            if (principal.IsInRole("User") || principal.IsInRole("Reader") || principal.IsInRole("BetAdmin"))
+            {
+                proxy.BetLogin(username, password, port);
+                allowed = true;
+            }
+
+            else
+                Console.WriteLine("BetLogin() failed for user {0}.", principal.Identity.Name);
+            return allowed;
         }
 
         public bool CheckIfAlive()
         {
-           return proxy.CheckIfAlive();         
+            return proxy.CheckIfAlive();
         }
 
-        public bool DeleteUser(User user)
+        public bool DeleteUser(string username)
         {
-            return proxy.DeleteUser(user);
+            bool allowed = false;
+
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
+            if (principal.IsInRole("BetAdmin"))
+            {
+                proxy.DeleteUser(username);
+                allowed = true;
+            }
+            else
+                Console.WriteLine("DeleteUser() failed for user {0}.", principal.Identity.Name);
+            return allowed;
         }
 
         public bool EditUser(User user)
         {
-            return proxy.EditUser(user);
+            bool allowed = false;
+
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
+            if (principal.IsInRole("BetAdmin"))
+            {
+                proxy.EditUser(user);
+                allowed = true;
+            }
+            else
+                Console.WriteLine("EditUser() failed for user {0}.", principal.Identity.Name);
+            return allowed;
         }
 
-        public bool SendPort(int port)
+        public bool SendPort(string username, int port)
         {
-            return proxy.SendPort(port);
+            return proxy.SendPort(username, port);
         }
 
         public bool SendTicket(Ticket ticket, string username)
         {
-            return proxy.SendTicket(ticket,username);
+            bool allowed = false;
+
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
+            if (principal.IsInRole("User"))
+            {
+                proxy.SendTicket(ticket, username);
+                allowed = true;
+            }
+            else
+                Console.WriteLine("SendTicket() failed for user {0}.", principal.Identity.Name);
+            return allowed;
         }
     }
 }

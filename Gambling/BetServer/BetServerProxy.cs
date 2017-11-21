@@ -32,11 +32,11 @@ namespace BetServer
             }
 
         }
-        public bool SendGameResults(List<Game> results,int port)
+        public bool SendGameResults(List<Game> results, int port)
         {
             try
             {
-                factory.SendGameResults(results,port);
+                factory.SendGameResults(results, port);
                 return true;
             }
             catch (Exception e)
@@ -47,11 +47,11 @@ namespace BetServer
 
         }
 
-        public bool SendOffers(Dictionary<int,BetOffer> offers, int port)
+        public bool SendOffers(Dictionary<int, BetOffer> offers, int port)
         {
             try
             {
-                factory.SendOffers(offers,port);
+                factory.SendOffers(offers, port);
                 return true;
             }
             catch (Exception e)
@@ -61,7 +61,7 @@ namespace BetServer
             }
         }
 
-        public bool SendTicketResults(Ticket ticket, bool isPassed,  int port)
+        public bool SendTicketResults(Ticket ticket, bool isPassed, int port)
         {
             try
             {

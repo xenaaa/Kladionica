@@ -31,11 +31,11 @@ namespace Client
             }
         }
 
-        public bool SendPort(int port)
+        public bool SendPort(string username, int port)
         {
             try
             {
-                factory.SendPort(port);
+                factory.SendPort(username, port);
                 return true;
             }
             catch (Exception e)
@@ -45,11 +45,11 @@ namespace Client
             }
         }
 
-        public bool BetLogin(string username, string password,int port)
+        public bool BetLogin(string username, string password, int port)
         {
             try
             {
-                factory.BetLogin(username,password,port);
+                factory.BetLogin(username, password, port);
                 return true;
             }
             catch (Exception e)
@@ -73,11 +73,11 @@ namespace Client
             }
         }
 
-        public bool DeleteUser(User user)
+        public bool DeleteUser(string username)
         {
             try
             {
-                factory.DeleteUser(user);
+                factory.DeleteUser(username);
                 return true;
             }
             catch (Exception e)
@@ -100,13 +100,13 @@ namespace Client
                 return false;
             }
         }
-       
+
         public bool SendTicket(Ticket ticket, string username)
         {
             bool sent = false;
             try
             {
-                sent = factory.SendTicket(ticket,username);
+                sent = factory.SendTicket(ticket, username);
                 Console.WriteLine("SendTicket() >> {0}", sent);
             }
             catch (Exception e)
