@@ -1,11 +1,9 @@
 ﻿using Contracts;
-using SecurityManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace IntergrationPlatform
@@ -51,17 +49,14 @@ namespace IntergrationPlatform
         }
 
         public bool CreateAccount(User user)
-        {
-            
+        { 
             try
             {
                 factory.CreateAccount(user);
-               
                 return true;
             }
             catch (Exception e)
             {
-                
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
@@ -69,11 +64,9 @@ namespace IntergrationPlatform
 
         public bool Deposit(Account acc, string username)
         {
-            
             try
             {
                 factory.Deposit(acc, username);
-                
                 return true;
             }
             catch (Exception e)
