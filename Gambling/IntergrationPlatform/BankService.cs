@@ -28,6 +28,7 @@ namespace IntergrationPlatform
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("User") || principal.IsInRole("Reader") || principal.IsInRole("BankAdmin"))
             {
+                Audit.AuthenticationSuccess(principal.Identity.Name.Split('\\')[1].ToString());
                 proxy.BankLogin(username, password, port);
                 allowed = true;
             }
@@ -49,12 +50,16 @@ namespace IntergrationPlatform
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("User") || principal.IsInRole("Reader"))
             {
+                Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "Deposite");
                 proxy.Deposit(acc, username);
+                Audit.Deposit(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString());
                 allowed = true;
             }
             else
+                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "Deposit","not authorized");
+                Audit.DepositFailed(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString(),"not authorized");
                 Console.WriteLine("Deposit() failed for user {0}.", principal.Identity.Name);
-            return allowed;
+                return allowed;
         }
 
         public bool CreateAccount(User user)
@@ -64,11 +69,18 @@ namespace IntergrationPlatform
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("BankAdmin"))
             {
+                Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "create account");
+
                 proxy.CreateAccount(user);
+                Audit.CreateAccount(principal.Identity.Name.Split('\\')[1].ToString());
                 allowed = true;
             }
             else
+                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "create account", "not authorized");
+                Audit.CreateAccountFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
                 Console.WriteLine("Deposit() failed for user {0}.", principal.Identity.Name);
+            
+
             return allowed;
         }
     }

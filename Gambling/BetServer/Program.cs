@@ -28,7 +28,7 @@ namespace BetServer
         static void Main(string[] args)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:9998/BetService";
+            string address = "net.tcp://localhost:12208/BetService";
 
             ServiceHost host = new ServiceHost(typeof(BetService));
             host.AddServiceEndpoint(typeof(IBetService), binding, address);

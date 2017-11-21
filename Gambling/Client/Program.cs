@@ -362,7 +362,6 @@ namespace Client
                 proxy.CreateAccount(new User("marina", "marina", "User"));
                 proxy.CreateAccount(new User("bojan", "bojan", "User"));
                 proxy.CreateAccount(new User("david", "david", "User"));
-                proxy.CreateAccount(new User("bojan", "bojan", "User"));
                 proxy.CreateAccount(new User("nicpa", "nicpa", "User"));
                 proxy.CreateAccount(new User("djole", "djole", "Reader"));
 
@@ -452,11 +451,10 @@ namespace Client
             string password;
             if (proxy.CheckIfAlive())
             {
-                proxy.AddUser(new User("admin", "admin", "BankAdmin"));
+                proxy.AddUser(new User("admin", "admin", "BetAdmin"));
                 proxy.AddUser(new User("marina", "marina", "User"));
                 proxy.AddUser(new User("bojan", "bojan", "User"));
                 proxy.AddUser(new User("david", "david", "User"));
-                proxy.AddUser(new User("bojan", "bojan", "User"));
                 proxy.AddUser(new User("nicpa", "nicpa", "User"));
                 proxy.AddUser(new User("djole", "djole", "Reader"));
 
@@ -491,13 +489,13 @@ namespace Client
                         proxy.AddUser(new User("nemanja", "nemanja", "User"));
 
                         //opcija 2 za testiranje
-                        Console.WriteLine("Enter username: ");
-                        string username = Console.ReadLine();
-                        Console.WriteLine("Enter password:");
-                        password = Console.ReadLine();
-                        Console.WriteLine("Enter role:");
-                        string role = Console.ReadLine();
-                        proxy.AddUser(new User(username, password, role));
+                        //Console.WriteLine("Enter username: ");
+                        //string username = Console.ReadLine();
+                        //Console.WriteLine("Enter password:");
+                        //password = Console.ReadLine();
+                        //Console.WriteLine("Enter role:");
+                        //string role = Console.ReadLine();
+                        //proxy.AddUser(new User(username, password, role));
 
                     }
 
@@ -509,11 +507,11 @@ namespace Client
                         proxy.EditUser(user);
 
                         //ili ovo za testiranje
-                        Console.WriteLine("Enter username: ");
-                        string username = Console.ReadLine();
-                        User user2 = new User(username, username, "User");
-                        user2.BetAccount.Amount = 1000;
-                        proxy.EditUser(user2);
+                        //Console.WriteLine("Enter username: ");
+                        //string username = Console.ReadLine();
+                        //User user2 = new User(username, username, "User");
+                        //user2.BetAccount.Amount = 1000;
+                        //proxy.EditUser(user2);
                     }
                     else if (inputValue == 3)
                     {
@@ -521,9 +519,9 @@ namespace Client
                         proxy.DeleteUser("marina");
 
                         //ili ovo za testiranje
-                        Console.WriteLine("Enter username: ");
-                        string username = Console.ReadLine();
-                        proxy.DeleteUser(username);
+                        //Console.WriteLine("Enter username: ");
+                        //string username = Console.ReadLine();
+                        //proxy.DeleteUser(username);
                     }
                     else if (inputValue == 4)
                     {

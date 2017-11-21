@@ -1,9 +1,11 @@
 ﻿using Contracts;
+using SecurityManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IntergrationPlatform
@@ -20,13 +22,16 @@ namespace IntergrationPlatform
 
         public bool AddUser(User user)
         {
+            
             try
             {
                 factory.AddUser(user);
+               
                 return true;
             }
             catch (Exception e)
             {
+              
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
@@ -35,13 +40,17 @@ namespace IntergrationPlatform
 
         public bool DeleteUser(string username)
         {
+           
             try
             {
+
                 factory.DeleteUser(username);
+                
                 return true;
             }
             catch (Exception e)
             {
+                
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
@@ -49,13 +58,16 @@ namespace IntergrationPlatform
 
         public bool EditUser(User user)
         {
+            
             try
             {
                 factory.EditUser(user);
+               
                 return true;
             }
             catch (Exception e)
             {
+               
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
@@ -63,14 +75,17 @@ namespace IntergrationPlatform
 
         public bool SendTicket(Ticket ticket, string username)
         {
+            
             bool sent = false;
             try
             {
                 sent = factory.SendTicket(ticket, username);
                 Console.WriteLine("SendTicket() >> {0}", sent);
+               
             }
             catch (Exception e)
             {
+               
                 Console.WriteLine("Error while trying to SendTicket(). {0}", e.Message);
             }
 

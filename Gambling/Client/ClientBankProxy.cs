@@ -1,9 +1,11 @@
 ﻿using Contracts;
+using SecurityManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Client
@@ -48,9 +50,11 @@ namespace Client
 
         public bool Deposit(Account acc, string username)
         {
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             try
             {
                 factory.Deposit(acc, username);
+                Audit.Deposit(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString());
                 return true;
             }
             catch (Exception e)
@@ -62,6 +66,7 @@ namespace Client
 
         public bool CreateAccount(User user)
         {
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             try
             {
                 factory.CreateAccount(user);

@@ -25,17 +25,17 @@ namespace ClientPrint
 
 
 
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\n\n-------------------------------------RESULTS------------------------------------------------\n");
             Console.WriteLine("ID |       HOME        |       AWAY        |         RESULT        ");
             Console.WriteLine("--------------------------------------------------------------------------------------------");
 
             foreach (var item in results)
             {
-                Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}       {3,-2}   :    {4,-5} ", item.BetOffer.Id, item.BetOffer.Home, item.BetOffer.Away, item.HomeGoalScored, item.AwayGoalScored));
+                Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}          {3,-2}  :  {4,-5} ", item.BetOffer.Id, item.BetOffer.Home, item.BetOffer.Away, item.HomeGoalScored, item.AwayGoalScored));
             }
             Console.WriteLine("**********************************************************************************************\n\n");
-
+            Console.ForegroundColor = ConsoleColor.White;
             return true;
         }
 

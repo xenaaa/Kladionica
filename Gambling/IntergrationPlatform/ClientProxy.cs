@@ -1,9 +1,11 @@
 ﻿using Contracts;
+using SecurityManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace IntergrationPlatform
@@ -38,6 +40,9 @@ namespace IntergrationPlatform
             try
             {
                 factory.SendGameResults(results, port);
+                CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
+                
+                
                 return true;
             }
             catch (Exception e)
