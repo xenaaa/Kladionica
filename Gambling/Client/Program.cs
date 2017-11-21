@@ -362,7 +362,6 @@ namespace Client
                 proxy.CreateAccount(new User("marina", "marina", "User"));
                 proxy.CreateAccount(new User("bojan", "bojan", "User"));
                 proxy.CreateAccount(new User("david", "david", "User"));
-                proxy.CreateAccount(new User("bojan", "bojan", "User"));
                 proxy.CreateAccount(new User("nicpa", "nicpa", "User"));
                 proxy.CreateAccount(new User("djole", "djole", "Reader"));
 
@@ -452,11 +451,10 @@ namespace Client
             string password;
             if (proxy.CheckIfAlive())
             {
-                proxy.AddUser(new User("admin", "admin", "BankAdmin"));
+                proxy.AddUser(new User("admin", "admin", "BetAdmin"));
                 proxy.AddUser(new User("marina", "marina", "User"));
                 proxy.AddUser(new User("bojan", "bojan", "User"));
                 proxy.AddUser(new User("david", "david", "User"));
-                proxy.AddUser(new User("bojan", "bojan", "User"));
                 proxy.AddUser(new User("nicpa", "nicpa", "User"));
                 proxy.AddUser(new User("djole", "djole", "Reader"));
 
