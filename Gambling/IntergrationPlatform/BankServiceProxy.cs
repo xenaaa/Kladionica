@@ -49,7 +49,7 @@ namespace IntergrationPlatform
         }
 
         public bool CreateAccount(User user)
-        {
+        { 
             try
             {
                 factory.CreateAccount(user);
