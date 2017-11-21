@@ -35,13 +35,13 @@ namespace IntergrationPlatform
             hostBet.Description.Behaviors.Remove(typeof(ServiceDebugBehavior));
             hostBet.Description.Behaviors.Add(new ServiceDebugBehavior() { IncludeExceptionDetailInFaults = true });
 
-            //ServiceSecurityAuditBehavior newAudit = new ServiceSecurityAuditBehavior();
-            //newAudit.AuditLogLocation = AuditLogLocation.Application;
-            //newAudit.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
-            //newAudit.SuppressAuditFailure = true;
+            ServiceSecurityAuditBehavior newAudit = new ServiceSecurityAuditBehavior();
+            newAudit.AuditLogLocation = AuditLogLocation.Application;
+            newAudit.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
+            newAudit.SuppressAuditFailure = true;
 
-            //host.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
-            //host.Description.Behaviors.Add(newAudit);
+            hostBet.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            hostBet.Description.Behaviors.Add(newAudit);
 
 
             hostBet.Open();
@@ -60,8 +60,8 @@ namespace IntergrationPlatform
             hostBank.Description.Behaviors.Remove(typeof(ServiceDebugBehavior));
             hostBank.Description.Behaviors.Add(new ServiceDebugBehavior() { IncludeExceptionDetailInFaults = true });
 
-            //host2.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
-            //host2.Description.Behaviors.Add(newAudit);
+            hostBank.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            hostBank.Description.Behaviors.Add(newAudit);
 
             hostBank.Open();
             Console.WriteLine("Bank Integration Platform is started.");
@@ -84,8 +84,8 @@ namespace IntergrationPlatform
             //host3.Description.Behaviors.Add(new ServiceDebugBehavior() { IncludeExceptionDetailInFaults = true });
 
 
-            //host3.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
-            //host3.Description.Behaviors.Add(newAudit);
+            hostClient.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            hostClient.Description.Behaviors.Add(newAudit);
 
             string srvCertCN = "betserviceintegration";
 
