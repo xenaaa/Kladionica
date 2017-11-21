@@ -17,7 +17,7 @@ namespace IntergrationPlatform
         public BankService()
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:8888/BankService";
+            string address = "net.tcp://localhost:9000/BankService";
             proxy = new BankServiceProxy(binding, address);
         }
 
