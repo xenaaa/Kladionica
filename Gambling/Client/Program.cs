@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
@@ -14,7 +16,14 @@ namespace Client
 {
     class Program
     {
-
+        static int FreeTcpPort()
+        {
+            TcpListener l = new TcpListener(IPAddress.Loopback, 0);
+            l.Start();
+            int port = ((IPEndPoint)l.LocalEndpoint).Port;
+            l.Stop();
+            return port;
+        }
         static void Main(string[] args)
         {
             bool bankAdmin = false;
@@ -39,8 +48,14 @@ namespace Client
 
             NetTcpBinding binding = new NetTcpBinding();
 
-            Console.WriteLine("Enter port: ");
-            int port = Convert.ToInt32(Console.ReadLine());
+            int port = FreeTcpPort();
+
+
+
+
+
+            //Console.WriteLine("Enter port: ");
+            //int port = Convert.ToInt32(Console.ReadLine());
             //int port = Convert.ToInt32(args[0]);
             string address = "net.tcp://localhost:" + port + "/ClientHelper";
 
