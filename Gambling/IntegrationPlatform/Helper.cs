@@ -10,8 +10,8 @@ namespace Contracts
     public static class Helper
     {
         public const string key = "123456781234567812345678";
-        public const int clientPrintPort = 15002;
-        public const int betServicePort = 15001;
+        public const int clientPrintPort = 22222;
+        public const int betServicePort = 17000;
         public const int bankServicePort = 15000;
         public const int integrationHostPort = 9991;
 

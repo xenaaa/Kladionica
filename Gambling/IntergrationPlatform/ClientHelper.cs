@@ -24,6 +24,7 @@ namespace IntergrationPlatform
 
             string address = "";
 
+
             if (port == Helper.clientPrintPort)
                 address = "net.tcp://localhost:" + port + "/ClientPrint";
             else

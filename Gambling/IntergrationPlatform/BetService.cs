@@ -76,7 +76,7 @@ namespace IntergrationPlatform
 
                 byte[] encryptedUser = Helper.EncryptOnIntegration(userBytes);
                 proxy.AddUser(encryptedUser);
-
+                loger.Debug("User {0} has been added.", user.Username);
                 Audit.AddUser(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString());
                 allowed = true;
             }
@@ -173,6 +173,8 @@ namespace IntergrationPlatform
         {
             bool allowed = false;
 
+            string username = (string)Helper.ByteArrayToObject(usernameBytes);
+
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("User"))
             {
@@ -180,6 +182,26 @@ namespace IntergrationPlatform
 
                 byte[] encryptedTicket = Helper.EncryptOnIntegration(ticketBytes);
                 byte[] encryptedUsername = Helper.EncryptOnIntegration(usernameBytes);
+
+                OperationContext context = OperationContext.Current;
+                MessageProperties properties = context.IncomingMessageProperties;
+
+                RemoteEndpointMessageProperty endpoint = properties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+
+                string address = string.Empty;
+
+                if (properties.Keys.Contains(HttpRequestMessageProperty.Name))
+                {
+                    HttpRequestMessageProperty endpointLoadBalancer = properties[HttpRequestMessageProperty.Name] as HttpRequestMessageProperty;
+                    if (endpointLoadBalancer != null && endpointLoadBalancer.Headers["X-Forwarded-For"] != null)
+                        address = endpointLoadBalancer.Headers["X-Forwarded-For"];
+                }
+                if (string.IsNullOrEmpty(address))
+                {
+                    address = endpoint.Address;
+                }
+
+                loger.Debug("User {0} sent ticket from address {1}.", username, address);
 
                 proxy.SendTicket(encryptedTicket, encryptedUsername);
                 Audit.TicketSent(principal.Identity.Name.Split('\\')[1].ToString());
