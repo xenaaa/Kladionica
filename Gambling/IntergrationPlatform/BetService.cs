@@ -1,5 +1,6 @@
 ﻿using CertificateManager;
 using Contracts;
+using NLog;
 using SecurityManager;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,10 @@ using System.Threading.Tasks;
 
 namespace IntergrationPlatform
 {
+    
     public class BetService : IBetService
     {
+        private static readonly Logger loger = LogManager.GetLogger("Syslog");
         BetServiceProxy proxy;
 
         public BetService()

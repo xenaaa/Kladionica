@@ -1,4 +1,5 @@
 ﻿using Contracts;
+using IntergrationPlatform;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +11,19 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
+
 namespace BetServer
 {
+    
+
     public class BetService : IBetService
     {
+        
 
         private static Dictionary<string, User> betUsers = new Dictionary<string, User>();
         private static Dictionary<int, Game> rezultati = new Dictionary<int, Game>();
         private static List<int> ports = new List<int>();
+       
 
         private static object portLock = new object();
 
@@ -125,10 +131,12 @@ namespace BetServer
             {
                 if (!BetUsers.ContainsKey(user.Username))
                 {
+                    
                     lock (PortLock)
                     {
                         BetUsers.Add(user.Username, user);
                     }
+                    
                     Console.WriteLine("User {0} successfully added to BetUsers", user.Username);
                     return true;
                 }

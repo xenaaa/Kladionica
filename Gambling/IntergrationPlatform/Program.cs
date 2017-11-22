@@ -2,6 +2,7 @@
 
 using CertificateManager;
 using Contracts;
+using NLog;
 using SecurityManager;
 using System;
 using System.Collections.Generic;
@@ -19,8 +20,7 @@ namespace IntergrationPlatform
 {
     public class Program
     {
-
-
+        private static readonly Logger loger = LogManager.GetLogger("Syslog");
         static void Main(string[] args)
         {
             NetTcpBinding binding = new NetTcpBinding();
@@ -77,14 +77,7 @@ namespace IntergrationPlatform
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             hostClient.AddServiceEndpoint(typeof(IClientHelper), binding, address);
 
-            // binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-
-
-            //host3.Authorization.ServiceAuthorizationManager = new CustomAuthorizationManager();
-            //host3.Authorization.ExternalAuthorizationPolicies = policies.AsReadOnly();
-            //host3.Authorization.PrincipalPermissionMode = PrincipalPermissionMode.Custom;
-            //host3.Description.Behaviors.Remove(typeof(ServiceDebugBehavior));
-            //host3.Description.Behaviors.Add(new ServiceDebugBehavior() { IncludeExceptionDetailInFaults = true });
+          
 
 
             hostClient.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
