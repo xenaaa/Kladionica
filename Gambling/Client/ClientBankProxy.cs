@@ -55,7 +55,7 @@ namespace Client
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             try
             {
-                factory.Deposit(acc, username);          
+                factory.Deposit(acc, username);
                 return true;
             }
             catch (Exception e)

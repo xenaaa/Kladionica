@@ -41,8 +41,8 @@ namespace IntergrationPlatform
             {
                 factory.SendGameResults(results, port, address);
                 CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
-                
-                
+
+
                 return true;
             }
             catch (Exception e)

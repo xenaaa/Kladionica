@@ -22,13 +22,21 @@ namespace BetServer
         private static Dictionary<int, BetOffer> Offers = new Dictionary<int, BetOffer>();
 
         private static object xmlLock = new object();
+        private static object resultsLock = new object();
 
         private static bool sendOffers = false;
+        private static bool checkUserGames = false;
 
         public static object XMLLock
         {
             get { return xmlLock; }
             set { xmlLock = value; }
+        }
+
+        public static object ResultsLock
+        {
+            get { return resultsLock; }
+            set { resultsLock = value; }
         }
 
         static void Main(string[] args)
@@ -61,7 +69,7 @@ namespace BetServer
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
-                SendOffers(bs.Ports);
+                SendOffers();
             }).Start();
 
             //Thread.Sleep(15000);
@@ -69,20 +77,20 @@ namespace BetServer
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
-                SendGameResults(bs.Ports);
+                SendGameResults();
             }).Start();
 
 
             while (true)
             {
-                CheckUserGames();
-                Thread.Sleep(3000);
+                if (checkUserGames)
+                    CheckUserGames();
             }
 
             host.Close();
         }
 
-        private static void SendOffers(List<int> ports) //slanje ponude kijentu svakih 5 minuta
+        private static void SendOffers() //slanje ponude kijentu svakih 5 minuta
         {
             NetTcpBinding binding = new NetTcpBinding();
 
@@ -164,8 +172,12 @@ namespace BetServer
                                 //        proxy.SendOffers(encryptedOffers, encryptedPort);
                                 //    }
                                 //}
+                                Dictionary<string, User> usersFromFile = new Dictionary<string, User>();
+                                Object obj = Persistance.ReadFromFile("betUsers");
+                                if (obj != null)
+                                    usersFromFile = (Dictionary<string, User>)obj;
                                 List<string> adresses = new List<string>();
-                                foreach (KeyValuePair<string, User> user in BetService.BetUsers)
+                                foreach (KeyValuePair<string, User> user in usersFromFile)
                                 {
                                     if (!string.IsNullOrEmpty(user.Value.Address))
                                     {
@@ -211,14 +223,30 @@ namespace BetServer
 
         private static bool CheckUserGames()//svake 2 sekunde proverava da li su se zavrsile sve utakmice na tiketima za svakog User-a pojedinacno. Ako su sve utakmice na tiketu zavrsene tikes se salje na proveru i brise
         {
+            checkUserGames = false;
             bool allGamesDone = true;
             Ticket t = new Ticket();
 
             List<Ticket> tickets = new List<Ticket>(); //lista tiketa koji se brisu iz liste
 
-            if (BetService.BetUsers.Count > 0 && BetService.Rezultati.Count > 0)
+            Object obj = Persistance.ReadFromFile("betUsers");
+            Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
+            if (obj != null)
+                betUsersFromFile = (Dictionary<string, User>)obj;
+
+
+            obj = Persistance.ReadFromFile("results");
+            Dictionary<int, Game> resultsFromFile = new Dictionary<int, Game>();
+            if (obj != null)
+                resultsFromFile = (Dictionary<int, Game>)obj;
+
+
+            //    if (BetService.BetUsers.Count > 0 && BetService.Rezultati.Count > 0)
+            if (betUsersFromFile.Count > 0 && resultsFromFile.Count > 0)
             {
-                foreach (KeyValuePair<string, User> user in BetService.BetUsers)
+                //  foreach (KeyValuePair<string, User> user in BetService.BetUsers)
+                foreach (KeyValuePair<string, User> user in betUsersFromFile)
+
                 {
                     if (user.Value.Tickets.Count > 0)
                     {
@@ -229,14 +257,12 @@ namespace BetServer
                             {
                                 foreach (KeyValuePair<int, Game> bet in ticket.Bets)
                                 {
-                                    if (BetService.Rezultati.ContainsKey(bet.Key))
+                                    if (resultsFromFile.ContainsKey(bet.Key))
                                     {
-                                        Console.WriteLine("Zavrsila se: {0}",bet.Key);
                                         continue;//utakmica zavrsena
                                     }
                                     else
                                     {
-                                        Console.WriteLine("nije se zavrsila: {0}", bet.Key);
                                         //utakmica nije gotova
                                         allGamesDone = false;
                                         break;//prelazi se na sledeci tiket istog User-a
@@ -248,7 +274,6 @@ namespace BetServer
 
                             if (allGamesDone)
                             {
-                                Console.WriteLine("salje se tiket: {0}", user.Value.Username);
                                 SendTicketResults2(user.Value, ticket);
                                 tickets.Add(ticket);
                             }
@@ -258,6 +283,10 @@ namespace BetServer
                         {
                             user.Value.Tickets.Remove(item);
                         }
+
+                        User changeUser = user.Value;
+                        BetService betService = new BetService();
+                        betService.EditUser(Helper.ObjectToByteArray(changeUser));
                     }
                 }
             }
@@ -266,15 +295,20 @@ namespace BetServer
 
         private static bool SendTicketResults2(User user, Ticket ticket)//sve utakmice na tiketu gotove, salje se ishod
         {
+            Object obj = Persistance.ReadFromFile("results");
+            Dictionary<int, Game> resultsFromFile = new Dictionary<int, Game>();
+            if (obj != null)
+                resultsFromFile = (Dictionary<int, Game>)obj;
+
             bool won = true;
 
             foreach (KeyValuePair<int, Game> bet in ticket.Bets)
             {
-                bet.Value.HomeGoalScored = BetService.Rezultati[bet.Key].HomeGoalScored;
-                bet.Value.AwayGoalScored = BetService.Rezultati[bet.Key].AwayGoalScored;
+                bet.Value.HomeGoalScored = resultsFromFile[bet.Key].HomeGoalScored;
+                bet.Value.AwayGoalScored = resultsFromFile[bet.Key].AwayGoalScored;
 
 
-                if (BetService.Rezultati[bet.Key].Tip != bet.Value.Tip)
+                if (resultsFromFile[bet.Key].Tip != bet.Value.Tip)
                 {
                     bet.Value.Won = false;
                     won = false;
@@ -294,7 +328,7 @@ namespace BetServer
                                       new X509CertificateEndpointIdentity(srvCert));
 
 
-        
+
 
             BetServerProxy proxy = new BetServerProxy(binding, address);
             
@@ -314,22 +348,24 @@ namespace BetServer
             if (won)//koja je svrha
             {
                 User changeUser = user;
-                changeUser.BetAccount.Amount += ticket.CashPrize;
                 BetService betService = new BetService();
+
+                changeUser.BetAccount.Amount += ticket.CashPrize;
                 betService.EditUser(Helper.ObjectToByteArray(changeUser));
             }
-
             return true;
         }
 
 
 
-        private static bool SendGameResults(List<int> ports)
+        private static bool SendGameResults()
         {
             List<Game> results = new List<Game>();
             List<int> gameIDs = new List<int>();
             BetOffer betOffer = new BetOffer();
             List<int> indexToDelete = new List<int>();
+
+            List<int> finishedGame = new List<int>();
 
             int index;
             int home;
@@ -397,25 +433,41 @@ namespace BetServer
 
                             results.Add(game);
 
-                            BetService.Rezultati.Add(betOffer.Id, game); //dodajemo utakmicu u listu zavrsenih utakmica                           
+                        Object obj = Persistance.ReadFromFile("results");
+                        Dictionary<int, Game> resultsFromFile = new Dictionary<int, Game>(); //citamo iz fajla rezultate
+                        if (obj != null)
+                            resultsFromFile = (Dictionary<int, Game>)obj;
 
-                            DeleteFinishedGame(betOffer.Id);
+                        resultsFromFile.Add(betOffer.Id, game); //dodajemo utakmicu u listu zavrsenih utakmica                           
 
-                            finished--;
-                            j++;
-                        } while (finished > 0);
+                        Persistance.WriteToFile(resultsFromFile, "results"); //upisujemo u fajl
 
-                    }
-                    //saljemo svima rezultate gotovih utakmica
-                    // lock (BetService.PortLock)
-                    //    {
-                    string srvCertCN = "betserviceintegration";
-                    NetTcpBinding binding = new NetTcpBinding();
-                    binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+                        finishedGame.Add(betOffer.Id);
+                     
+                        finished--;
+                        j++;
+                    } while (finished > 0);
 
-                    X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-                    EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
-                                              new X509CertificateEndpointIdentity(srvCert));
+
+                    lock (ResultsLock)
+                    {
+
+                        foreach (var item in finishedGame)
+                        {
+                            DeleteFinishedGame(item);
+                        }
+
+
+                        //saljemo svima rezultate gotovih utakmica
+                        lock (BetService.PortLock)
+                        {
+                            string srvCertCN = "betserviceintegration";
+                            NetTcpBinding binding = new NetTcpBinding();
+                            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
+                            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+                            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+                                                      new X509CertificateEndpointIdentity(srvCert));
 
                     BetServerProxy proxy = new BetServerProxy(binding, address);
 
@@ -475,19 +527,19 @@ namespace BetServer
                         }
                         sendOffers = true;
                     }
+                                checkUserGames = true;
 
+                                //encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
 
-                    //encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+                                //if (proxy.CheckIfAlive(encryptedPort))
+                                //{
+                                //    byte[] encryptedResults = Helper.Encrypt(results);
+                                //    proxy.SendGameResults(encryptedResults, encryptedPort); //treba i port da se salje
+                                //    sendOffers = true;
+                                //}
 
-                    //if (proxy.CheckIfAlive(encryptedPort))
-                    //{
-                    //    byte[] encryptedResults = Helper.Encrypt(results);
-                    //    proxy.SendGameResults(encryptedResults, encryptedPort); //treba i port da se salje
-                    //    sendOffers = true;
-                    //}
-
-                    //  }
-                }
+                                //  }
+                            }
             }
             return true;
         }

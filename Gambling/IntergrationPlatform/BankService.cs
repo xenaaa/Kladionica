@@ -27,9 +27,9 @@ namespace IntergrationPlatform
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-         
+
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:"+ Helper.bankServicePort + "/BankService"),
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.bankServicePort + "/BankService"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             proxy = new BankServiceProxy(binding, address);
@@ -114,7 +114,7 @@ namespace IntergrationPlatform
 
                 byte[] encryptedAccount = Helper.EncryptOnIntegration(accBytes);
                 byte[] encryptedUsername = Helper.EncryptOnIntegration(usernameBytes);
-            
+
                 proxy.Deposit(encryptedAccount, encryptedUsername);
                 Audit.Deposit(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString());
                 loger.Debug("IP address: {0} - User {1} deposited {2}.", Helper.GetIP(), username, acc.Number);
@@ -155,7 +155,7 @@ namespace IntergrationPlatform
                 loger.Debug("IP address: {0} - User {1} couldn't be created.", Helper.GetIP(), user.Username);
                 Console.WriteLine("CreateAccount() failed for user {0}.", principal.Identity.Name);
             }
-            
+
             return allowed;
         }
     }
