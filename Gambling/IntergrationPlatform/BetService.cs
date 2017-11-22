@@ -87,9 +87,11 @@ namespace IntergrationPlatform
                 allowed = true;
             }
             else
-                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "DeleteUser","not authorized");
-                Audit.DeleteUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), username,"not authorized");
+            {
+                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "DeleteUser", "not authorized");
+                Audit.DeleteUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), username, "not authorized");
                 Console.WriteLine("DeleteUser() failed for user {0}.", principal.Identity.Name);
+            }
                 return allowed;
         }
 

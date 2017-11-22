@@ -22,6 +22,8 @@ namespace BetServer
 
         private static object xmlLock = new object();
 
+        private static bool sendOffers = false;
+
         public static object XMLLock
         {
             get { return xmlLock; }
@@ -89,7 +91,21 @@ namespace BetServer
             {
                 lock (XMLLock)
                 {
-                    Thread.Sleep(15000);
+                    // Thread.Sleep(15000);
+
+                    DateTime start = DateTime.Now;               
+                 //   DateTime now;
+
+                    do
+                    {
+                        if (sendOffers)
+                        {
+                            break;
+                        }
+                   //     now = DateTime.Now;
+                    } while (start.AddSeconds(15) > DateTime.Now);
+
+                    sendOffers = false;
 
                     if (File.Exists("offers.xml"))
                     {
@@ -415,8 +431,12 @@ namespace BetServer
                         BetServerProxy proxy = new BetServerProxy(binding, address);
                         {
                             if (proxy.CheckIfAlive(9995))
+                            {
                                 proxy.SendGameResults(results, 9995); //treba i port da se salje
+                                sendOffers = true;
+                            }
                         }
+                        
                     }
                 }
             }

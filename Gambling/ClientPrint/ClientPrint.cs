@@ -18,7 +18,7 @@ namespace ClientPrint
 
             foreach (var item in results)
             {
-                Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}                 {3,-2}:{4,-5} ", item.BetOffer.Id, item.BetOffer.Home, item.BetOffer.Away, item.HomeGoalScored, item.AwayGoalScored));
+                Console.WriteLine(String.Format("{0,-10}  {1,-10}     {2,-10}                 {3,-2}: {4,-5} ", item.BetOffer.Id, item.BetOffer.Home, item.BetOffer.Away, item.HomeGoalScored, item.AwayGoalScored));
             }
             Console.WriteLine("**********************************************************************************************\n\n");
             Console.ForegroundColor = ConsoleColor.White;

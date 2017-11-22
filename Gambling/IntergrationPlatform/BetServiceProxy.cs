@@ -20,7 +20,7 @@ namespace IntergrationPlatform
         public BetServiceProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
             /// cltCertCN.SubjectName should be set to the client's username. .NET WindowsIdentity class provides information about Windows user running the given process
-            string cltCertCN = "betservice";
+            string cltCertCN = "betserviceclient"; //mijenjala
 
             this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
             this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;

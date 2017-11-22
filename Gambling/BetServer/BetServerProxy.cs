@@ -17,7 +17,7 @@ namespace BetServer
         public BetServerProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
 
-            string cltCertCN = "bankservice";
+            string cltCertCN = "betserviceclientintegration"; //mijenjala
 
             this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
             this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;

@@ -44,7 +44,7 @@ namespace IntergrationPlatform
             }
 
             else
-                Console.WriteLine("Deposit() failed for user {0}.", principal.Identity.Name);
+                Console.WriteLine("BankLogin() failed for user {0}.", principal.Identity.Name);
             return allowed;
         }
 
@@ -66,10 +66,12 @@ namespace IntergrationPlatform
                 allowed = true;
             }
             else
-               Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "Deposit","not authorized");
-                Audit.DepositFailed(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString(),"not authorized");
-                Console.WriteLine("Deposit() failed for user {0}.", principal.Identity.Name);
-                return allowed;
+            {
+                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "Deposit", "not authorized");
+                Audit.DepositFailed(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString(), "not authorized");
+                Console.WriteLine("Deposit() failed for user {0}.", principal.Identity.Name);          
+            }
+            return allowed;
         }
 
         public bool CreateAccount(User user)
@@ -86,11 +88,12 @@ namespace IntergrationPlatform
                 allowed = true;
             }
             else
+            {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "create account", "not authorized");
                 Audit.CreateAccountFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
-                Console.WriteLine("Deposit() failed for user {0}.", principal.Identity.Name);
+                Console.WriteLine("CreateAccount() failed for user {0}.", principal.Identity.Name);
+            }
             
-
             return allowed;
         }
     }
