@@ -34,7 +34,7 @@ namespace Client
             }
         }
 
-        public bool BankLogin(string username, string password, int port)
+        public bool BankLogin(byte[] username, byte[] password, byte[] port)
         {
             try
             {
@@ -48,13 +48,14 @@ namespace Client
             }
         }
 
-        public bool Deposit(Account acc, string username)
+        public bool Deposit(byte[] acc, byte[] username)
         {
+
+
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             try
             {
-                factory.Deposit(acc, username);
-                Audit.Deposit(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString());
+                factory.Deposit(acc, username);          
                 return true;
             }
             catch (Exception e)
@@ -64,7 +65,7 @@ namespace Client
             }
         }
 
-        public bool CreateAccount(User user)
+        public bool CreateAccount(byte[] user)
         {
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             try

@@ -25,8 +25,12 @@ namespace BankServer
             return true;
         }
 
-        public bool BankLogin(string username, string password, int port)
+        public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes)
         {
+            string username = (string)Helper.Decrypt(usernameBytes);
+            string password = (string)Helper.Decrypt(passwordBytes);
+            int port = (int)Helper.Decrypt(portBytes);
+
             WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             if (identity.Name == username)
             {
@@ -58,8 +62,10 @@ namespace BankServer
         }
 
 
-        public bool CreateAccount(User user)
+        public bool CreateAccount(byte[] userBytes)
         {
+            User user = (User)Helper.Decrypt(userBytes);
+
             //  WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             if (BankUsers.Keys.Contains(user.Username))
                 return false;
@@ -77,11 +83,11 @@ namespace BankServer
 
         }
 
-        public bool Deposit(Account acc, string username)
+        public bool Deposit(byte[] accBytes, byte[] usernameBytes)
         {
-            //WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
-            //if (BankUsers.Keys.Contains(identity.Name))
-            //{
+            Account acc = (Account)Helper.Decrypt(accBytes);
+            string username = (string)Helper.Decrypt(usernameBytes);
+
             KeyValuePair<string, User> user = BankUsers.Where(u => u.Value.BankAccount.Number == acc.Number).FirstOrDefault();
 
             if (user.Key == null)
@@ -102,13 +108,7 @@ namespace BankServer
                     BankUsers[username].BankAccount.Amount = BankUsers[username].BankAccount.Amount - acc.Amount; // smanjujemo onaj s kog prebacujemo
                     return true;
                 }
-            }
-            //}
-            //else
-            //{
-            //    Console.WriteLine("User {0} doesn't exist", identity.Name);
-            //    return false;
-            //}
+            }      
         }
     }
 }

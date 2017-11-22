@@ -50,10 +50,6 @@ namespace Client
 
             int port = FreeTcpPort();
 
-
-
-
-
             //Console.WriteLine("Enter port: ");
             //int port = Convert.ToInt32(Console.ReadLine());
             //int port = Convert.ToInt32(args[0]);
@@ -164,12 +160,8 @@ namespace Client
              bets.Add(3002, g);*/
             // t.Bets = bets;
 
-            if (proxy.SendTicket(ticket, clientIdentity.Name.Split('\\')[1]))
+            if (proxy.SendTicket(Helper.ObjectToByteArray(ticket), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1])))
             {
-
-
-
-
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("\n************************************TICKET**************************************\n");
                 Console.ForegroundColor = ConsoleColor.White;
@@ -192,7 +184,7 @@ namespace Client
         private static void BankService(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:9991/BankIntegrationPlatform";
+            string address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/BankIntegrationPlatform";
             ClientBankProxy proxy = new ClientBankProxy(binding, address);
 
             double inputValue = 0;
@@ -204,8 +196,7 @@ namespace Client
                     Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
-
-                } while (!proxy.BankLogin(clientIdentity.Name.Split('\\')[1], password, port));
+                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port)));
 
                 while (true)
                 {
@@ -220,8 +211,8 @@ namespace Client
                     if (inputValue == 1)
                     {
                         //ovo za testiranje
-                        proxy.Deposit(new Account(4, 12), clientIdentity.Name.Split('\\')[1]);
-                        proxy.Deposit(new Account(4, 15), clientIdentity.Name.Split('\\')[1]);
+                        proxy.Deposit(Helper.ObjectToByteArray(new Account(4, 12)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
+                        proxy.Deposit(Helper.ObjectToByteArray(new Account(4, 15)),Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
 
                         //ili ovo za testiranje
                         int accountNumber = 0;
@@ -246,7 +237,7 @@ namespace Client
                             }
                         } while (inputValue == -1);
 
-                        proxy.Deposit(new Account(amount, accountNumber), clientIdentity.Name.Split('\\')[1]);
+                        proxy.Deposit(Helper.ObjectToByteArray(new Account(amount, accountNumber)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
                     }
                     else if (inputValue == 2)
                         break;
@@ -261,7 +252,7 @@ namespace Client
         private static void BetService(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:9991/BetIntegrationPlatform";
+            string address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/BetIntegrationPlatform";
             ClientBetProxy proxy = new ClientBetProxy(binding, address);
 
             double inputValue = 0;
@@ -269,7 +260,7 @@ namespace Client
 
             if (proxy.CheckIfAlive())
             {
-                proxy.SendPort(clientIdentity.Name.Split('\\')[1], port);
+                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port),Helper.ObjectToByteArray(0)); //treci parametar zbog intefejsa kasnije citamo adresu
 
                 do
                 {
@@ -277,7 +268,7 @@ namespace Client
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
-                } while (!proxy.BetLogin(clientIdentity.Name.Split('\\')[1], password, port));
+                } while (!proxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port)));
 
                 // proxy.AddUser(new User("lala", "lala", "Admin")); provjera autorizacije
 
@@ -370,19 +361,19 @@ namespace Client
         private static void BankAdmin(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:9991/BankIntegrationPlatform";
+            string address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/BankIntegrationPlatform";
 
             ClientBankProxy proxy = new ClientBankProxy(binding, address);
 
             string password;
             if (proxy.CheckIfAlive())
             {
-                proxy.CreateAccount(new User("admin", "admin", "BankAdmin"));
-                proxy.CreateAccount(new User("marina", "marina", "User"));
-                proxy.CreateAccount(new User("bojan", "bojan", "User"));
-                proxy.CreateAccount(new User("david", "david", "User"));
-                proxy.CreateAccount(new User("nicpa", "nicpa", "User"));
-                proxy.CreateAccount(new User("djole", "djole", "Reader"));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("admin", "admin", "BankAdmin")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("marina", "marina", "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("bojan", "bojan", "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("david", "david", "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("nicpa", "nicpa", "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("djole", "djole", "Reader")));
 
                 do
                 {
@@ -390,7 +381,7 @@ namespace Client
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
-                } while (!proxy.BankLogin(clientIdentity.Name.Split('\\')[1], password, port));
+                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port)));
 
                 double inputValue = 0;
                 while (true)
@@ -409,7 +400,7 @@ namespace Client
                     if (inputValue == 1)
                     {
                         //opcija 1 za testiranje
-                        proxy.CreateAccount(new User("nemanja", "nemanja", "User"));
+                        proxy.CreateAccount(Helper.ObjectToByteArray(new User("nemanja", "nemanja", "User")));
 
                         //opcija 2 za testiranje
                         Console.WriteLine("Enter username: ");
@@ -418,15 +409,15 @@ namespace Client
                         password = Console.ReadLine();
                         Console.WriteLine("Enter role:");
                         string role = Console.ReadLine();
-                        proxy.CreateAccount(new User(username, password, role));
+                        proxy.CreateAccount(Helper.ObjectToByteArray(new User(username, password, role)));
 
                     }
 
                     else if (inputValue == 2)
                     {
                         //ovo za testiranje
-                        proxy.Deposit(new Account(4, 12), clientIdentity.Name.Split('\\')[1]);
-                        proxy.Deposit(new Account(4, 15), clientIdentity.Name.Split('\\')[1]);
+                        proxy.Deposit(Helper.ObjectToByteArray(new Account(4, 12)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
+                        proxy.Deposit(Helper.ObjectToByteArray(new Account(4, 15)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
 
                         //ili ovo za testiranje
                         int accountNumber = 0;
@@ -451,7 +442,7 @@ namespace Client
                             }
                         } while (inputValue == -1);
 
-                        proxy.Deposit(new Account(amount, accountNumber), clientIdentity.Name.Split('\\')[1]);
+                        proxy.Deposit(Helper.ObjectToByteArray(new Account(amount, accountNumber)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
                     }
                     else if (inputValue == 3)
                         break;
@@ -464,20 +455,20 @@ namespace Client
         private static void BetAdmin(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:9991/BetIntegrationPlatform";
+            string address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/BetIntegrationPlatform";
 
             ClientBetProxy proxy = new ClientBetProxy(binding, address);
             string password;
             if (proxy.CheckIfAlive())
             {
-                proxy.AddUser(new User("admin", "admin", "BetAdmin"));
-                proxy.AddUser(new User("marina", "marina", "User"));
-                proxy.AddUser(new User("bojan", "bojan", "User"));
-                proxy.AddUser(new User("david", "david", "User"));
-                proxy.AddUser(new User("nicpa", "nicpa", "User"));
-                proxy.AddUser(new User("djole", "djole", "Reader"));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("admin", "admin", "BetAdmin")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("marina", "marina", "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("bojan", "bojan", "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("david", "david", "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("nicpa", "nicpa", "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("djole", "djole", "Reader")));
 
-                proxy.SendPort("admin", port);
+                proxy.SendPort(Helper.ObjectToByteArray("admin"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)); //treci parametar zbog intefejsa kasnije citamo adresu
 
                 do
                 {
@@ -485,7 +476,7 @@ namespace Client
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
-                } while (!proxy.BetLogin(clientIdentity.Name.Split('\\')[1], password, port));
+                } while (!proxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port)));
 
 
                 double inputValue = 0;
@@ -505,7 +496,7 @@ namespace Client
                     if (inputValue == 1)
                     {
                         //opcija 1 za testiranje
-                        proxy.AddUser(new User("nemanja", "nemanja", "User"));
+                        proxy.AddUser(Helper.ObjectToByteArray(new User("nemanja", "nemanja", "User")));
 
                         //opcija 2 za testiranje
                         //Console.WriteLine("Enter username: ");
@@ -523,7 +514,7 @@ namespace Client
                         //ovo za testiranje         
                         User user = new User("marina", "marina", "User");
                         user.BetAccount.Amount = 65;
-                        proxy.EditUser(user);
+                        proxy.EditUser(Helper.ObjectToByteArray(user));
 
                         //ili ovo za testiranje
                         //Console.WriteLine("Enter username: ");
@@ -535,7 +526,7 @@ namespace Client
                     else if (inputValue == 3)
                     {
                         //ovo za testiranje         
-                        proxy.DeleteUser("marina");
+                        proxy.DeleteUser(Helper.ObjectToByteArray("marina"));
 
                         //ili ovo za testiranje
                         //Console.WriteLine("Enter username: ");

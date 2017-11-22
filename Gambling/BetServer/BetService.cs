@@ -56,18 +56,31 @@ namespace BetServer
             return true;
         }
 
-        public bool SendPort(string username, int port)
+        public bool SendPort(byte[] usernameBytes, byte[] portBytes, byte[] addressBytes)
         {
             lock (PortLock)
             {
+                string username = (string)Helper.Decrypt(usernameBytes);
+                int port = (int)Helper.Decrypt(portBytes);
+                string address = (string)Helper.Decrypt(addressBytes);
+
                 BetUsers[username].Port = port;
+                BetUsers[username].Address = address;
+
                 ports.Add(port);
             }
             return true;
         }
 
-        public bool BetLogin(string username, string password, int port)//da li dopustiti istom User-u da se loguje na vise klijenata?
+
+
+        public bool BetLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes)//da li dopustiti istom User-u da se loguje na vise klijenata?
         {
+
+            string username = (string)Helper.Decrypt(usernameBytes);
+            string password = (string)Helper.Decrypt(passwordBytes);
+            int port = (int)Helper.Decrypt(portBytes);
+
             WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             if (identity.Name == username)
             {
@@ -101,8 +114,11 @@ namespace BetServer
         }
 
 
-        public bool AddUser(User user)
+        public bool AddUser(byte[] userBytes)
         {
+            //dekpricija
+            User user = (User)Helper.Decrypt(userBytes);
+
             WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             Console.WriteLine("User {0} je pozvao AddUser\n", identity.Name);
             if (!BetUsers.ContainsKey(identity.Name))
@@ -128,8 +144,9 @@ namespace BetServer
 
         }
 
-        public bool DeleteUser(string username)
+        public bool DeleteUser(byte[] usernameBytes)
         {
+            string username = (string)Helper.Decrypt(usernameBytes);
             //WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             //Console.WriteLine("User {0} je pozvao DeleteUser\n", identity.Name);
             //if (BetUsers.ContainsKey(identity.Name))
@@ -153,12 +170,10 @@ namespace BetServer
             //}
         }
 
-        public bool EditUser(User user)
+        public bool EditUser(byte[] userBytes)
         {
-            //WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
-            //Console.WriteLine("User {0} je pozvao EditUser\n", identity.Name);
-            //if (BetUsers.ContainsKey(identity.Name))
-            //{
+            User user = (User)Helper.ByteArrayToObject(userBytes);
+
             if (!BetUsers.ContainsKey(user.Username))
             {
                 Console.WriteLine("Error! There is no user {0} in BetService", user.Username);
@@ -170,28 +185,19 @@ namespace BetServer
                 {
                     if (kvp.Key == user.Username)
                     {
-                        kvp.Value.BetAccount = user.BetAccount;
-                        kvp.Value.Role = user.Role;
-                        kvp.Value.Password = user.Password;
+                        kvp.Value.BetAccount = user.BetAccount;                    
                     }
                 }
                 return true;
             }
-            //}
-            //else
-            //{
-            //    Console.WriteLine("User {0} doesn't exist", identity.Name);
-            //    return false;
-            //}
         }
 
 
-        public bool SendTicket(Ticket ticket, string username)
+        public bool SendTicket(byte[] ticketBytes, byte[] usernameBytes)
         {
-            //WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
-            //Console.WriteLine("User {0} je pozvao SendTicket\n", identity.Name);
-            //  if (BetUsers.ContainsKey(identity.Name))
-            //{
+            Ticket ticket = (Ticket)Helper.Decrypt(ticketBytes);
+            string username = (string)Helper.Decrypt(usernameBytes);
+
             if (BetUsers.ContainsKey(username))
             {
                 BetUsers[username].Tickets.Add(ticket);
@@ -199,13 +205,6 @@ namespace BetServer
             }
             else
                 return false;
-
-            //}
-            //else
-            //{
-            //    Console.WriteLine("User {0} doesn't exist", identity.Name);
-            //    return false;
-            //}
         }
     }
 }

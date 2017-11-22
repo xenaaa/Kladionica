@@ -1,4 +1,6 @@
-﻿using CertificateManager;
+﻿
+
+using CertificateManager;
 using Contracts;
 using SecurityManager;
 using System;
@@ -13,16 +15,17 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-
 namespace IntergrationPlatform
 {
-    class Program
+    public class Program
     {
+
+
         static void Main(string[] args)
         {
             NetTcpBinding binding = new NetTcpBinding();
 
-            string address = "net.tcp://localhost:9991/BetIntegrationPlatform";
+            string address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/BetIntegrationPlatform";
             ServiceHost hostBet = new ServiceHost(typeof(BetService));
             hostBet.AddServiceEndpoint(typeof(IBetService), binding, address);
 
@@ -49,7 +52,7 @@ namespace IntergrationPlatform
             Console.WriteLine("Press <enter> to stop service...");
 
 
-            address = "net.tcp://localhost:9991/BankIntegrationPlatform";
+            address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/BankIntegrationPlatform";
             ServiceHost hostBank = new ServiceHost(typeof(BankService));
             hostBank.AddServiceEndpoint(typeof(IBankService), binding, address);
 
@@ -69,7 +72,7 @@ namespace IntergrationPlatform
 
 
 
-            address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
+            address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/ClientIntegrationPlatform";
             ServiceHost hostClient = new ServiceHost(typeof(ClientHelper));
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             hostClient.AddServiceEndpoint(typeof(IClientHelper), binding, address);

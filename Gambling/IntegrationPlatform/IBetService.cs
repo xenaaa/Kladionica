@@ -14,22 +14,21 @@ namespace Contracts
         bool CheckIfAlive();
 
         [OperationContract]
-        bool SendPort(string username, int port);
+        bool SendPort(byte[] username, byte[] port, byte[] address);
 
         [OperationContract]
-        bool BetLogin(string username, string password, int port);
+        bool BetLogin(byte[] username, byte[] password, byte[] port);
 
         [OperationContract]
-        bool AddUser(User user);
+        bool AddUser(byte[] user);
 
         [OperationContract]
-        bool DeleteUser(string username);
+        bool DeleteUser(byte[] username);
 
         [OperationContract]
-        bool EditUser(User user);
-
+        bool EditUser(byte[] user);
 
         [OperationContract]
-        bool SendTicket(Ticket ticket, string username);
+        bool SendTicket(byte[] ticket, byte[] username);
     }
 }

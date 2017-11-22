@@ -11,15 +11,15 @@ namespace Contracts
     public interface IClientHelper
     {
         [OperationContract]
-        bool CheckIfAlive(int port);
+        bool CheckIfAlive(byte[] portBytes);
 
         [OperationContract]
-        bool SendGameResults(List<Game> results, int port);
+        bool SendGameResults(byte[] results, byte[] port);
 
         [OperationContract]
-        bool SendOffers(Dictionary<int, BetOffer> offers, int port);
+        bool SendOffers(byte[] offers, byte[] port);
 
         [OperationContract]
-        bool SendTicketResults(Ticket ticket, bool isPassed, int port);
+        bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port);
     }
 }

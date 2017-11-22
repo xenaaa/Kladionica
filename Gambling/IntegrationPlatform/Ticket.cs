@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
-
+    [Serializable]
 
     [DataContract]
     public class Ticket

@@ -1,6 +1,7 @@
 ﻿using BetServer;
 using CertificateManager;
 using Contracts;
+using SecurityManager;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -36,7 +37,7 @@ namespace BetServer
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            string address = "net.tcp://localhost:9998/BetService";
+            string address = "net.tcp://localhost:" + Helper.betServicePort + "/BetService";
 
             ServiceHost host = new ServiceHost(typeof(BetService));
             host.AddServiceEndpoint(typeof(IBetService), binding, address);
@@ -49,7 +50,7 @@ namespace BetServer
             ///Set appropriate service's certificate on the host. Use CertManager class to obtain the certificate based on the "srvCertCN"
             host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
 
-        
+
             host.Open();
 
             Console.WriteLine("Bet service is started.");
@@ -93,8 +94,8 @@ namespace BetServer
                 {
                     // Thread.Sleep(15000);
 
-                    DateTime start = DateTime.Now;               
-                 //   DateTime now;
+                    DateTime start = DateTime.Now;
+                    //   DateTime now;
 
                     do
                     {
@@ -102,7 +103,7 @@ namespace BetServer
                         {
                             break;
                         }
-                   //     now = DateTime.Now;
+                        //     now = DateTime.Now;
                     } while (start.AddSeconds(15) > DateTime.Now);
 
                     sendOffers = false;
@@ -142,47 +143,37 @@ namespace BetServer
                                 string srvCertCN = "betserviceintegration";
                                 binding = new NetTcpBinding();
                                 binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-                                //   string address = "net.tcp://localhost:9998/BetService";
 
                                 X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-                                EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9991/ClientIntegrationPlatform"),
+                                EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
                                                           new X509CertificateEndpointIdentity(srvCert));
 
                                 BetServerProxy proxy;
-                                //  string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
                                 proxy = new BetServerProxy(binding, address);
 
+                                byte[] encryptedPort;
 
                                 foreach (var port in ports)
                                 {
-                                    //string srvCertCN = "betservice"; //betserviceintegration
-                                    //binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+                                    encryptedPort = Helper.Encrypt(port);
 
-                                    ///// Use CertManager class to obtain the certificate based on the "srvCertCN" representing the expected service identity.
-                                    //X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-                                    //EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9991/ClientIntegrationPlatform"),
-                                    //                          new X509CertificateEndpointIdentity(srvCert));
-
+                                    if (proxy.CheckIfAlive(encryptedPort))
                                     {
-                                        if (proxy.CheckIfAlive(port))
-                                            proxy.SendOffers(Offers, port);
+                                        byte[] encryptedOffers = Helper.Encrypt(Offers);
+                                        proxy.SendOffers(encryptedOffers, encryptedPort);
                                     }
-
                                 }
 
-                                binding = new NetTcpBinding();
+                                encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
 
-                                string address2 = "net.tcp://localhost:" + 9995 + "/ClientPrint";
-                                proxy = new BetServerProxy(binding, address2);
+                                if (proxy.CheckIfAlive(encryptedPort))
                                 {
-                                    //if (proxy.CheckIfAlive(port))
-                                    //    proxy.SendOffers(Offers, port);
-                                    if (proxy.CheckIfAlive(9995))
-                                        proxy.SendOffers(Offers, 9995);
+                                    byte[] encryptedOffers = Helper.Encrypt(Offers);
+                                    proxy.SendOffers(encryptedOffers, encryptedPort);
                                 }
                             }
                         }
-                    }              
+                    }
                 }
             }
         }
@@ -225,17 +216,6 @@ namespace BetServer
                             {
                                 SendTicketResults2(user.Value, ticket);
                                 tickets.Add(ticket);
-
-                                //   //sendticketresoults za tog User-a i taj tiket...
-                                //   new Thread(() =>
-                                //   {
-                                //       Thread.CurrentThread.IsBackground = true;
-                                //       SendTicketResults2(user.Value, ticket);
-                                //   }).Start();
-                                ////   user.Value.Tickets.Remove(ticket);//uklanja se tiket
-
-                                //   if (user.Value.Tickets.Count == 0)//ako obrise i poslednji tiket
-                                //       break;
                             }
                         }
 
@@ -253,13 +233,8 @@ namespace BetServer
         {
             bool won = true;
 
-            //   List<string> results = new List<string>();
-
             foreach (KeyValuePair<int, Game> bet in ticket.Bets)
             {
-
-                //   bet.Value.Result = BetService.Rezultati[bet.Key].Result;
-                //  results.Add(BetService.Rezultati[bet.Key].Result);
                 bet.Value.HomeGoalScored = BetService.Rezultati[bet.Key].HomeGoalScored;
                 bet.Value.AwayGoalScored = BetService.Rezultati[bet.Key].AwayGoalScored;
 
@@ -274,33 +249,30 @@ namespace BetServer
             }
 
             NetTcpBinding binding = new NetTcpBinding();
-            //    string address = "net.tcp://localhost:" + user.Port + "/ClientHelper";
-            // string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
-
-            //string srvCertCN = "betserviceintegration";
-            //binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-
-            ///// Use CertManager class to obtain the certificate based on the "srvCertCN" representing the expected service identity.
-            //X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            //EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9991/ClientIntegrationPlatform"),
-            //                          new X509CertificateEndpointIdentity(srvCert));
-
-          //  string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
-
 
             string srvCertCN = "betserviceintegration";
             binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            //   string address = "net.tcp://localhost:9998/BetService";
 
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9991/ClientIntegrationPlatform"),
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
                                       new X509CertificateEndpointIdentity(srvCert));
+
+
+        
 
             BetServerProxy proxy = new BetServerProxy(binding, address);
             {
-                if (proxy.CheckIfAlive(user.Port))//ako vrati false obrisati tog user-a?
-                    proxy.SendTicketResults(ticket, won, user.Port); // treba port od klijenta kom salje
+                byte[] encryptedPort;
+                encryptedPort = Helper.Encrypt(user.Port);
+
+                if (proxy.CheckIfAlive(encryptedPort))//ako vrati false obrisati tog user-a?
+                {
+                    byte[] encryptedTicket = Helper.Encrypt(ticket);
+                    byte[] encryptedWon = Helper.Encrypt(won);
+
+                    proxy.SendTicketResults(encryptedTicket, encryptedWon, encryptedPort); // treba port od klijenta kom salje
+                }
             }
 
             if (won)
@@ -308,10 +280,9 @@ namespace BetServer
                 User changeUser = user;
                 changeUser.BetAccount.Amount += ticket.CashPrize;
                 BetService betService = new BetService();
-                betService.EditUser(changeUser);
+                betService.EditUser(Helper.ObjectToByteArray(changeUser));
             }
 
-            //user.Tickets.Clear();
             return true;
         }
 
@@ -398,45 +369,29 @@ namespace BetServer
                     } while (finished > 0);
 
 
-
                     //saljemo svima rezultate gotovih utakmica
                     lock (BetService.PortLock)
                     {
-                        //foreach (var port in ports)//ne treba jer salje samo jednom zapravo
-                        //{
-                        //    //NetTcpBinding binding = new NetTcpBinding();
-                        //    //string address = "net.tcp://localhost:" + port + "/ClientHelper";
-                        //    //BetServerProxy proxy = new BetServerProxy(binding, address);
-                        //    //{
-                        //    //    if (proxy.CheckIfAlive())
-                        //    //        proxy.SendGameResults(results);
-                        //    //}
-                        //    NetTcpBinding binding = new NetTcpBinding();
-                        //  //  string address = "net.tcp://localhost:" + port + "/ClientHelper";
-                        //   // string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
-                        //    string address = "net.tcp://localhost:" + 9995 + "/ClientPrint";  //moramo dodati novi proxy
-
-                        //    BetServerProxy proxy = new BetServerProxy(binding, address);
-                        //    {
-                        //        if (proxy.CheckIfAlive(port))
-                        //            proxy.SendGameResults(results,port); //treba i port da se salje
-                        //    }
-                        //}
-
+                        string srvCertCN = "betserviceintegration";
                         NetTcpBinding binding = new NetTcpBinding();
-                        //  string address = "net.tcp://localhost:" + port + "/ClientHelper";
-                        // string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
-                        string address = "net.tcp://localhost:" + 9995 + "/ClientPrint";  //moramo dodati novi proxy
+                        binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
+                        X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+                        EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+                                                  new X509CertificateEndpointIdentity(srvCert));
 
                         BetServerProxy proxy = new BetServerProxy(binding, address);
                         {
-                            if (proxy.CheckIfAlive(9995))
+                            byte[] encryptedPort;
+                            encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+
+                            if (proxy.CheckIfAlive(encryptedPort))
                             {
-                                proxy.SendGameResults(results, 9995); //treba i port da se salje
+                                byte[] encryptedResults = Helper.Encrypt(results);
+                                proxy.SendGameResults(encryptedResults, encryptedPort); //treba i port da se salje
                                 sendOffers = true;
                             }
                         }
-                        
                     }
                 }
             }

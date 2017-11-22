@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Account.cs" />
     <Compile Include="BetOffer.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="IBankService.cs" />
     <Compile Include="IBetService.cs" />
@@ -51,6 +52,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ticket.cs" />
     <Compile Include="User.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SecurityManager\SecurityManager.csproj">
+      <Project>{62A54F0A-8E5A-4300-819F-D1625EF865C8}</Project>
+      <Name>SecurityManager</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

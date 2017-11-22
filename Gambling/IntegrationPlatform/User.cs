@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Contracts
 {
+    [Serializable]
     [DataContract]
     public class User
     {
@@ -18,6 +19,7 @@ namespace Contracts
         Account betAccount;
         List<Ticket> tickets;
         int port;
+        string address;
 
 
         [DataMember]
@@ -110,6 +112,20 @@ namespace Contracts
             set
             {
                 port = value;
+            }
+        }
+
+        [DataMember]
+        public string Address
+        {
+            get
+            {
+                return address;
+            }
+
+            set
+            {
+                address = value;
             }
         }
 

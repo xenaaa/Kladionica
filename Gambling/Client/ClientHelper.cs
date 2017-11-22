@@ -24,7 +24,7 @@ namespace Client
         }
 
 
-        public bool SendGameResults(List<Game> results, int port)
+        public bool SendGameResults(byte[] results, byte[] port)
         {
             //if (Monitor.TryEnter(PrintLock))
             //{
@@ -45,13 +45,16 @@ namespace Client
             return true;
         }
 
-        public bool CheckIfAlive(int port)
+        public bool CheckIfAlive(byte[] port)
         {
             return true;
         }
 
-        public bool SendOffers(Dictionary<int, BetOffer> offers, int port)
+        public bool SendOffers(byte[] offersBytes, byte[] port)
         {
+
+            Dictionary<int, BetOffer> offers = (Dictionary<int, BetOffer>)Helper.ByteArrayToObject(offersBytes);
+
             if (Monitor.TryEnter(PrintLock))
             {
                 //lock (PrintLock)
@@ -76,9 +79,15 @@ namespace Client
             return false;
         }
 
-        public bool SendTicketResults(Ticket ticket, bool prosao, int port)
+        public bool SendTicketResults(byte[] ticketBytes, byte[] isPassedBytes, byte[] portBytes)
         {
-            if (prosao)
+
+            Ticket ticket = (Ticket)Helper.ByteArrayToObject(ticketBytes);
+
+            bool isPassed = (bool)Helper.ByteArrayToObject(isPassedBytes);
+
+
+            if (isPassed)
             {
                 if (Monitor.TryEnter(PrintLock))
                 {

@@ -19,7 +19,7 @@ namespace BankServer
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            string address = "net.tcp://localhost:9000/BankService";
+            string address = "net.tcp://localhost:"+ Helper.bankServicePort + "/BankService";
 
             ServiceHost host = new ServiceHost(typeof(BankService));
             host.AddServiceEndpoint(typeof(IBankService), binding, address);

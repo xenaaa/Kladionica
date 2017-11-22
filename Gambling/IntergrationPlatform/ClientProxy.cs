@@ -21,11 +21,11 @@ namespace IntergrationPlatform
 
         }
 
-        public bool CheckIfAlive(int port)
+        public bool CheckIfAlive(byte[] portBytes)
         {
             try
             {
-                factory.CheckIfAlive(port);
+                factory.CheckIfAlive(portBytes);
                 return true;
             }
             catch (Exception e)
@@ -35,7 +35,7 @@ namespace IntergrationPlatform
             }
         }
 
-        public bool SendGameResults(List<Game> results, int port)
+        public bool SendGameResults(byte[] results, byte[] port)
         {
             try
             {
@@ -52,7 +52,8 @@ namespace IntergrationPlatform
             }
         }
 
-        public bool SendOffers(Dictionary<int, BetOffer> offers, int port)
+        //   public bool SendOffers(Dictionary<int, BetOffer> offers, int port)
+        public bool SendOffers(byte[] offers, byte[] port)
         {
             try
             {
@@ -66,7 +67,7 @@ namespace IntergrationPlatform
             }
         }
 
-        public bool SendTicketResults(Ticket ticket, bool isPassed, int port)
+        public bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port)
         {
             try
             {

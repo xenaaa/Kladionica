@@ -32,7 +32,7 @@ namespace IntergrationPlatform
         }
 
 
-        public bool BankLogin(string username, string password, int port)
+        public bool BankLogin(byte[] username, byte[] password, byte[] port)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace IntergrationPlatform
             }
         }
 
-        public bool CreateAccount(User user)
+        public bool CreateAccount(byte[] user)
         { 
             try
             {
@@ -74,7 +74,7 @@ namespace IntergrationPlatform
             }
         }
 
-        public bool Deposit(Account acc, string username)
+        public bool Deposit(byte[] acc, byte[] username)
         {
             try
             {

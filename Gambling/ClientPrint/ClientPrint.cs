@@ -9,8 +9,10 @@ namespace ClientPrint
 {
     public class ClientPrint : IClientHelper
     {
-        public bool SendGameResults(List<Game> results, int port)
+        public bool SendGameResults(byte[] resultsBytes, byte[] port)
         {
+            List<Game> results = (List<Game>)Helper.ByteArrayToObject(resultsBytes);
+
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\n\n-------------------------------------RESULTS------------------------------------------------\n");
             Console.WriteLine("ID |       HOME        |       AWAY        |         RESULT        ");
@@ -26,12 +28,14 @@ namespace ClientPrint
         }
 
 
-        public bool CheckIfAlive(int port)
+        public bool CheckIfAlive(byte[] port)
         {
             return true;
         }
-        public bool SendOffers(Dictionary<int, BetOffer> offers, int port)
+        public bool SendOffers(byte[] offersBytes, byte[] portBytes)
         {
+
+            Dictionary<int, BetOffer> offers = (Dictionary<int, BetOffer>)Helper.ByteArrayToObject(offersBytes);
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("------------------------------------DAILY OFFER------------------------------------------------\n");
@@ -48,7 +52,7 @@ namespace ClientPrint
 
         }
 
-        public bool SendTicketResults(Ticket tiket, bool prosao, int port)
+        public bool SendTicketResults(byte[] tiket, byte[] prosao, byte[] port)
         {
             throw new NotImplementedException();
         }
