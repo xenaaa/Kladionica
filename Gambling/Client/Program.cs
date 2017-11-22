@@ -16,6 +16,7 @@ namespace Client
 {
     class Program
     {
+        
         static int FreeTcpPort()
         {
             TcpListener l = new TcpListener(IPAddress.Loopback, 0);
@@ -26,6 +27,7 @@ namespace Client
         }
         static void Main(string[] args)
         {
+            
             bool bankAdmin = false;
             bool betAdmin = false;
 
@@ -50,6 +52,7 @@ namespace Client
 
             int port = FreeTcpPort();
 
+           
 
 
 

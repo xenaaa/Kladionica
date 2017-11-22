@@ -61,6 +61,10 @@
       <Project>{1559299E-7348-4FD7-9D85-9F78B1988343}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\IntergrationPlatform\IntergrationPlatform.csproj">
+      <Project>{37997F47-FC86-4542-87A8-68AA71341FFC}</Project>
+      <Name>IntergrationPlatform</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SecurityManager\SecurityManager.csproj">
       <Project>{62a54f0a-8e5a-4300-819f-d1625ef865c8}</Project>
       <Name>SecurityManager</Name>

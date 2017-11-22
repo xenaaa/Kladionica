@@ -13,7 +13,7 @@ namespace ClientPrint
         static void Main(string[] args)
         {
             
-            string address = "net.tcp://localhost:" + 9995 + "/ClientPrint";
+            string address = "net.tcp://localhost:" + 30426 + "/ClientPrint";
 
             NetTcpBinding binding = new NetTcpBinding();
             ServiceHost host = new ServiceHost(typeof(ClientPrint));

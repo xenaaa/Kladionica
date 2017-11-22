@@ -25,7 +25,7 @@ namespace IntergrationPlatform
             //   string address = "net.tcp://localhost:9998/BetService";
 
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9000/BankService"),
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:12201/BankService"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             proxy = new BankServiceProxy(binding, address);

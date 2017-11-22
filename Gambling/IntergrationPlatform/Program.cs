@@ -1,5 +1,6 @@
 ﻿using CertificateManager;
 using Contracts;
+using NLog;
 using SecurityManager;
 using System;
 using System.Collections.Generic;
@@ -18,8 +19,11 @@ namespace IntergrationPlatform
 {
     class Program
     {
+        private static readonly Logger loger = LogManager.GetLogger("Syslog");
         static void Main(string[] args)
         {
+
+            loger.Info($"neka poruka");
             NetTcpBinding binding = new NetTcpBinding();
 
             string address = "net.tcp://localhost:9991/BetIntegrationPlatform";

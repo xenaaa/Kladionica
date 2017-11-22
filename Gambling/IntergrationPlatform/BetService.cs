@@ -1,5 +1,6 @@
 ﻿using CertificateManager;
 using Contracts;
+using NLog;
 using SecurityManager;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,10 @@ using System.Threading.Tasks;
 
 namespace IntergrationPlatform
 {
+    
     public class BetService : IBetService
     {
+        private static readonly Logger loger = LogManager.GetLogger("Syslog");
         BetServiceProxy proxy;
 
         public BetService()
@@ -25,7 +28,7 @@ namespace IntergrationPlatform
             //   string address = "net.tcp://localhost:9998/BetService";
 
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:9998/BetService"),
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:12208/BetService"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             proxy = new BetServiceProxy(binding, address);
@@ -41,6 +44,7 @@ namespace IntergrationPlatform
                 Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser");
                 proxy.AddUser(user);
                 Audit.AddUser(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString());
+                loger.Debug("User {0} has been added", user.Username);
                 allowed = true;
             }
             else

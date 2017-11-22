@@ -16,6 +16,7 @@ using System.Xml.Serialization;
 
 namespace BetServer
 {
+    
     class Program
     {
         private static Dictionary<int, BetOffer> Offers = new Dictionary<int, BetOffer>();
@@ -34,7 +35,7 @@ namespace BetServer
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            string address = "net.tcp://localhost:9998/BetService";
+            string address = "net.tcp://localhost:12208/BetService";
 
             ServiceHost host = new ServiceHost(typeof(BetService));
             host.AddServiceEndpoint(typeof(IBetService), binding, address);
@@ -156,13 +157,13 @@ namespace BetServer
 
                                 binding = new NetTcpBinding();
 
-                                string address2 = "net.tcp://localhost:" + 9995 + "/ClientPrint";
+                                string address2 = "net.tcp://localhost:" + 30426 + "/ClientPrint";
                                 proxy = new BetServerProxy(binding, address2);
                                 {
                                     //if (proxy.CheckIfAlive(port))
                                     //    proxy.SendOffers(Offers, port);
-                                    if (proxy.CheckIfAlive(9995))
-                                        proxy.SendOffers(Offers, 9995);
+                                    if (proxy.CheckIfAlive(30426))
+                                        proxy.SendOffers(Offers, 30426);
                                 }
                             }
                         }
@@ -410,12 +411,12 @@ namespace BetServer
                         NetTcpBinding binding = new NetTcpBinding();
                         //  string address = "net.tcp://localhost:" + port + "/ClientHelper";
                         // string address = "net.tcp://localhost:9991/ClientIntegrationPlatform";
-                        string address = "net.tcp://localhost:" + 9995 + "/ClientPrint";  //moramo dodati novi proxy
+                        string address = "net.tcp://localhost:" + 30426 + "/ClientPrint";  //moramo dodati novi proxy
 
                         BetServerProxy proxy = new BetServerProxy(binding, address);
                         {
-                            if (proxy.CheckIfAlive(9995))
-                                proxy.SendGameResults(results, 9995); //treba i port da se salje
+                            if (proxy.CheckIfAlive(30426))
+                                proxy.SendGameResults(results, 30426); //treba i port da se salje
                         }
                     }
                 }

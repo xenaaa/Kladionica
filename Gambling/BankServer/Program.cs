@@ -1,5 +1,6 @@
 ﻿using CertificateManager;
 using Contracts;
+using IntergrationPlatform;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,12 @@ namespace BankServer
     {
         static void Main(string[] args)
         {
+            
             string srvCertCN = "bankservice";
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            string address = "net.tcp://localhost:9000/BankService";
+            string address = "net.tcp://localhost:12201/BankService";
 
             ServiceHost host = new ServiceHost(typeof(BankService));
             host.AddServiceEndpoint(typeof(IBankService), binding, address);
