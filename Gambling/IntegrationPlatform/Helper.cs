@@ -2,6 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.ServiceModel;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -79,6 +83,39 @@ namespace Contracts
             RivestChest4Algorithm rc4 = new RivestChest4Algorithm();
             byte[] encrypted = rc4.Encrypt(key, obj);
             return encrypted;
+        }
+
+        public static string GetIP()
+        {
+            string addressIPv4 = string.Empty;
+
+            OperationContext oOperationContext = OperationContext.Current;
+            MessageProperties oMessageProperties = oOperationContext.IncomingMessageProperties;
+
+            RemoteEndpointMessageProperty endpoint = oMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+
+            string addressIPv6 = endpoint.Address;
+            int nPort = endpoint.Port;
+
+
+            addressIPv4 = addressIPv6;//ako je vracena adresa vec zapravo IPv4, moze se dasiti...
+
+
+            //byte[] encryptedAddress = Helper.Encrypt(addressIPv6);
+
+            IPAddress ipAddress = IPAddress.Parse(addressIPv6);
+            IPHostEntry ipHostEntry = Dns.GetHostEntry(ipAddress);
+            foreach (IPAddress address in ipHostEntry.AddressList)
+            {
+                if (address.AddressFamily == AddressFamily.InterNetwork)
+                    addressIPv4 = address.ToString();
+
+            }
+
+            return addressIPv4;
+
+
+
         }
     }
 }

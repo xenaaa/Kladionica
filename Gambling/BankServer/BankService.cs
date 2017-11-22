@@ -25,11 +25,12 @@ namespace BankServer
             return true;
         }
 
-        public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes)
+        public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes,byte[] addressBytes)
         {
             string username = (string)Helper.Decrypt(usernameBytes);
             string password = (string)Helper.Decrypt(passwordBytes);
             int port = (int)Helper.Decrypt(portBytes);
+            string addressIPv4 = (string)Helper.Decrypt(addressBytes);
 
             WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             if (identity.Name == username)
@@ -38,6 +39,7 @@ namespace BankServer
                 {
                     if (BankUsers[username].Password == password)
                     {
+                        BankUsers[username].Address = addressIPv4;//valjda je ovo ok?
                         Console.WriteLine("You successfully logged in!");
                         return true;
                     }

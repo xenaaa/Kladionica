@@ -1,11 +1,15 @@
 ﻿using CertificateManager;
 using Contracts;
+using NLog;
 using SecurityManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +18,7 @@ namespace IntergrationPlatform
 {
     public class BankService : IBankService
     {
+        private static readonly Logger loger = LogManager.GetLogger("Syslog");
         BankServiceProxy proxy;
 
         public BankService()
@@ -30,10 +35,10 @@ namespace IntergrationPlatform
             proxy = new BankServiceProxy(binding, address);
         }
 
-        public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes)
+        public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes,byte[] addressBytes)
         {
             bool allowed = false;
-
+            string username = (string)Helper.ByteArrayToObject(usernameBytes);
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("User") || principal.IsInRole("Reader") || principal.IsInRole("BankAdmin"))
             {
@@ -42,13 +47,52 @@ namespace IntergrationPlatform
                 byte[] encryptedUser = Helper.EncryptOnIntegration(usernameBytes);
                 byte[] encryptedPassword = Helper.EncryptOnIntegration(passwordBytes);
                 byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
-                proxy.BankLogin(encryptedUser, encryptedPassword, encryptedPort);
+
+
+
+
+
+
+
+                //OperationContext oOperationContext = OperationContext.Current;
+                //MessageProperties oMessageProperties = oOperationContext.IncomingMessageProperties;
+
+                //RemoteEndpointMessageProperty endpoint = oMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+
+                //string addressIPv6 = endpoint.Address;
+                //int nPort = endpoint.Port;
+
+
+                //byte[] encryptedAddress = Helper.Encrypt(addressIPv6);//ako je vracena adresa vec zapravo IPv4, moze se dasiti...
+
+                //IPAddress ipAddress = IPAddress.Parse(addressIPv6);
+                //IPHostEntry ipHostEntry = Dns.GetHostEntry(ipAddress);
+                //foreach (IPAddress address in ipHostEntry.AddressList)
+                //{
+                //    if (address.AddressFamily == AddressFamily.InterNetwork)
+                //        encryptedAddress = Helper.Encrypt(address.ToString());
+
+                //}
+                byte[] encryptedAddress = Helper.Encrypt(Helper.GetIP());
+
+
+
+                proxy.BankLogin(encryptedUser, encryptedPassword, encryptedPort, encryptedAddress);
+
+                Audit.AuthenticationSuccess(principal.Identity.Name.Split('\\')[1].ToString());
+
+                Audit.LogIn(principal.Identity.Name.Split('\\')[1].ToString());
+                loger.Debug("IP address: {0} - User {1} logged in.", Helper.GetIP(), username);
 
                 allowed = true;
             }
 
             else
-                Console.WriteLine("BankLogin() failed for user {0}.", principal.Identity.Name);
+            {
+                loger.Debug("IP address: {0} - User {1} not authorized to log in.", Helper.GetIP(), username);
+                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser", "not authorized");
+                Audit.LogInFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
+            }
             return allowed;
         }
 
@@ -62,7 +106,7 @@ namespace IntergrationPlatform
             bool allowed = false;
 
             Account acc = (Account)Helper.ByteArrayToObject(accBytes);
-
+            string username = (string)Helper.ByteArrayToObject(usernameBytes);
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("User") || principal.IsInRole("Reader"))
             {
@@ -73,12 +117,14 @@ namespace IntergrationPlatform
             
                 proxy.Deposit(encryptedAccount, encryptedUsername);
                 Audit.Deposit(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString());
+                loger.Debug("IP address: {0} - User {1} deposited {2}.", Helper.GetIP(), username, acc.Number);
                 allowed = true;
             }
             else
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "Deposit", "not authorized");
                 Audit.DepositFailed(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString(), "not authorized");
+                loger.Debug("IP address: {0} - User {1} couldn't deposit {2}.", Helper.GetIP(), username, acc.Number);
                 Console.WriteLine("Deposit() failed for user {0}.", principal.Identity.Name);          
             }
             return allowed;
@@ -87,7 +133,7 @@ namespace IntergrationPlatform
         public bool CreateAccount(byte[] userBytes)
         {
             bool allowed = false;
-
+            User user = Helper.ByteArrayToObject(userBytes) as User;
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("BankAdmin"))
             {
@@ -97,12 +143,16 @@ namespace IntergrationPlatform
 
                 proxy.CreateAccount(encryptedUser);
                 Audit.CreateAccount(principal.Identity.Name.Split('\\')[1].ToString());
+
+                loger.Debug("IP address: {0} - User {1} has been created.", Helper.GetIP(), user.Username);
                 allowed = true;
             }
             else
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "create account", "not authorized");
                 Audit.CreateAccountFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
+
+                loger.Debug("IP address: {0} - User {1} couldn't be created.", Helper.GetIP(), user.Username);
                 Console.WriteLine("CreateAccount() failed for user {0}.", principal.Identity.Name);
             }
             

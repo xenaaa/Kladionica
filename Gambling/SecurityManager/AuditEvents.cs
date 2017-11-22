@@ -24,7 +24,9 @@ namespace SecurityManager
         Deposit = 11,
         DepositFailed = 12,
         CreateAccount = 13,
-        CreateAccountFailed = 14
+        CreateAccountFailed = 14,
+        LogIn = 15,
+        LogInFailed = 16
     }
 
     public class AuditEvents
@@ -162,6 +164,20 @@ namespace SecurityManager
             get
             {
                 return ResourceMgr.GetString(AuditEventTypes.CreateAccountFailed.ToString());
+            }
+        }
+        public static string LogIn
+        {
+            get
+            {
+                return ResourceMgr.GetString(AuditEventTypes.LogIn.ToString());
+            }
+        }
+        public static string LogInFailed
+        {
+            get
+            {
+                return ResourceMgr.GetString(AuditEventTypes.LogInFailed.ToString());
             }
         }
     }

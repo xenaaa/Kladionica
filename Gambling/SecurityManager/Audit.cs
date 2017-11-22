@@ -158,6 +158,18 @@ namespace SecurityManager
             CreateAccountFailed = string.Format(CreateAccountFailed,userName, reason);
             customLog.WriteEntry(CreateAccountFailed);
         }
+        public static void LogIn(string userName)
+        {
+            string logIn = AuditEvents.LogIn; //unusual suspect
+            logIn = string.Format(logIn, userName);
+            customLog.WriteEntry(logIn);
+        }
+        public static void LogInFailed(string userName, string reason)
+        {
+            string logInFailed = AuditEvents.LogInFailed; //unusual suspect
+            logInFailed = string.Format(logInFailed, userName, reason);
+            customLog.WriteEntry(logInFailed);
+        }
 
         public void Dispose()
 		{

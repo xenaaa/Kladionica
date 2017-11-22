@@ -34,11 +34,11 @@ namespace Client
             }
         }
 
-        public bool BankLogin(byte[] username, byte[] password, byte[] port)
+        public bool BankLogin(byte[] username, byte[] password, byte[] port,byte[] address)
         {
             try
             {
-                factory.BankLogin(username, password, port);
+                factory.BankLogin(username, password, port,address);
                 return true;
             }
             catch (Exception e)

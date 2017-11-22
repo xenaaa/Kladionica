@@ -28,11 +28,11 @@ namespace BetServer
             factory = this.CreateChannel();
         }
 
-        public bool CheckIfAlive(byte[] portBytes)
+        public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes)
         {
             try
             {
-                factory.CheckIfAlive(portBytes);
+                factory.CheckIfAlive(portBytes, addressBytes);
                 return true;
             }
             catch (Exception e)
@@ -42,11 +42,11 @@ namespace BetServer
             }
 
         }
-        public bool SendGameResults(byte[] results, byte[] port)
+        public bool SendGameResults(byte[] results, byte[] port, byte[] address)
         {
             try
             {
-                factory.SendGameResults(results, port);
+                factory.SendGameResults(results, port,address);
                 return true;
             }
             catch (Exception e)
@@ -57,11 +57,11 @@ namespace BetServer
 
         }
 
-        public bool SendOffers(byte[] offers, byte[] port)
+        public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes)
         {
             try
             {
-                factory.SendOffers(offers, port);
+                factory.SendOffers(offers, port, addressBytes);
                 return true;
             }
             catch (Exception e)
@@ -71,11 +71,11 @@ namespace BetServer
             }
         }
 
-        public bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port)
+        public bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port,byte[] address)
         {
             try
             {
-                factory.SendTicketResults(ticket, isPassed, port);
+                factory.SendTicketResults(ticket, isPassed, port, address);
                 return true;
             }
             catch (Exception e)

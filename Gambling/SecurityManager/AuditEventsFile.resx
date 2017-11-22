@@ -121,7 +121,7 @@
     <value>User {0} is added.</value>
   </data>
   <data name="AddUserFailed" xml:space="preserve">
-    <value>Admin {0} failed to add {1}. Reason: {1}</value>
+    <value>Admin {0} failed to add {1}. Reason: {2}</value>
   </data>
   <data name="CreateAccount" xml:space="preserve">
     <value>User {0} successfully  created account.</value>
@@ -147,6 +147,12 @@
   <data name="EditUserFailed" xml:space="preserve">
     <value>Admin {0} failed to edit {1}. Reason: {2}</value>
   </data>
+  <data name="LogIn" xml:space="preserve">
+    <value>User {0} is logged in.</value>
+  </data>
+  <data name="LogInFailed" xml:space="preserve">
+    <value>User {0} failed to log in. Reason: {1}</value>
+  </data>
   <data name="TicketSent" xml:space="preserve">
     <value>User {0} successfully sent Ticket.</value>
   </data>
@@ -157,7 +163,7 @@
     <value>User {0} successfully authenticated.</value>
   </data>
   <data name="UserAuthorizationFailed" xml:space="preserve">
-    <value>Authorization failed. User {0} failed to access {1}. Reason: {1}</value>
+    <value>Authorization failed. User {0} failed to access {1}. Reason: {2}</value>
   </data>
   <data name="UserAuthorizationSuccess" xml:space="preserve">
     <value>User {0} successfully accessed to {1}.</value>

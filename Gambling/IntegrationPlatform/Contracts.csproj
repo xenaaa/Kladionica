@@ -44,8 +44,8 @@
   <ItemGroup>
     <Compile Include="Account.cs" />
     <Compile Include="BetOffer.cs" />
-    <Compile Include="Helper.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="IBankService.cs" />
     <Compile Include="IBetService.cs" />
     <Compile Include="IClientHelper.cs" />

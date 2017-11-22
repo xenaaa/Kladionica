@@ -152,24 +152,54 @@ namespace BetServer
                                 proxy = new BetServerProxy(binding, address);
 
                                 byte[] encryptedPort;
+                                byte[] encryptedAddress;
 
-                                foreach (var port in ports)
+                                //foreach (var port in ports)
+                                //{
+                                //    encryptedPort = Helper.Encrypt(port);
+
+                                //    if (proxy.CheckIfAlive(encryptedPort))
+                                //    {
+                                //        byte[] encryptedOffers = Helper.Encrypt(Offers);
+                                //        proxy.SendOffers(encryptedOffers, encryptedPort);
+                                //    }
+                                //}
+                                List<string> adresses = new List<string>();
+                                foreach (KeyValuePair<string, User> user in BetService.BetUsers)
                                 {
-                                    encryptedPort = Helper.Encrypt(port);
-
-                                    if (proxy.CheckIfAlive(encryptedPort))
+                                    if (!string.IsNullOrEmpty(user.Value.Address))
                                     {
-                                        byte[] encryptedOffers = Helper.Encrypt(Offers);
-                                        proxy.SendOffers(encryptedOffers, encryptedPort);
+                                        encryptedPort = Helper.Encrypt(user.Value.Port);
+                                        encryptedAddress = Helper.Encrypt(user.Value.Address);
+
+                                        if (!adresses.Contains(user.Value.Address))
+                                            adresses.Add(user.Value.Address);
+
+                                        if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
+                                        {
+                                            byte[] encryptedOffers = Helper.Encrypt(Offers);
+                                            proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
+                                        }
                                     }
+                                    else
+                                        continue;
                                 }
 
-                                encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
 
-                                if (proxy.CheckIfAlive(encryptedPort))
+                                if (adresses.Count > 0)
                                 {
-                                    byte[] encryptedOffers = Helper.Encrypt(Offers);
-                                    proxy.SendOffers(encryptedOffers, encryptedPort);
+                                    foreach (string address1 in adresses)
+                                    {
+                                        encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+                                        encryptedAddress = Helper.Encrypt(address1);
+
+                                        if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
+                                        {
+                                            byte[] encryptedOffers = Helper.Encrypt(Offers);
+                                            proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
+
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -177,6 +207,7 @@ namespace BetServer
                 }
             }
         }
+
 
         private static bool CheckUserGames()//svake 2 sekunde proverava da li su se zavrsile sve utakmice na tiketima za svakog User-a pojedinacno. Ako su sve utakmice na tiketu zavrsene tikes se salje na proveru i brise
         {
@@ -193,16 +224,19 @@ namespace BetServer
                     {
                         foreach (Ticket ticket in user.Value.Tickets)
                         {
+                            allGamesDone = true;
                             if (ticket.Bets.Count > 0)
                             {
                                 foreach (KeyValuePair<int, Game> bet in ticket.Bets)
                                 {
                                     if (BetService.Rezultati.ContainsKey(bet.Key))
                                     {
+                                        Console.WriteLine("Zavrsila se: {0}",bet.Key);
                                         continue;//utakmica zavrsena
                                     }
                                     else
                                     {
+                                        Console.WriteLine("nije se zavrsila: {0}", bet.Key);
                                         //utakmica nije gotova
                                         allGamesDone = false;
                                         break;//prelazi se na sledeci tiket istog User-a
@@ -214,6 +248,7 @@ namespace BetServer
 
                             if (allGamesDone)
                             {
+                                Console.WriteLine("salje se tiket: {0}", user.Value.Username);
                                 SendTicketResults2(user.Value, ticket);
                                 tickets.Add(ticket);
                             }
@@ -262,20 +297,21 @@ namespace BetServer
         
 
             BetServerProxy proxy = new BetServerProxy(binding, address);
+            
+            byte[] encryptedPort, encryptedAddress;
+            encryptedPort = Helper.Encrypt(user.Port);
+            encryptedAddress = Helper.Encrypt(user.Address);
+
+            if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))//ako vrati false obrisati tog user-a?
             {
-                byte[] encryptedPort;
-                encryptedPort = Helper.Encrypt(user.Port);
+                byte[] encryptedTicket = Helper.Encrypt(ticket);
+                byte[] encryptedWon = Helper.Encrypt(won);
 
-                if (proxy.CheckIfAlive(encryptedPort))//ako vrati false obrisati tog user-a?
-                {
-                    byte[] encryptedTicket = Helper.Encrypt(ticket);
-                    byte[] encryptedWon = Helper.Encrypt(won);
-
-                    proxy.SendTicketResults(encryptedTicket, encryptedWon, encryptedPort); // treba port od klijenta kom salje
-                }
+                proxy.SendTicketResults(encryptedTicket, encryptedWon, encryptedPort, encryptedAddress); // treba port od klijenta kom salje
             }
+            
 
-            if (won)
+            if (won)//koja je svrha
             {
                 User changeUser = user;
                 changeUser.BetAccount.Amount += ticket.CashPrize;
@@ -305,7 +341,7 @@ namespace BetServer
 
             while (true)
             {
-                Thread.Sleep(40000);
+                Thread.Sleep(20000);
 
                 j = 0;
                 if (Offers.Count > 0)
@@ -343,56 +379,114 @@ namespace BetServer
                             }
                         } while (indexToDelete.Contains(index));
                     }
-
-                    do
+                    lock (XMLLock)
                     {
-                        betOffer = Offers[gameIDs[indexToDelete[j]]]; //izvlacimo tu utakmicu
-                        home = r.Next(0, 5); //broj datih golova
-                        away = r.Next(0, 5);
-
-                        tip = 0; //provjera ko je pobijedio
-                        if (home > away)
-                            tip = 1;
-                        else if (home < away)
-                            tip = 2;
-
-                        Game game = new Game(betOffer, home, away, tip);
-
-                        results.Add(game);
-
-                        BetService.Rezultati.Add(betOffer.Id, game); //dodajemo utakmicu u listu zavrsenih utakmica                           
-
-                        DeleteFinishedGame(betOffer.Id);
-
-                        finished--;
-                        j++;
-                    } while (finished > 0);
-
-
-                    //saljemo svima rezultate gotovih utakmica
-                    lock (BetService.PortLock)
-                    {
-                        string srvCertCN = "betserviceintegration";
-                        NetTcpBinding binding = new NetTcpBinding();
-                        binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-
-                        X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-                        EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
-                                                  new X509CertificateEndpointIdentity(srvCert));
-
-                        BetServerProxy proxy = new BetServerProxy(binding, address);
+                        do
                         {
-                            byte[] encryptedPort;
-                            encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+                            betOffer = Offers[gameIDs[indexToDelete[j]]]; //izvlacimo tu utakmicu
+                            home = r.Next(0, 5); //broj datih golova
+                            away = r.Next(0, 5);
 
-                            if (proxy.CheckIfAlive(encryptedPort))
+                            tip = 0; //provjera ko je pobijedio
+                            if (home > away)
+                                tip = 1;
+                            else if (home < away)
+                                tip = 2;
+
+                            Game game = new Game(betOffer, home, away, tip);
+
+                            results.Add(game);
+
+                            BetService.Rezultati.Add(betOffer.Id, game); //dodajemo utakmicu u listu zavrsenih utakmica                           
+
+                            DeleteFinishedGame(betOffer.Id);
+
+                            finished--;
+                            j++;
+                        } while (finished > 0);
+
+                    }
+                    //saljemo svima rezultate gotovih utakmica
+                    // lock (BetService.PortLock)
+                    //    {
+                    string srvCertCN = "betserviceintegration";
+                    NetTcpBinding binding = new NetTcpBinding();
+                    binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
+                    X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+                    EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+                                              new X509CertificateEndpointIdentity(srvCert));
+
+                    BetServerProxy proxy = new BetServerProxy(binding, address);
+
+                    byte[] encryptedPort, encryptedAddress;
+                    //foreach (KeyValuePair<string, User> user in BetService.BetUsers)
+                    //{
+                    //    encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+                    //    encryptedAddress = Helper.Encrypt(user.Value.Address);
+
+                    //    if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
+                    //    {
+                    //        byte[] encryptedOffers = Helper.Encrypt(Offers);
+                    //        proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
+                    //    }
+                    //}
+
+
+
+
+
+
+                    List<string> adresses = new List<string>();
+                    foreach (KeyValuePair<string, User> user in BetService.BetUsers)
+                    {
+                        if (!string.IsNullOrEmpty(user.Value.Address))
+                        {
+                            //encryptedPort = Helper.Encrypt(user.Value.Port);
+                            //encryptedAddress = Helper.Encrypt(user.Value.Address);
+
+                            if (!adresses.Contains(user.Value.Address))
+                                adresses.Add(user.Value.Address);
+
+                            //if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
+                            //{
+                            //    byte[] encryptedOffers = Helper.Encrypt(Offers);
+                            //    proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
+                            //}
+                        }
+                        else
+                            continue;
+                    }
+
+
+                    if (adresses.Count > 0)
+                    {
+                        foreach (string address1 in adresses)
+                        {
+                            encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+                            encryptedAddress = Helper.Encrypt(address1);
+
+                            if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
                             {
-                                byte[] encryptedResults = Helper.Encrypt(results);
-                                proxy.SendGameResults(encryptedResults, encryptedPort); //treba i port da se salje
-                                sendOffers = true;
+                                byte[] encryptedOffers = Helper.Encrypt(results);
+                                proxy.SendGameResults(encryptedOffers, encryptedPort, encryptedAddress);
+
                             }
                         }
+                        sendOffers = true;
                     }
+
+
+                    //encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+
+                    //if (proxy.CheckIfAlive(encryptedPort))
+                    //{
+                    //    byte[] encryptedResults = Helper.Encrypt(results);
+                    //    proxy.SendGameResults(encryptedResults, encryptedPort); //treba i port da se salje
+                    //    sendOffers = true;
+                    //}
+
+                    //  }
                 }
             }
             return true;
@@ -401,8 +495,7 @@ namespace BetServer
         private static void DeleteFinishedGame(int game)
         {
             XmlDocument xmlDoc = new XmlDocument(); // Create an XML document object
-            lock (XMLLock)
-            {
+            
                 if (File.Exists("offers.xml"))
                 {
                     xmlDoc.Load("offers.xml");
@@ -418,7 +511,7 @@ namespace BetServer
 
                     xmlDoc.Save("offers.xml");
                 }
-            }
+            
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Contracts
         [OperationContract]
         bool CheckIfAlive();
         [OperationContract]
-        bool BankLogin(byte[] username, byte[] password, byte[] port);
+        bool BankLogin(byte[] username, byte[] password, byte[] port,byte[] address);
         [OperationContract]
         bool Deposit(byte[] acc, byte[] username);
         [OperationContract]

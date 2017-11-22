@@ -196,7 +196,7 @@ namespace Client
                     Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
-                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port)));
+                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)));
 
                 while (true)
                 {
@@ -381,7 +381,7 @@ namespace Client
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
-                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port)));
+                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port),Helper.ObjectToByteArray(0)));
 
                 double inputValue = 0;
                 while (true)

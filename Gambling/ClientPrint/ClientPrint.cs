@@ -9,7 +9,7 @@ namespace ClientPrint
 {
     public class ClientPrint : IClientHelper
     {
-        public bool SendGameResults(byte[] resultsBytes, byte[] port)
+        public bool SendGameResults(byte[] resultsBytes, byte[] port,byte[] address)
         {
             List<Game> results = (List<Game>)Helper.ByteArrayToObject(resultsBytes);
 
@@ -28,11 +28,11 @@ namespace ClientPrint
         }
 
 
-        public bool CheckIfAlive(byte[] port)
+        public bool CheckIfAlive(byte[] port, byte[] addressb)
         {
             return true;
         }
-        public bool SendOffers(byte[] offersBytes, byte[] portBytes)
+        public bool SendOffers(byte[] offersBytes, byte[] portBytes, byte[] addressBytes)
         {
 
             Dictionary<int, BetOffer> offers = (Dictionary<int, BetOffer>)Helper.ByteArrayToObject(offersBytes);
@@ -52,7 +52,7 @@ namespace ClientPrint
 
         }
 
-        public bool SendTicketResults(byte[] tiket, byte[] prosao, byte[] port)
+        public bool SendTicketResults(byte[] tiket, byte[] prosao, byte[] port,byte[] address)
         {
             throw new NotImplementedException();
         }
