@@ -7,7 +7,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IntergrationPlatform
+namespace IntegrationPlatform
 {
     public class ClientHelper : IClientHelper
     {

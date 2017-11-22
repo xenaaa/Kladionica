@@ -42,9 +42,18 @@ namespace BankServer
             {
                 if (bankUsersFromFile.Keys.Contains(username))
                 {
-                    if (bankUsersFromFile[username].Password == password)
+                    if (bankUsersFromFile[username].Password == password)//OKK?****
                     {
-                        BankUsers[username].Address = addressIPv4;//valjda je ovo ok?
+                        foreach (KeyValuePair<string, User> kvp in bankUsersFromFile)
+                        {
+                            if (kvp.Key == username)
+                            {
+                                kvp.Value.Address = addressIPv4;//valjda je ovo ok?
+                                break;
+                            }
+                        }
+                        Persistance.WriteToFile(bankUsersFromFile, "bankUsers");//*****
+                       
                         Console.WriteLine("You successfully logged in!");
                         return true;
                     }

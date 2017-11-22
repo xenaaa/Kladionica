@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace IntergrationPlatform
+namespace IntegrationPlatform
 {
     public class BankService : IBankService
     {

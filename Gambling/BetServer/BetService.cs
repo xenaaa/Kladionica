@@ -1,5 +1,5 @@
 ﻿using Contracts;
-using IntergrationPlatform;
+using IntegrationPlatform;
 using System;
 using System.Collections.Generic;
 using System.Linq;

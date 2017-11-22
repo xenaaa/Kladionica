@@ -8,7 +8,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IntergrationPlatform
+namespace IntegrationPlatform
 {
     public class BankServiceProxy : ChannelFactory<IBankService>, IBankService, IDisposable
     {
