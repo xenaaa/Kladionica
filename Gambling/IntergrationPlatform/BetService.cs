@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace IntergrationPlatform
 {
-    
+
     public class BetService : IBetService
     {
         private static readonly Logger loger = LogManager.GetLogger("Syslog");
@@ -28,7 +28,7 @@ namespace IntergrationPlatform
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:"+ Helper.betServicePort + "/BetService"),
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.betServicePort + "/BetService"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             proxy = new BetServiceProxy(binding, address);
@@ -82,8 +82,8 @@ namespace IntergrationPlatform
             }
             else
             {
-                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser","not authorized");
-                Audit.AddUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString(),"not authorized");
+                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser", "not authorized");
+                Audit.AddUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString(), "not authorized");
                 Console.WriteLine("AddUser() failed for user {0}.", principal.Identity.Name);
             }
             return allowed;
@@ -111,7 +111,7 @@ namespace IntergrationPlatform
                 Audit.DeleteUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), username, "not authorized");
                 Console.WriteLine("DeleteUser() failed for user {0}.", principal.Identity.Name);
             }
-                return allowed;
+            return allowed;
         }
 
         public bool EditUser(byte[] userBytes)
@@ -209,8 +209,8 @@ namespace IntergrationPlatform
             }
             else
             {
-               Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "sendticket","not authorized");
-               Audit.TicketSentFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
+                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "sendticket", "not authorized");
+                Audit.TicketSentFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
                 Console.WriteLine("SendTicket() failed for user {0}.", principal.Identity.Name);
             }
             return allowed;

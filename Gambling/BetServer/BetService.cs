@@ -53,7 +53,7 @@ namespace BetServer
                 Persistance.WriteToFile(betUsersFromFile, "betUsers");
 
                 List<int> portsFromFile = new List<int>();
-                 obj = Persistance.ReadFromFile("ports");
+                obj = Persistance.ReadFromFile("ports");
                 if (obj != null)
                     portsFromFile = (List<int>)obj;
 
@@ -158,7 +158,7 @@ namespace BetServer
                 Persistance.WriteToFile(betUsersFromFile, "users");
                 Console.WriteLine("User {0} removed from BetService", username);
                 return true;
-            }          
+            }
         }
 
         public bool EditUser(byte[] userBytes)
