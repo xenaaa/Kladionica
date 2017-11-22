@@ -61,7 +61,7 @@ namespace IntergrationPlatform
         }
 
         public bool CreateAccount(byte[] user)
-        { 
+        {
             try
             {
                 factory.CreateAccount(user);

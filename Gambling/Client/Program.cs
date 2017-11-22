@@ -184,7 +184,7 @@ namespace Client
         private static void BankService(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/BankIntegrationPlatform";
+            string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BankIntegrationPlatform";
             ClientBankProxy proxy = new ClientBankProxy(binding, address);
 
             double inputValue = 0;
@@ -212,7 +212,7 @@ namespace Client
                     {
                         //ovo za testiranje
                         proxy.Deposit(Helper.ObjectToByteArray(new Account(4, 12)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
-                        proxy.Deposit(Helper.ObjectToByteArray(new Account(4, 15)),Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
+                        proxy.Deposit(Helper.ObjectToByteArray(new Account(4, 15)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
 
                         //ili ovo za testiranje
                         int accountNumber = 0;
@@ -252,7 +252,7 @@ namespace Client
         private static void BetService(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/BetIntegrationPlatform";
+            string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform";
             ClientBetProxy proxy = new ClientBetProxy(binding, address);
 
             double inputValue = 0;
@@ -260,7 +260,7 @@ namespace Client
 
             if (proxy.CheckIfAlive())
             {
-                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port),Helper.ObjectToByteArray(0)); //treci parametar zbog intefejsa kasnije citamo adresu
+                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)); //treci parametar zbog intefejsa kasnije citamo adresu
 
                 do
                 {
@@ -361,7 +361,7 @@ namespace Client
         private static void BankAdmin(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/BankIntegrationPlatform";
+            string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BankIntegrationPlatform";
 
             ClientBankProxy proxy = new ClientBankProxy(binding, address);
 
@@ -455,7 +455,7 @@ namespace Client
         private static void BetAdmin(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/BetIntegrationPlatform";
+            string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform";
 
             ClientBetProxy proxy = new ClientBetProxy(binding, address);
             string password;

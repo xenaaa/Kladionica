@@ -70,6 +70,6 @@ namespace SecurityManager
             s[i] = s[j];
             s[j] = c;
         }
-    
+
     }
 }

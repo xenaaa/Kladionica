@@ -33,16 +33,16 @@ namespace IntergrationPlatform
 
         public bool AddUser(byte[] user)
         {
-            
+
             try
             {
                 factory.AddUser(user);
-               
+
                 return true;
             }
             catch (Exception e)
             {
-              
+
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
@@ -50,18 +50,18 @@ namespace IntergrationPlatform
 
 
         public bool DeleteUser(byte[] username)
-        { 
-          
+        {
+
             try
             {
 
                 factory.DeleteUser(username);
-                
+
                 return true;
             }
             catch (Exception e)
             {
-                
+
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
@@ -69,16 +69,16 @@ namespace IntergrationPlatform
 
         public bool EditUser(byte[] user)
         {
-            
+
             try
             {
                 factory.EditUser(user);
-               
+
                 return true;
             }
             catch (Exception e)
             {
-               
+
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
@@ -86,17 +86,17 @@ namespace IntergrationPlatform
 
         public bool SendTicket(byte[] ticket, byte[] username)
         {
-            
+
             bool sent = false;
             try
             {
                 sent = factory.SendTicket(ticket, username);
                 Console.WriteLine("SendTicket() >> {0}", sent);
-               
+
             }
             catch (Exception e)
             {
-               
+
                 Console.WriteLine("Error while trying to SendTicket(). {0}", e.Message);
             }
 
@@ -138,7 +138,7 @@ namespace IntergrationPlatform
         {
             try
             {
-                factory.SendPort(username, port,address);
+                factory.SendPort(username, port, address);
                 return true;
             }
             catch (Exception e)

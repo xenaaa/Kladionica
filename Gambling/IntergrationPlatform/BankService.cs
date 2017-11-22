@@ -22,9 +22,9 @@ namespace IntergrationPlatform
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-         
+
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:"+ Helper.bankServicePort + "/BankService"),
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.bankServicePort + "/BankService"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             proxy = new BankServiceProxy(binding, address);
@@ -70,7 +70,7 @@ namespace IntergrationPlatform
 
                 byte[] encryptedAccount = Helper.EncryptOnIntegration(accBytes);
                 byte[] encryptedUsername = Helper.EncryptOnIntegration(usernameBytes);
-            
+
                 proxy.Deposit(encryptedAccount, encryptedUsername);
                 Audit.Deposit(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString());
                 allowed = true;
@@ -79,7 +79,7 @@ namespace IntergrationPlatform
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "Deposit", "not authorized");
                 Audit.DepositFailed(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString(), "not authorized");
-                Console.WriteLine("Deposit() failed for user {0}.", principal.Identity.Name);          
+                Console.WriteLine("Deposit() failed for user {0}.", principal.Identity.Name);
             }
             return allowed;
         }
@@ -105,7 +105,7 @@ namespace IntergrationPlatform
                 Audit.CreateAccountFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
                 Console.WriteLine("CreateAccount() failed for user {0}.", principal.Identity.Name);
             }
-            
+
             return allowed;
         }
     }

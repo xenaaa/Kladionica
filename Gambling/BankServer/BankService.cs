@@ -12,7 +12,7 @@ namespace BankServer
 {
     public class BankService : IBankService
     {
-        private static Dictionary<string, User> BankUsers = new Dictionary<string, User>();
+        //  private static Dictionary<string, User> BankUsers = new Dictionary<string, User>();
         private static int accNumb = 11;
 
         public BankService()
@@ -32,11 +32,17 @@ namespace BankServer
             int port = (int)Helper.Decrypt(portBytes);
 
             WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+
+            Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("bankUsers");
+            if (obj != null)
+                bankUsersFromFile = (Dictionary<string, User>)obj;
+
             if (identity.Name == username)
             {
-                if (BankUsers.Keys.Contains(username))
+                if (bankUsersFromFile.Keys.Contains(username))
                 {
-                    if (BankUsers[username].Password == password)
+                    if (bankUsersFromFile[username].Password == password)
                     {
                         Console.WriteLine("You successfully logged in!");
                         return true;
@@ -47,16 +53,6 @@ namespace BankServer
                         return false;
                     }
                 }
-                //else
-                //{
-
-                //    User user = new User(username, password, "User");
-                //    user.Port = port;
-                //    if (CreateAccount(user))
-                //        return true;
-                //    else
-                //        return false;
-                //}
             }
             return false;
         }
@@ -66,8 +62,12 @@ namespace BankServer
         {
             User user = (User)Helper.Decrypt(userBytes);
 
-            //  WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
-            if (BankUsers.Keys.Contains(user.Username))
+            Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("bankUsers");
+            if (obj != null)
+                bankUsersFromFile = (Dictionary<string, User>)obj;
+
+            if (bankUsersFromFile.Keys.Contains(user.Username))
                 return false;
             else
             {
@@ -76,7 +76,8 @@ namespace BankServer
                 Account betAcc = new Account(0, accNumb);
                 accNumb++;
                 User user1 = new User(user.Username, user.Password, user.Role, bankAcc, betAcc);
-                BankUsers.Add(user1.Username, user1);
+                bankUsersFromFile.Add(user1.Username, user1);
+                Persistance.WriteToFile(bankUsersFromFile, "bankUsers");
                 Console.Write("Korisnik {0}", user1.Username);
                 return true;
             }
@@ -88,7 +89,12 @@ namespace BankServer
             Account acc = (Account)Helper.Decrypt(accBytes);
             string username = (string)Helper.Decrypt(usernameBytes);
 
-            KeyValuePair<string, User> user = BankUsers.Where(u => u.Value.BankAccount.Number == acc.Number).FirstOrDefault();
+            Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("bankUsers");
+            if (obj != null)
+                bankUsersFromFile = (Dictionary<string, User>)obj;
+
+            KeyValuePair<string, User> user = bankUsersFromFile.Where(u => u.Value.BankAccount.Number == acc.Number).FirstOrDefault();
 
             if (user.Key == null)
             {
@@ -97,18 +103,19 @@ namespace BankServer
             }
             else
             {
-                if (BankUsers[username].BankAccount.Amount - acc.Amount < 0)
+                if (bankUsersFromFile[username].BankAccount.Amount - acc.Amount < 0)
                 {
                     Console.WriteLine("There is not enough amount on your bank account");
                     return false;
                 }
                 else
                 {
-                    BankUsers[user.Value.Username].BankAccount.Amount += acc.Amount; // povecavamo drugi
-                    BankUsers[username].BankAccount.Amount = BankUsers[username].BankAccount.Amount - acc.Amount; // smanjujemo onaj s kog prebacujemo
+                    bankUsersFromFile[user.Value.Username].BankAccount.Amount += acc.Amount; // povecavamo drugi
+                    bankUsersFromFile[username].BankAccount.Amount = bankUsersFromFile[username].BankAccount.Amount - acc.Amount; // smanjujemo onaj s kog prebacujemo
+                    Persistance.WriteToFile(bankUsersFromFile, "bankUsers");
                     return true;
                 }
-            }      
+            }
         }
     }
 }
