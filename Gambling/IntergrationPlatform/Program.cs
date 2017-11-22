@@ -23,6 +23,8 @@ namespace IntergrationPlatform
         private static readonly Logger loger = LogManager.GetLogger("Syslog");
         static void Main(string[] args)
         {
+            Persistance.EmptyFiles();
+
             NetTcpBinding binding = new NetTcpBinding();
 
             string address = "net.tcp://localhost:"+ Helper.integrationHostPort + "/BetIntegrationPlatform";

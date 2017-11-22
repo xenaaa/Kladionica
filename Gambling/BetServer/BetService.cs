@@ -14,44 +14,16 @@ using System.Xml.Serialization;
 
 namespace BetServer
 {
-    
+
 
     public class BetService : IBetService
     {
-        
-
-        private static Dictionary<string, User> betUsers = new Dictionary<string, User>();
-        private static Dictionary<int, Game> rezultati = new Dictionary<int, Game>();
-        private static List<int> ports = new List<int>();
-       
-
         private static object portLock = new object();
 
         public static object PortLock
         {
             get { return portLock; }
             set { portLock = value; }
-        }
-
-
-        public static Dictionary<string, User> BetUsers
-        {
-            get { return betUsers; }
-            set { betUsers = value; }
-        }
-
-        public static Dictionary<int, Game> Rezultati // sifra utakmica i rezultat
-        {
-            get { return rezultati; }
-            set { rezultati = value; }
-        }
-
-        public List<int> Ports
-        {
-            get
-            {
-                return ports;
-            }
         }
 
         public BetService()
@@ -66,14 +38,28 @@ namespace BetServer
         {
             lock (PortLock)
             {
+                Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
+                Object obj = Persistance.ReadFromFile("betUsers");
+                if (obj != null)
+                    betUsersFromFile = (Dictionary<string, User>)obj;
+
                 string username = (string)Helper.Decrypt(usernameBytes);
                 int port = (int)Helper.Decrypt(portBytes);
                 string address = (string)Helper.Decrypt(addressBytes);
 
-                BetUsers[username].Port = port;
-                BetUsers[username].Address = address;
+                betUsersFromFile[username].Port = port;
+                betUsersFromFile[username].Address = address;
 
-                ports.Add(port);
+                Persistance.WriteToFile(betUsersFromFile, "betUsers");
+
+                List<int> portsFromFile = new List<int>();
+                 obj = Persistance.ReadFromFile("ports");
+                if (obj != null)
+                    portsFromFile = (List<int>)obj;
+
+                portsFromFile.Add(port);
+
+                Persistance.WriteToFile(portsFromFile, "ports");
             }
             return true;
         }
@@ -88,14 +74,18 @@ namespace BetServer
             int port = (int)Helper.Decrypt(portBytes);
 
             WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
+
+            Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("betUsers");
+            if (obj != null)
+                betUsersFromFile = (Dictionary<string, User>)obj;
+
             if (identity.Name == username)
             {
-                if (BetUsers.Keys.Contains(username))
+                if (betUsersFromFile.Keys.Contains(username))
                 {
-                    if (BetUsers[username].Password == password)
+                    if (betUsersFromFile[username].Password == password)
                     {
-                        //ako je dozvoljeno logovanje sa vise klijenata treba umesto jednog porta implementirati listu portova i svaki put ovde dodati novi port
-                        //takodje kad vec postoji i log in dodati i log-out?
                         Console.WriteLine("You successfully logged in!");
                         return true;
                     }
@@ -105,16 +95,6 @@ namespace BetServer
                         return false;
                     }
                 }
-                //else
-                //{
-
-                //    User user = new User(username, password, "User");
-                //    user.Port = port;
-                //    if (AddUser(user))
-                //        return true;
-                //    else
-                //        return false;
-                //}
             }
             return false;
         }
@@ -127,16 +107,23 @@ namespace BetServer
 
             WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
             Console.WriteLine("User {0} je pozvao AddUser\n", identity.Name);
-            if (!BetUsers.ContainsKey(identity.Name))
+
+            Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("betUsers");
+            if (obj != null)
+                betUsersFromFile = (Dictionary<string, User>)obj;
+
+            if (!betUsersFromFile.ContainsKey(identity.Name))
             {
-                if (!BetUsers.ContainsKey(user.Username))
+                if (!betUsersFromFile.ContainsKey(user.Username))
                 {
-                    
+
                     lock (PortLock)
                     {
-                        BetUsers.Add(user.Username, user);
+                        betUsersFromFile.Add(user.Username, user);
+                        Persistance.WriteToFile(betUsersFromFile, "betUsers");
                     }
-                    
+
                     Console.WriteLine("User {0} successfully added to BetUsers", user.Username);
                     return true;
                 }
@@ -149,53 +136,56 @@ namespace BetServer
             }
             Console.WriteLine("User {0} already exists", identity.Name);
             return false;
-
         }
 
         public bool DeleteUser(byte[] usernameBytes)
         {
             string username = (string)Helper.Decrypt(usernameBytes);
-            //WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
-            //Console.WriteLine("User {0} je pozvao DeleteUser\n", identity.Name);
-            //if (BetUsers.ContainsKey(identity.Name))
-            //{
-            if (!BetUsers.ContainsKey(username))
+
+            Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("betUsers");
+            if (obj != null)
+                betUsersFromFile = (Dictionary<string, User>)obj;
+
+            if (!betUsersFromFile.ContainsKey(username))
             {
                 Console.WriteLine("Error! There is no user {0} in BetService", username);
                 return false;
             }
             else
             {
-                BetUsers.Remove(username);
+                betUsersFromFile.Remove(username);
+                Persistance.WriteToFile(betUsersFromFile, "users");
                 Console.WriteLine("User {0} removed from BetService", username);
                 return true;
-            }
-            //  }
-            //else
-            //{
-            //    Console.WriteLine("User {0} doesn't exist", identity.Name);
-            //    return false;
-            //}
+            }          
         }
 
         public bool EditUser(byte[] userBytes)
         {
             User user = (User)Helper.ByteArrayToObject(userBytes);
 
-            if (!BetUsers.ContainsKey(user.Username))
+            Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("betUsers");
+            if (obj != null)
+                betUsersFromFile = (Dictionary<string, User>)obj;
+
+            if (!betUsersFromFile.ContainsKey(user.Username))
             {
                 Console.WriteLine("Error! There is no user {0} in BetService", user.Username);
                 return false;
             }
             else
             {
-                foreach (KeyValuePair<string, User> kvp in BetUsers)
+                foreach (KeyValuePair<string, User> kvp in betUsersFromFile)
                 {
                     if (kvp.Key == user.Username)
                     {
-                        kvp.Value.BetAccount = user.BetAccount;                    
+                        kvp.Value.BetAccount = user.BetAccount;
+                        kvp.Value.Tickets = user.Tickets;
                     }
                 }
+                Persistance.WriteToFile(betUsersFromFile, "betUsers");
                 return true;
             }
         }
@@ -206,9 +196,15 @@ namespace BetServer
             Ticket ticket = (Ticket)Helper.Decrypt(ticketBytes);
             string username = (string)Helper.Decrypt(usernameBytes);
 
-            if (BetUsers.ContainsKey(username))
+            Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("betUsers");
+            if (obj != null)
+                betUsersFromFile = (Dictionary<string, User>)obj;
+
+            if (betUsersFromFile.ContainsKey(username))
             {
-                BetUsers[username].Tickets.Add(ticket);
+                betUsersFromFile[username].Tickets.Add(ticket);
+                Persistance.WriteToFile(betUsersFromFile, "betUsers");
                 return true;
             }
             else
