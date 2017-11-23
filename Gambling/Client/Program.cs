@@ -179,7 +179,7 @@ namespace Client
         private static void BankService(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BankIntegrationPlatform";
+            string address = "net.tcp://"+Helper.integrationHostAddress+":" + Helper.integrationHostPort + "/BankIntegrationPlatform";
             ClientBankProxy proxy = new ClientBankProxy(binding, address);
 
             double inputValue = 0;
@@ -247,7 +247,7 @@ namespace Client
         private static void BetService(WindowsIdentity clientIdentity, int port)
         {        
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform";
+            string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform";
             ClientBetProxy proxy = new ClientBetProxy(binding, address);
 
             double inputValue = 0;
@@ -364,7 +364,7 @@ namespace Client
         private static void BankAdmin(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BankIntegrationPlatform";
+            string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BankIntegrationPlatform";
 
             ClientBankProxy proxy = new ClientBankProxy(binding, address);
 
@@ -555,7 +555,7 @@ namespace Client
         private static void BetAdmin(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform";   
+            string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform";   
 
             ClientBetProxy proxy = new ClientBetProxy(binding, address);
             string password;

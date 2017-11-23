@@ -17,7 +17,7 @@ namespace Contracts
        // public const int clientPrintPort = 60304;
       //  public const int betServicePort = 12208;
         //public const int bankServicePort = 15000;
-        public const int integrationHostPort = 9991;
+        public const int integrationHostPort = 42855;
 
         public const string integrationHostAddress = "localhost";
         public static string BetServerAddress = string.Empty;

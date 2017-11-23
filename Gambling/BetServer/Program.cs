@@ -195,7 +195,7 @@ namespace BetServer
                                 binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
                                 X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-                                EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+                                EndpointAddress address = new EndpointAddress(new Uri("net.tcp://"+Helper.integrationHostAddress+":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
                                                           new X509CertificateEndpointIdentity(srvCert));
 
                                 BetServerProxy proxy;
@@ -375,7 +375,7 @@ namespace BetServer
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://"+Helper.integrationHostAddress+":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             BetServerProxy proxy = new BetServerProxy(binding, address);
@@ -514,7 +514,7 @@ namespace BetServer
                             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
                             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-                            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+                            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://"+Helper.integrationHostAddress+":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
                                                       new X509CertificateEndpointIdentity(srvCert));
 
                             BetServerProxy proxy = new BetServerProxy(binding, address);
