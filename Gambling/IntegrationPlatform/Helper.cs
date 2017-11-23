@@ -14,10 +14,10 @@ namespace Contracts
     public static class Helper
     {
         public const string key = "123456781234567812345678";
-        public const int clientPrintPort = 22222;
-        public const int betServicePort = 17000;
-        public const int bankServicePort = 15000;
-        public const int integrationHostPort = 9991;
+        public const int clientPrintPort = 23500;
+        public const int betServicePort = 23618;
+        public const int bankServicePort = 23719;
+        public const int integrationHostPort = 23879;
 
         public static byte[] ObjectToByteArray(object obj)
         {
