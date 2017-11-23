@@ -187,16 +187,6 @@ namespace BetServer
                                 byte[] encryptedPort;
                                 byte[] encryptedAddress;
 
-                                //foreach (var port in ports)
-                                //{
-                                //    encryptedPort = Helper.Encrypt(port);
-
-                                //    if (proxy.CheckIfAlive(encryptedPort))
-                                //    {
-                                //        byte[] encryptedOffers = Helper.Encrypt(Offers);
-                                //        proxy.SendOffers(encryptedOffers, encryptedPort);
-                                //    }
-                                //}
                                 Dictionary<string, User> usersFromFile = new Dictionary<string, User>();
                                 Object obj = Persistance.ReadFromFile("betUsers");
                                 if (obj != null)
@@ -271,7 +261,6 @@ namespace BetServer
             {
                 //  foreach (KeyValuePair<string, User> user in BetService.BetUsers)
                 foreach (KeyValuePair<string, User> user in betUsersFromFile)
-
                 {
                     if (user.Value.Tickets.Count > 0)
                     {
@@ -300,20 +289,27 @@ namespace BetServer
                             if (allGamesDone)
                             {
                                 SendTicketResults2(user.Value, ticket);
-                                tickets.Add(ticket);
+                                tickets.Add(ticket); //
                             }
                         }
 
+                        bool delete = false;
+
                         foreach (var item in tickets)
                         {
+                            delete = true;
                             user.Value.Tickets.Remove(item);
                         }
-
-                        User changeUser = user.Value;
-                        BetService betService = new BetService();
-                        betService.EditUser(Helper.ObjectToByteArray(changeUser));
+                        if (delete)
+                        {
+                            User changeUser = user.Value;
+                            BetService betService = new BetService();
+                            betService.EditUser(Helper.Encrypt(changeUser));
+                        }
                     }
+
                 }
+
             }
             return true;
         }
@@ -352,9 +348,6 @@ namespace BetServer
             EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
-
-
-
             BetServerProxy proxy = new BetServerProxy(binding, address);
 
             byte[] encryptedPort, encryptedAddress;
@@ -370,15 +363,17 @@ namespace BetServer
             }
 
 
+
             if (won)//koja je svrha
             {
                 User changeUser = user;
                 BetService betService = new BetService();
-
                 changeUser.BetAccount.Amount += ticket.CashPrize;
-                betService.EditUser(Helper.ObjectToByteArray(changeUser));
+                betService.EditUser(Helper.Encrypt(changeUser));
+                return true;
             }
-            return true;
+
+            return true; 
         }
 
 
@@ -424,7 +419,7 @@ namespace BetServer
                     }
 
                     Random r = new Random();
-                    finished = r.Next(1, 6);  //broj utakmica koje ce se zavrsiti
+                    finished = r.Next(1, 8);  //broj utakmica koje ce se zavrsiti
                     if (finished > Offers.Count)
                         finished = Offers.Count;
 

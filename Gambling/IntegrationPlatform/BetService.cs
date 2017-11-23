@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationPlatform
 {
-    
+
     public class BetService : IBetService
     {
         private static readonly Logger loger = LogManager.GetLogger("Syslog");
@@ -46,7 +46,7 @@ namespace IntegrationPlatform
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("User") || principal.IsInRole("Reader") || principal.IsInRole("BetAdmin"))
             {
-               
+
 
                 byte[] encryptedUser = Helper.EncryptOnIntegration(usernameBytes);
                 byte[] encryptedPassword = Helper.EncryptOnIntegration(passwordBytes);
@@ -93,15 +93,15 @@ namespace IntegrationPlatform
                 byte[] encryptedUser = Helper.EncryptOnIntegration(userBytes);
                 proxy.AddUser(encryptedUser);
 
-                loger.Debug("IP address: {0} - User {1} has been added.", Helper.GetIP(),user.Username);
+                loger.Debug("IP address: {0} - User {1} has been added.", Helper.GetIP(), user.Username);
 
                 Audit.AddUser(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString());
                 allowed = true;
             }
             else
             {
-                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser","not authorized");
-                Audit.AddUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString(),"not authorized");
+                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser", "not authorized");
+                Audit.AddUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString(), "not authorized");
 
                 loger.Debug("IP address: {0} - User {1} not authorized to add.", Helper.GetIP(), user.Username);
 
@@ -139,7 +139,7 @@ namespace IntegrationPlatform
 
                 Console.WriteLine("DeleteUser() failed for user {0}.", principal.Identity.Name);
             }
-                return allowed;
+            return allowed;
         }
 
         public bool EditUser(byte[] userBytes)
@@ -175,13 +175,9 @@ namespace IntegrationPlatform
 
         public bool SendPort(byte[] usernameBytes, byte[] portBytes, byte[] addressBytes)
         {
-            
-
-            byte[] encryptedAddress = Helper.Encrypt(Helper.GetIP());
-
             byte[] encryptedUsername = Helper.EncryptOnIntegration(usernameBytes);
             byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
-           // byte[] encryptedAddress = Helper.Encrypt(address);
+            byte[] encryptedAddress = Helper.Encrypt(Helper.GetIP());
 
             return proxy.SendPort(encryptedUsername, encryptedPort, encryptedAddress);
         }
@@ -213,14 +209,24 @@ namespace IntegrationPlatform
             }
             else
             {
-               Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "sendticket","not authorized");
-               Audit.TicketSentFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
+                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "sendticket", "not authorized");
+                Audit.TicketSentFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
 
                 loger.Debug("IP address: {0} - User {1} not authorized to send ticket.", Helper.GetIP(), username);
 
                 Console.WriteLine("SendTicket() failed for user {0}.", principal.Identity.Name);
             }
             return allowed;
+        }
+
+        public bool Deposit(byte[] accBytes, byte[] usernameBytes)
+        {
+          //  byte[] encryptedAccount = Helper.EncryptOnIntegration(accBytes);
+          //  byte[] encryptedUsername = Helper.EncryptOnIntegration(usernameBytes);
+
+            proxy.Deposit(accBytes, usernameBytes);
+            return true;
+
         }
     }
 }

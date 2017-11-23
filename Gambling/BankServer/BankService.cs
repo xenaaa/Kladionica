@@ -1,9 +1,12 @@
 ﻿
+using CertificateManager;
 using Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
+using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +27,7 @@ namespace BankServer
             return true;
         }
 
-        public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes,byte[] addressBytes)
+        public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes, byte[] addressBytes)
         {
             string username = (string)Helper.Decrypt(usernameBytes);
             string password = (string)Helper.Decrypt(passwordBytes);
@@ -53,7 +56,7 @@ namespace BankServer
                             }
                         }
                         Persistance.WriteToFile(bankUsersFromFile, "bankUsers");//*****
-                       
+
                         Console.WriteLine("You successfully logged in!");
                         return true;
                     }
@@ -104,14 +107,8 @@ namespace BankServer
             if (obj != null)
                 bankUsersFromFile = (Dictionary<string, User>)obj;
 
-            KeyValuePair<string, User> user = bankUsersFromFile.Where(u => u.Value.BankAccount.Number == acc.Number).FirstOrDefault();
 
-            if (user.Key == null)
-            {
-                Console.WriteLine("Account number doesn't exist\n");
-                return false;
-            }
-            else
+            if (acc.Number == 0)
             {
                 if (bankUsersFromFile[username].BankAccount.Amount - acc.Amount < 0)
                 {
@@ -120,12 +117,53 @@ namespace BankServer
                 }
                 else
                 {
-                    bankUsersFromFile[user.Value.Username].BankAccount.Amount += acc.Amount; // povecavamo drugi
-                    bankUsersFromFile[username].BankAccount.Amount = bankUsersFromFile[username].BankAccount.Amount - acc.Amount; // smanjujemo onaj s kog prebacujemo
+                    bankUsersFromFile[username].BankAccount.Amount -= acc.Amount; // povecavamo drugi
+                    bankUsersFromFile[username].BetAccount.Amount += acc.Amount; // smanjujemo onaj s kog prebacujemo
                     Persistance.WriteToFile(bankUsersFromFile, "bankUsers");
+
+                    string srvCertCN = "bankserviceintegration";
+                    NetTcpBinding binding = new NetTcpBinding();
+                    binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
+                    X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+                    EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform2"),
+                                              new X509CertificateEndpointIdentity(srvCert));
+
+                    BankServerProxy proxy;
+                    proxy = new BankServerProxy(binding, address);
+
+                    byte[] encryptedAccount = Helper.Encrypt(acc);
+                    byte[] encryptedUername = Helper.Encrypt(username);
+
+                    proxy.Deposit(encryptedAccount, encryptedUername);
                     return true;
                 }
-            }      
+            }
+            else
+            {
+                KeyValuePair<string, User> user = bankUsersFromFile.Where(u => u.Value.BankAccount.Number == acc.Number).FirstOrDefault();
+
+                if (user.Key == null)
+                {
+                    Console.WriteLine("Account number doesn't exist\n");
+                    return false;
+                }
+                else
+                {
+                    if (bankUsersFromFile[username].BankAccount.Amount - acc.Amount < 0)
+                    {
+                        Console.WriteLine("There is not enough amount on your bank account");
+                        return false;
+                    }
+                    else
+                    {
+                        bankUsersFromFile[user.Value.Username].BankAccount.Amount += acc.Amount; // povecavamo drugi
+                        bankUsersFromFile[username].BankAccount.Amount = bankUsersFromFile[username].BankAccount.Amount - acc.Amount; // smanjujemo onaj s kog prebacujemo
+                        Persistance.WriteToFile(bankUsersFromFile, "bankUsers");
+                        return true;
+                    }
+                }
+            }
         }
     }
 }

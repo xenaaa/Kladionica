@@ -105,31 +105,35 @@ namespace Client
             else
             {
                 double inputValue = 0;
-
-                do
+                while (true)
                 {
-                    Console.WriteLine(" Press 1 - Bank service");
-                    Console.WriteLine(" Press 2 - Bet service");
-                    Console.WriteLine(" Press 3 for exit.");
+                    do
+                    {
+                        Console.WriteLine(" Press 1 - Bank service");
+                        Console.WriteLine(" Press 2 - Bet service");
+                        Console.WriteLine(" Press 3 for exit.");
 
-                    inputValue = (int)(CheckIfNumber(Console.ReadLine()));
+                        inputValue = (int)(CheckIfNumber(Console.ReadLine()));
 
-                } while (inputValue != 1 && inputValue != 2 && inputValue != 3);
-
-
-                if (inputValue == 1)
-                {
-                    BankService(clientIdentity, port);
-                }
+                    } while (inputValue != 1 && inputValue != 2 && inputValue != 3);
 
 
-                else if (inputValue == 2)
-                {
-                    BetService(clientIdentity, port);
-                    Console.WriteLine(port.ToString());
+                    if (inputValue == 1)
+                    {
+                        BankService(clientIdentity, port);
+                    }
+
+                    else if (inputValue == 2)
+                    {
+                        BetService(clientIdentity, port);
+                    }
+
+                    else if (inputValue == 3)
+                    {
+                        break;
+                    }
                 }
             }
-
             host.Close();
         }
 
@@ -170,9 +174,9 @@ namespace Client
             string password;
             if (proxy.CheckIfAlive())
             {
+                Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
                 {
-                    Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
                 } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)));
@@ -182,7 +186,7 @@ namespace Client
                     do
                     {
                         Console.WriteLine("Press 1 for deposit.");
-                        Console.WriteLine("Press 2 for exit.");
+                        Console.WriteLine("Press 2 for logout.");
                         inputValue = (int)CheckIfNumber(Console.ReadLine());
 
                     } while (inputValue != 1 && inputValue != 2);
@@ -190,8 +194,8 @@ namespace Client
                     if (inputValue == 1)
                     {
                         //ovo za testiranje
-                        proxy.Deposit(Helper.ObjectToByteArray(new Account(4, 12)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
-                        proxy.Deposit(Helper.ObjectToByteArray(new Account(4, 15)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
+                        //      proxy.Deposit(Helper.ObjectToByteArray(new Account(4, 12)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
+                        //    proxy.Deposit(Helper.ObjectToByteArray(new Account(4, 15)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
 
                         //ili ovo za testiranje
                         int accountNumber = 0;
@@ -229,7 +233,7 @@ namespace Client
 
 
         private static void BetService(WindowsIdentity clientIdentity, int port)
-        {
+        {        
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform";
             ClientBetProxy proxy = new ClientBetProxy(binding, address);
@@ -239,11 +243,12 @@ namespace Client
 
             if (proxy.CheckIfAlive())
             {
+                Console.WriteLine("gasga");
                 proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)); //treci parametar zbog intefejsa kasnije citamo adresu
 
+                Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
                 {
-                    Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
@@ -259,88 +264,89 @@ namespace Client
                 {
                     while (ClientHelper.Offers.Count < 1)
                         Thread.Sleep(2000);
-                    Console.WriteLine("Press Enter for new ticket");
-                    while (true)
+                    do
                     {
-                        if (Console.ReadKey(true).Key == ConsoleKey.Enter && Monitor.TryEnter(ClientHelper.PrintLock))//kada se stisne Enter pravi se novi tiket
+                        Console.WriteLine("Press 1 for new ticket.");
+                        Console.WriteLine("Press 2 for logout.");
+                        inputValue = (int)CheckIfNumber(Console.ReadLine());
+
+                    } while (inputValue != 1 && inputValue != 2);
+
+
+                    if (inputValue == 1)
+                    {
+                        while (true)
                         {
+
                             bets = new Dictionary<int, Game>();
-                            lock (ClientHelper.PrintLock)
+
+                            do
                             {
                                 do
                                 {
+                                    Console.WriteLine("\n1.\tAdd tip\n2.\t Exit");
+                                    inputValue = CheckIfNumber(Console.ReadLine());
+                                } while (inputValue != 1 && inputValue != 2);
+
+                                if (inputValue == 1)
+                                {
+                                    g = new Game();
                                     do
                                     {
-                                        Console.WriteLine("\n1.\tAdd tip\n2.\t Exit");
+                                        Console.WriteLine("\nGame code: ");
                                         inputValue = CheckIfNumber(Console.ReadLine());
-                                    } while (inputValue != 1 && inputValue != 2);
+                                    } while (inputValue == -1);
 
-                                    if (inputValue == 1)
+                                    code = (int)inputValue;
+
+                                    if (!ClientHelper.Offers.ContainsKey(code))
                                     {
-                                        g = new Game();
-                                        do
-                                        {
-                                            Console.WriteLine("\nGame code: ");
-                                            inputValue = CheckIfNumber(Console.ReadLine());
-                                        } while (inputValue == -1);
-
-                                        code = (int)inputValue;
-
-                                        if (!ClientHelper.Offers.ContainsKey(code))
-                                        {
-                                            Console.WriteLine("\nThis code doesn't exist!");
-                                            continue;
-                                        }
-
-                                        do
-                                        {
-                                            Console.WriteLine("\nTip: ");
-                                            inputValue = CheckIfNumber(Console.ReadLine());
-                                        } while (inputValue == -1);
-
-                                        g.Tip = (int)inputValue;
-                                        g.BetOffer = ClientHelper.Offers[code];
-
-                                        if (!bets.ContainsKey(code))
-                                            bets.Add(code, g);//proveriti ako dodaje istu utakmicu
-
-                                    }
-                                    else if (inputValue == 2)
-                                    {
-                                        if (bets.Count > 0)
-                                        {
-                                            do
-                                            {
-                                                Console.WriteLine("\nPayment: ");
-                                                inputValue = CheckIfNumber(Console.ReadLine());
-                                            } while (inputValue == -1);
-                                            int payment = (int)inputValue;
-                                            MakeTicket(proxy, bets, payment);
-
-                                        }
-                                        break;
+                                        Console.WriteLine("\nThis code doesn't exist!");
+                                        continue;
                                     }
 
-                                } while (true);
+                                    do
+                                    {
+                                        Console.WriteLine("\nTip: ");
+                                        inputValue = CheckIfNumber(Console.ReadLine());
+                                    } while (inputValue == -1);
 
-                                Monitor.Exit(ClientHelper.PrintLock);
-                                break;
-                            }
+                                    g.Tip = (int)inputValue;
+                                    g.BetOffer = ClientHelper.Offers[code];
 
-                        }
-                        else
-                        {
-                            // Monitor.Exit(ClientHelper.PrintLock);
-                            continue;
+                                    if (!bets.ContainsKey(code))
+                                        bets.Add(code, g);//proveriti ako dodaje istu utakmicu
+
+                                }
+                                else if (inputValue == 2)
+                                {
+                                    if (bets.Count > 0)
+                                    {
+                                        do
+                                        {
+                                            Console.WriteLine("\nPayment: ");
+                                            inputValue = CheckIfNumber(Console.ReadLine());
+                                        } while (inputValue == -1);
+                                        int payment = (int)inputValue;
+                                        MakeTicket(proxy, bets, payment);
+
+                                    }
+                                    break;
+                                }
+
+                            } while (true);
+                            break;
                         }
                     }
-
+                    else if (inputValue == 2)
+                    {
+                        break;
+                    }
                 }
             }
             else
                 Console.WriteLine("Server is down");
         }
-
 
 
         private static void BankAdmin(WindowsIdentity clientIdentity, int port)
@@ -360,9 +366,9 @@ namespace Client
                 proxy.CreateAccount(Helper.ObjectToByteArray(new User("nicpa", "nicpa", "User")));
                 proxy.CreateAccount(Helper.ObjectToByteArray(new User("djole", "djole", "Reader")));
 
+                Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
                 {
-                    Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
@@ -553,9 +559,9 @@ namespace Client
 
                 proxy.SendPort(Helper.ObjectToByteArray("admin"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)); //treci parametar zbog intefejsa kasnije citamo adresu
 
+                Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
                 {
-                    Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
