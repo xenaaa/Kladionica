@@ -30,8 +30,10 @@ namespace IntegrationPlatform
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:"+ Helper.betServicePort + "/BetService"),
-                                      new X509CertificateEndpointIdentity(srvCert));
+            //EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:"+ Helper.betServicePort + "/BetService"),
+            //                          new X509CertificateEndpointIdentity(srvCert));
+            EndpointAddress address = new EndpointAddress(new Uri(Helper.BetServerAddress),
+                                    new X509CertificateEndpointIdentity(srvCert));
 
             proxy = new BetServiceProxy(binding, address);
         }
@@ -173,46 +175,7 @@ namespace IntegrationPlatform
 
         public bool SendPort(byte[] usernameBytes, byte[] portBytes, byte[] addressBytes)
         {
-            //OperationContext context = OperationContext.Current;
-            //MessageProperties properties = context.IncomingMessageProperties;
-
-            //RemoteEndpointMessageProperty endpoint = properties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
-
-            //string address = string.Empty;
-
-            //if (properties.Keys.Contains(HttpRequestMessageProperty.Name))
-            //{
-            //    HttpRequestMessageProperty endpointLoadBalancer = properties[HttpRequestMessageProperty.Name] as HttpRequestMessageProperty;
-            //    if (endpointLoadBalancer != null && endpointLoadBalancer.Headers["X-Forwarded-For"] != null)
-            //        address = endpointLoadBalancer.Headers["X-Forwarded-For"];
-            //}
-            //if (string.IsNullOrEmpty(address))
-            //{
-            //    address = endpoint.Address;
-            //}
-
-           // string IPP = Helper.GetIP();
-
-
-            //OperationContext oOperationContext = OperationContext.Current;
-            //MessageProperties oMessageProperties = oOperationContext.IncomingMessageProperties;
-          
-            //RemoteEndpointMessageProperty endpoint = oMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
-
-            //string addressIPv6 = endpoint.Address;
-            //int nPort = endpoint.Port;
-
-
-            //byte[] encryptedAddress = Helper.Encrypt(addressIPv6);//ako je vracena adresa vec zapravo IPv4, moze se dasiti...
-
-            //IPAddress ipAddress = IPAddress.Parse(addressIPv6);
-            //IPHostEntry ipHostEntry = Dns.GetHostEntry(ipAddress);
-            //foreach (IPAddress address in ipHostEntry.AddressList)
-            //{
-            //    if (address.AddressFamily == AddressFamily.InterNetwork)
-            //        encryptedAddress = Helper.Encrypt(address.ToString());
-               
-            //}
+            
 
             byte[] encryptedAddress = Helper.Encrypt(Helper.GetIP());
 
@@ -238,47 +201,7 @@ namespace IntegrationPlatform
                 byte[] encryptedTicket = Helper.EncryptOnIntegration(ticketBytes);
                 byte[] encryptedUsername = Helper.EncryptOnIntegration(usernameBytes);
 
-                //OperationContext context = OperationContext.Current;
-                //MessageProperties properties = context.IncomingMessageProperties;
-
-                //RemoteEndpointMessageProperty endpoint = properties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
-
-                //
-
-                //if (properties.Keys.Contains(HttpRequestMessageProperty.Name))
-                //{
-                //    HttpRequestMessageProperty endpointLoadBalancer = properties[HttpRequestMessageProperty.Name] as HttpRequestMessageProperty;
-                //    if (endpointLoadBalancer != null && endpointLoadBalancer.Headers["X-Forwarded-For"] != null)
-                //        address = endpointLoadBalancer.Headers["X-Forwarded-For"];
-                //}
-                //if (string.IsNullOrEmpty(address))
-                //{
-                //    address = endpoint.Address;
-                //}
-
-
-                //OperationContext oOperationContext = OperationContext.Current;
-                //MessageProperties oMessageProperties = oOperationContext.IncomingMessageProperties;
-
-                //RemoteEndpointMessageProperty endpoint = oMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
-
-                //string addressIPv6 = endpoint.Address;
-                //int nPort = endpoint.Port;
-
-
-                //addressIPv4 = addressIPv6;//ako je vracena adresa vec zapravo IPv4, moze se dasiti...
-
-
-                //byte[] encryptedAddress = Helper.Encrypt(addressIPv6);
-
-                //IPAddress ipAddress = IPAddress.Parse(addressIPv6);
-                //IPHostEntry ipHostEntry = Dns.GetHostEntry(ipAddress);
-                //foreach (IPAddress address in ipHostEntry.AddressList)
-                //{
-                //    if (address.AddressFamily == AddressFamily.InterNetwork)
-                //        addressIPv4 = address.ToString();
-
-                //}
+                
                 string addressIPv4 = Helper.GetIP();
 
                 proxy.SendTicket(encryptedTicket, encryptedUsername);

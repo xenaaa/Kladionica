@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Security;
@@ -17,6 +19,7 @@ using System.Xml.Serialization;
 
 namespace BetServer
 {
+
     class Program
     {
         private static Dictionary<int, BetOffer> Offers = new Dictionary<int, BetOffer>();
@@ -38,6 +41,14 @@ namespace BetServer
             get { return resultsLock; }
             set { resultsLock = value; }
         }
+        static int FreeTcpPort()
+        {
+            TcpListener l = new TcpListener(IPAddress.Loopback, 0);
+            l.Start();
+            int port = ((IPEndPoint)l.LocalEndpoint).Port;
+            l.Stop();
+            return port;
+        }
 
         static void Main(string[] args)
         {
@@ -45,7 +56,7 @@ namespace BetServer
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            string address = "net.tcp://localhost:" + Helper.betServicePort + "/BetService";
+            string address = "net.tcp://localhost:" + FreeTcpPort() + "/BetService";
 
             ServiceHost host = new ServiceHost(typeof(BetService));
             host.AddServiceEndpoint(typeof(IBetService), binding, address);
@@ -60,6 +71,20 @@ namespace BetServer
 
 
             host.Open();
+
+            string srvCertCN2 = "betserviceintegration";
+            binding = new NetTcpBinding();
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
+            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN2);
+            EndpointAddress address2 = new EndpointAddress(new Uri("net.tcp://"+Helper.integrationHostAddress+":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+                                      new X509CertificateEndpointIdentity(srvCert));
+
+            BetServerProxy proxy;
+            proxy = new BetServerProxy(binding, address2);
+
+            proxy.GetServiceIP(Helper.Encrypt(address));
+
 
             Console.WriteLine("Bet service is started.");
             Console.WriteLine("Press <enter> to stop service...");

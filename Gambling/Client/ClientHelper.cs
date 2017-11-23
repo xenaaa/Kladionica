@@ -154,5 +154,10 @@ namespace Client
             }
             return true;
         }
+
+        public bool GetServiceIP(byte[] AddressStringBytes)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

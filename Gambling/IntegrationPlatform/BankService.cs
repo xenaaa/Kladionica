@@ -29,8 +29,10 @@ namespace IntegrationPlatform
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.bankServicePort + "/BankService"),
-                                      new X509CertificateEndpointIdentity(srvCert));
+            //EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.bankServicePort + "/BankService"),
+            //                          new X509CertificateEndpointIdentity(srvCert));
+            EndpointAddress address = new EndpointAddress(new Uri(Helper.BankServerAddress),
+                                     new X509CertificateEndpointIdentity(srvCert));
 
             proxy = new BankServiceProxy(binding, address);
         }

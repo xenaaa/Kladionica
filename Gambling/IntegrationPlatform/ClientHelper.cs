@@ -37,6 +37,23 @@ namespace IntegrationPlatform
             return proxy.CheckIfAlive(portBytes, addressBytes);
         }
 
+        public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo
+        {
+            string AddressString = Helper.Decrypt(AddressStringBytes) as string;
+
+
+            if (AddressString.Contains("BankService"))//banka salje adresu
+            {
+                Helper.BankServerAddress = AddressString;
+            }
+            else//bet salje adresu
+            {
+                Helper.BetServerAddress = AddressString;
+            }
+
+            return true;
+        }
+
         public bool SendGameResults(byte[] resultsBytes, byte[] portBytes, byte[] addressBytes)
         {
             Object obj = Helper.Decrypt(resultsBytes);

@@ -42,6 +42,21 @@ namespace BetServer
             }
 
         }
+
+        public bool GetServiceIP(byte[] AddressStringBytes)
+        {
+            try
+            {
+                factory.GetServiceIP(AddressStringBytes);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
+        }
+
         public bool SendGameResults(byte[] results, byte[] port, byte[] address)
         {
             try

@@ -14,6 +14,9 @@ namespace Contracts
         bool CheckIfAlive(byte[] portBytes, byte[] addressBytes);
 
         [OperationContract]
+        bool GetServiceIP(byte[] AddressStringBytes);
+
+        [OperationContract]
         bool SendGameResults(byte[] results, byte[] port,byte[] address);
 
         [OperationContract]

@@ -35,6 +35,11 @@ namespace IntegrationPlatform
             }
         }
 
+        public bool GetServiceIP(byte[] AddressStringBytes)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool SendGameResults(byte[] results, byte[] port,byte[] address)
         {
             try
