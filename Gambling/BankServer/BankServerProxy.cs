@@ -32,8 +32,7 @@ namespace BankServer
         {
             try
             {
-                factory.Deposit(acc, username);
-                return true;
+              return factory.Deposit(acc, username);
             }
             catch (Exception e)
             {
@@ -42,7 +41,18 @@ namespace BankServer
             }
         }
 
-
+        public bool GetServiceIP(byte[] AddressStringBytes)
+        {
+            try
+            {
+                return factory.GetServiceIP(AddressStringBytes);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
+        }
         public bool AddUser(byte[] user)
         {
             throw new NotImplementedException();
@@ -68,7 +78,7 @@ namespace BankServer
             throw new NotImplementedException();
         }
 
-        public bool SendPort(byte[] username, byte[] port, byte[] address)
+        public bool SendPort(byte[] username, byte[] port, byte[] address,byte[] printPort)
         {
             throw new NotImplementedException();
         }
@@ -78,19 +88,9 @@ namespace BankServer
             throw new NotImplementedException();
         }
 
-
-        public bool GetServiceIP(byte[] AddressStringBytes)
+        public bool IntrusionPrevention(byte[] user)
         {
-            try
-            {
-                factory.GetServiceIP(AddressStringBytes);
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error {0}", e.Message);
-                return false;
-            }
+            throw new NotImplementedException();
         }
     }
 }

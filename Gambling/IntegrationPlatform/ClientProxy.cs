@@ -17,16 +17,18 @@ namespace IntegrationPlatform
         public ClientProxy() { }
         public ClientProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
+
             factory = this.CreateChannel();
 
         }
 
-        public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes)
+        public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
         {
+            
             try
             {
-                factory.CheckIfAlive(portBytes, addressBytes);
-                return true;
+               return  factory.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
+               
             }
             catch (Exception e)
             {
@@ -44,11 +46,8 @@ namespace IntegrationPlatform
         {
             try
             {
-                factory.SendGameResults(results, port, address);
-                CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
+                return factory.SendGameResults(results, port, address);
 
-
-                return true;
             }
             catch (Exception e)
             {
@@ -58,12 +57,11 @@ namespace IntegrationPlatform
         }
 
         //   public bool SendOffers(Dictionary<int, BetOffer> offers, int port)
-        public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes)
+        public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes,byte[] isItPrintClientBytes)
         {
             try
             {
-                factory.SendOffers(offers, port, addressBytes);
-                return true;
+                return  factory.SendOffers(offers, port, addressBytes, isItPrintClientBytes);
             }
             catch (Exception e)
             {
@@ -76,8 +74,7 @@ namespace IntegrationPlatform
         {
             try
             {
-                factory.SendTicketResults(ticket, isPassed, port, address);
-                return true;
+                return factory.SendTicketResults(ticket, isPassed, port, address);
             }
             catch (Exception e)
             {

@@ -14,7 +14,7 @@ namespace Contracts
         bool CheckIfAlive();
 
         [OperationContract]
-        bool SendPort(byte[] username, byte[] port, byte[] address);
+        bool SendPort(byte[] username, byte[] port, byte[] address, byte[] Printport);
 
         [OperationContract]
         bool BetLogin(byte[] username, byte[] password, byte[] port);
@@ -36,5 +36,7 @@ namespace Contracts
 
         [OperationContract]
         bool GetServiceIP(byte[] AddressStringBytes);
+        [OperationContract]
+        bool IntrusionPrevention(byte[] user);
     }
 }

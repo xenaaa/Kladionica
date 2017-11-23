@@ -52,6 +52,7 @@ namespace BetServer
 
         static void Main(string[] args)
         {
+           
             string srvCertCN = "betservice";
 
             NetTcpBinding binding = new NetTcpBinding();
@@ -201,13 +202,17 @@ namespace BetServer
                                 proxy = new BetServerProxy(binding, address);
 
                                 byte[] encryptedPort;
+                                byte[] encryptedPrintPort;
                                 byte[] encryptedAddress;
 
                                 Dictionary<string, User> usersFromFile = new Dictionary<string, User>();
-                                Object obj = Persistance.ReadFromFile("betUsers");
+                                Object obj = Persistance.ReadFromFile("betUsers.txt");
                                 if (obj != null)
                                     usersFromFile = (Dictionary<string, User>)obj;
                                 List<string> adresses = new List<string>();
+
+                                byte[] encryptedOffers = Helper.Encrypt(Offers);
+
                                 foreach (KeyValuePair<string, User> user in usersFromFile)
                                 {
                                     if (!string.IsNullOrEmpty(user.Value.Address))
@@ -216,12 +221,21 @@ namespace BetServer
                                         encryptedAddress = Helper.Encrypt(user.Value.Address);
 
                                         if (!adresses.Contains(user.Value.Address))
-                                            adresses.Add(user.Value.Address);
-
-                                        if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
                                         {
-                                            byte[] encryptedOffers = Helper.Encrypt(Offers);
-                                            proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
+                                            encryptedPrintPort = Helper.Encrypt(user.Value.PrintPort);
+                                            if (proxy.CheckIfAlive(encryptedPrintPort, encryptedAddress, Helper.Encrypt(true)))
+                                            {                                                
+                                                proxy.SendOffers(encryptedOffers, encryptedPrintPort, encryptedAddress, Helper.Encrypt(true));
+
+                                            }
+                                            adresses.Add(user.Value.Address);
+                                        }
+                                        if (proxy.CheckIfAlive(encryptedPort, encryptedAddress, Helper.Encrypt(false)))
+                                        {
+                                           
+                                            proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress,Helper.Encrypt(false));
+
+                                           
                                         }
                                     }
                                     else
@@ -229,21 +243,21 @@ namespace BetServer
                                 }
 
 
-                                if (adresses.Count > 0)
-                                {
-                                    foreach (string address1 in adresses)
-                                    {
-                                        encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
-                                        encryptedAddress = Helper.Encrypt(address1);
+                                //if (adresses.Count > 0)
+                                //{
+                                //    foreach (string address1 in adresses)
+                                //    {
+                                //        encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+                                //        encryptedAddress = Helper.Encrypt(address1);
 
-                                        if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
-                                        {
-                                            byte[] encryptedOffers = Helper.Encrypt(Offers);
-                                            proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
+                                //        if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
+                                //        {
+                                //            byte[] encryptedOffers = Helper.Encrypt(Offers);
+                                //            proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
 
-                                        }
-                                    }
-                                }
+                                //        }
+                                //    }
+                                //}
                             }
                         }
                     }
@@ -260,13 +274,13 @@ namespace BetServer
 
             List<Ticket> tickets = new List<Ticket>(); //lista tiketa koji se brisu iz liste
 
-            Object obj = Persistance.ReadFromFile("betUsers");
+            Object obj = Persistance.ReadFromFile("betUsers.txt");
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
             if (obj != null)
                 betUsersFromFile = (Dictionary<string, User>)obj;
 
 
-            obj = Persistance.ReadFromFile("results");
+            obj = Persistance.ReadFromFile("results.txt");
             Dictionary<int, Game> resultsFromFile = new Dictionary<int, Game>();
             if (obj != null)
                 resultsFromFile = (Dictionary<int, Game>)obj;
@@ -332,7 +346,7 @@ namespace BetServer
 
         private static bool SendTicketResults2(User user, Ticket ticket)//sve utakmice na tiketu gotove, salje se ishod
         {
-            Object obj = Persistance.ReadFromFile("results");
+            Object obj = Persistance.ReadFromFile("results.txt");
             Dictionary<int, Game> resultsFromFile = new Dictionary<int, Game>();
             if (obj != null)
                 resultsFromFile = (Dictionary<int, Game>)obj;
@@ -370,7 +384,7 @@ namespace BetServer
             encryptedPort = Helper.Encrypt(user.Port);
             encryptedAddress = Helper.Encrypt(user.Address);
 
-            if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))//ako vrati false obrisati tog user-a?
+            if (proxy.CheckIfAlive(encryptedPort, encryptedAddress, Helper.Encrypt(false)))//ako vrati false obrisati tog user-a?
             {
                 byte[] encryptedTicket = Helper.Encrypt(ticket);
                 byte[] encryptedWon = Helper.Encrypt(won);
@@ -469,14 +483,14 @@ namespace BetServer
 
                             results.Add(game);
 
-                            Object obj = Persistance.ReadFromFile("results");
+                            Object obj = Persistance.ReadFromFile("results.txt");
                             Dictionary<int, Game> resultsFromFile = new Dictionary<int, Game>(); //citamo iz fajla rezultate
                             if (obj != null)
                                 resultsFromFile = (Dictionary<int, Game>)obj;
 
                             resultsFromFile.Add(betOffer.Id, game); //dodajemo utakmicu u listu zavrsenih utakmica                           
 
-                            Persistance.WriteToFile(resultsFromFile, "results"); //upisujemo u fajl
+                            Persistance.WriteToFile(resultsFromFile, "results.txt"); //upisujemo u fajl
 
                             finishedGame.Add(betOffer.Id);
 
@@ -505,7 +519,7 @@ namespace BetServer
 
                             BetServerProxy proxy = new BetServerProxy(binding, address);
 
-                            byte[] encryptedPort, encryptedAddress;
+                            byte[] encryptedPort, encryptedAddress, encryptedPrintPort;
                             //foreach (KeyValuePair<string, User> user in BetService.BetUsers)
                             //{
                             //    encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
@@ -519,7 +533,7 @@ namespace BetServer
                             //}
 
                             Dictionary<string, User> usersFromFile = new Dictionary<string, User>();//da li treba lock?
-                            Object obj = Persistance.ReadFromFile("betUsers");
+                            Object obj = Persistance.ReadFromFile("betUsers.txt");
                             if (obj != null)
                                 usersFromFile = (Dictionary<string, User>)obj;
 
@@ -527,6 +541,7 @@ namespace BetServer
 
 
                             List<string> adresses = new List<string>();
+                            byte[] encryptedOffers = Helper.Encrypt(results);
                             foreach (KeyValuePair<string, User> user in usersFromFile)
                             {
                                 if (!string.IsNullOrEmpty(user.Value.Address))
@@ -535,8 +550,19 @@ namespace BetServer
                                     //encryptedAddress = Helper.Encrypt(user.Value.Address);
 
                                     if (!adresses.Contains(user.Value.Address))
-                                        adresses.Add(user.Value.Address);
+                                    {
+                                        encryptedPort = Helper.Encrypt(user.Value.Port);
+                                        encryptedAddress = Helper.Encrypt(user.Value.Address);
+                                        encryptedPrintPort = Helper.Encrypt(user.Value.PrintPort);
+                                        if (proxy.CheckIfAlive(encryptedPrintPort, encryptedAddress, Helper.Encrypt(true)))
+                                        {
 
+                                            proxy.SendGameResults(encryptedOffers, encryptedPrintPort, encryptedAddress);
+
+                                        }
+                                        adresses.Add(user.Value.Address);
+                                        sendOffers = true;
+                                    }
                                     //if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
                                     //{
                                     //    byte[] encryptedOffers = Helper.Encrypt(Offers);
@@ -546,25 +572,25 @@ namespace BetServer
                                 else
                                     continue;
                             }
-
-
-                            if (adresses.Count > 0)
-                            {
-                                foreach (string address1 in adresses)
-                                {
-                                    encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
-                                    encryptedAddress = Helper.Encrypt(address1);
-
-                                    if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
-                                    {
-                                        byte[] encryptedOffers = Helper.Encrypt(results);
-                                        proxy.SendGameResults(encryptedOffers, encryptedPort, encryptedAddress);
-
-                                    }
-                                }
-                                sendOffers = true;
-                            }
                             checkUserGames = true;
+
+                            //if (adresses.Count > 0)
+                            //{
+                            //    foreach (string address1 in adresses)
+                            //    {
+                            //        encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+                            //        encryptedAddress = Helper.Encrypt(address1);
+
+                            //        if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
+                            //        {
+                            //            byte[] encryptedOffers = Helper.Encrypt(results);
+                            //            proxy.SendGameResults(encryptedOffers, encryptedPort, encryptedAddress);
+
+                            //        }
+                            //    }
+                               
+                            //}
+                            
 
                             //encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
 

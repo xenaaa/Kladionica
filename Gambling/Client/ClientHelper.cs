@@ -45,12 +45,12 @@ namespace Client
             return true;
         }
 
-        public bool CheckIfAlive(byte[] port, byte[] adressBytes)
+        public bool CheckIfAlive(byte[] port, byte[] adressBytes, byte[] isItPrintClientBytes)
         {
             return true;
         }
 
-        public bool SendOffers(byte[] offersBytes, byte[] port, byte[] addressBytes)
+        public bool SendOffers(byte[] offersBytes, byte[] port, byte[] addressBytes, byte[] isItPrintClientBytes)
         {
 
             Dictionary<int, BetOffer> offers = (Dictionary<int, BetOffer>)Helper.ByteArrayToObject(offersBytes);

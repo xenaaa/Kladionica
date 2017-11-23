@@ -19,6 +19,7 @@ namespace Contracts
         Account betAccount;
         List<Ticket> tickets;
         int port;
+        int printPort;
         string address;
 
 
@@ -126,6 +127,19 @@ namespace Contracts
             set
             {
                 address = value;
+            }
+        }
+        [DataMember]
+        public int PrintPort
+        {
+            get
+            {
+                return printPort;
+            }
+
+            set
+            {
+                printPort = value;
             }
         }
 

@@ -71,19 +71,27 @@ namespace IntegrationPlatform
                 byte[] encryptedAddress = Helper.Encrypt(Helper.GetIP());
 
 
-                proxy.BankLogin(encryptedUser, encryptedPassword, encryptedPort, encryptedAddress);
+                if (proxy.BankLogin(encryptedUser, encryptedPassword, encryptedPort, encryptedAddress))
+                {
 
-                Audit.AuthenticationSuccess(principal.Identity.Name.Split('\\')[1].ToString());
+                    Audit.AuthenticationSuccess(principal.Identity.Name.Split('\\')[1].ToString());
 
-                Audit.LogIn(principal.Identity.Name.Split('\\')[1].ToString());
-                loger.Debug("IP address: {0} - User {1} logged in.", Helper.GetIP(), username);
+                    Audit.LogIn(principal.Identity.Name.Split('\\')[1].ToString());
+                    loger.Info("IP address: {0} Port: {1} - User {2} logged in.", Helper.GetIP(), Helper.GetPort(), username);
+                    allowed = true;
+                }
+                else
+                {
 
-                allowed = true;
+                    Audit.LogInFailed(principal.Identity.Name.Split('\\')[1].ToString(),"wrong password");
+                    loger.Warn("IP address: {0} Port: {1} - User {2} failed to log in.", Helper.GetIP(), Helper.GetPort(), username);
+                    allowed = false;
+                }
             }
 
             else
             {
-                loger.Debug("IP address: {0} - User {1} not authorized to log in.", Helper.GetIP(), username);
+                loger.Warn("IP address: {0} Port: {1} - User {2} not authorized to log in.", Helper.GetIP(), Helper.GetPort(), username);
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser", "not authorized");
                 Audit.LogInFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
             }
@@ -111,15 +119,14 @@ namespace IntegrationPlatform
 
                 proxy.Deposit(encryptedAccount, encryptedUsername);
                 Audit.Deposit(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString());
-                loger.Debug("IP address: {0} - User {1} deposited {2}.", Helper.GetIP(), username, acc.Number);
+                loger.Info("IP address: {0} Port: {1} - User {2} deposited {3}.", Helper.GetIP(), Helper.GetPort(), username, acc.Number);
                 allowed = true;
             }
             else
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "Deposit", "not authorized");
                 Audit.DepositFailed(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString(), "not authorized");
-                loger.Debug("IP address: {0} - User {1} couldn't deposit {2}.", Helper.GetIP(), username, acc.Number);
-                Console.WriteLine("Deposit() failed for user {0}.", principal.Identity.Name);          
+                loger.Warn("IP address: {0} : Port: {1} - User {2} couldn't deposit {3}.", Helper.GetIP(), Helper.GetPort(), username, acc.Number);    
             }
             return allowed;
         }
@@ -138,7 +145,7 @@ namespace IntegrationPlatform
                 proxy.CreateAccount(encryptedUser);
                 Audit.CreateAccount(principal.Identity.Name.Split('\\')[1].ToString());
 
-                loger.Debug("IP address: {0} - User {1} has been created.", Helper.GetIP(), user.Username);
+                loger.Info("IP address: {0} Port: {1} - User {2} has been created.", Helper.GetIP(), Helper.GetPort(), user.Username);
                 allowed = true;
             }
             else
@@ -146,11 +153,16 @@ namespace IntegrationPlatform
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "create account", "not authorized");
                 Audit.CreateAccountFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
 
-                loger.Debug("IP address: {0} - User {1} couldn't be created.", Helper.GetIP(), user.Username);
-                Console.WriteLine("CreateAccount() failed for user {0}.", principal.Identity.Name);
+                loger.Warn("IP address: {0} Port: {1} - User {2} couldn't be created.", Helper.GetIP(), Helper.GetPort(), user.Username);
             }
 
             return allowed;
+        }
+
+        public bool IntrusionPrevention(byte[] user)
+        {
+            byte[] encryptedUser = Helper.EncryptOnIntegration(user);
+            return proxy.IntrusionPrevention(user);
         }
     }
 }
