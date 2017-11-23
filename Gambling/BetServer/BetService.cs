@@ -34,7 +34,7 @@ namespace BetServer
             return true;
         }
 
-        public bool SendPort(byte[] usernameBytes, byte[] portBytes, byte[] addressBytes)
+        public bool SendPort(byte[] usernameBytes, byte[] portBytes, byte[] addressBytes,byte[] printPortBytes)
         {
             lock (PortLock)
             {
@@ -46,9 +46,11 @@ namespace BetServer
                 string username = (string)Helper.Decrypt(usernameBytes);
                 int port = (int)Helper.Decrypt(portBytes);
                 string address = (string)Helper.Decrypt(addressBytes);
+                int printPort = (int)Helper.Decrypt(printPortBytes);
 
                 betUsersFromFile[username].Port = port;
                 betUsersFromFile[username].Address = address;
+                betUsersFromFile[username].PrintPort = printPort;
 
                 Persistance.WriteToFile(betUsersFromFile, "betUsers");
 

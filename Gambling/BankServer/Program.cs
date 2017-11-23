@@ -9,6 +9,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Security;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BankServer
@@ -25,6 +26,8 @@ namespace BankServer
         }
         static void Main(string[] args)
         {
+            Thread.Sleep(2000);
+
             string srvCertCN = "bankservice";
 
             NetTcpBinding binding = new NetTcpBinding();

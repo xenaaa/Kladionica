@@ -28,11 +28,11 @@ namespace BetServer
             factory = this.CreateChannel();
         }
 
-        public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes)
+        public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
         {
             try
             {
-                factory.CheckIfAlive(portBytes, addressBytes);
+                factory.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
                 return true;
             }
             catch (Exception e)
@@ -72,11 +72,11 @@ namespace BetServer
 
         }
 
-        public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes)
+        public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes, byte[] isItPrintClientBytes)
         {
             try
             {
-                factory.SendOffers(offers, port, addressBytes);
+                factory.SendOffers(offers, port, addressBytes, isItPrintClientBytes);
                 return true;
             }
             catch (Exception e)

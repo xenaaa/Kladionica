@@ -24,6 +24,7 @@ namespace Client
             l.Stop();
             return port;
         }
+        static int ClientPrintPort;
         static void Main(string[] args)
         {
             bool bankAdmin = false;
@@ -31,20 +32,7 @@ namespace Client
 
 
             //proveriti da lie je jedan vec otvoren
-            Process[] clientPrint = Process.GetProcessesByName("ClientPrint");
-            if (clientPrint.Length == 0)
-            {
-                Process p = new Process();
-                string path = Directory.GetCurrentDirectory();
-                path = path.Replace("Client", "ClientPrint");
-                p.StartInfo.WorkingDirectory = @path;
-                p.StartInfo.FileName = @path + @"\ClientPrint.exe";
-
-                p.StartInfo.UseShellExecute = true;
-
-                p.StartInfo.CreateNoWindow = false;
-                p.Start();
-            }
+           
 
             NetTcpBinding binding = new NetTcpBinding();
 
@@ -59,6 +47,30 @@ namespace Client
             host.AddServiceEndpoint(typeof(IClientHelper), binding, address);
 
             host.Open();
+           
+            Process[] clientPrint = Process.GetProcessesByName("ClientPrint");
+            if (clientPrint.Length == 0)
+            {
+                Process p = new Process();
+                string path = Directory.GetCurrentDirectory();
+                path = path.Replace("Client", "ClientPrint");
+                p.StartInfo.WorkingDirectory = @path;
+                p.StartInfo.FileName = @path + @"\ClientPrint.exe";
+
+                ClientPrintPort = FreeTcpPort();
+
+                p.StartInfo.Arguments = ClientPrintPort.ToString();
+
+               
+
+                p.StartInfo.UseShellExecute = true;
+
+                p.StartInfo.CreateNoWindow = false;
+                p.Start();
+            }
+
+
+
 
             Console.WriteLine("Client service is started.");
             Console.WriteLine("Press <enter> to stop service...");
@@ -244,7 +256,7 @@ namespace Client
             if (proxy.CheckIfAlive())
             {
                 Console.WriteLine("gasga");
-                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)); //treci parametar zbog intefejsa kasnije citamo adresu
+                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort)); //treci parametar zbog intefejsa kasnije citamo adresu
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
@@ -557,7 +569,7 @@ namespace Client
                 proxy.AddUser(Helper.ObjectToByteArray(new User("nicpa", "nicpa", "User")));
                 proxy.AddUser(Helper.ObjectToByteArray(new User("djole", "djole", "Reader")));
 
-                proxy.SendPort(Helper.ObjectToByteArray("admin"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)); //treci parametar zbog intefejsa kasnije citamo adresu
+                proxy.SendPort(Helper.ObjectToByteArray("admin"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort)); //treci parametar zbog intefejsa kasnije citamo adresu
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do

@@ -28,11 +28,11 @@ namespace ClientPrint
         }
 
 
-        public bool CheckIfAlive(byte[] port, byte[] addressb)
+        public bool CheckIfAlive(byte[] port, byte[] address,byte[] isItPrintClientBytes)
         {
             return true;
         }
-        public bool SendOffers(byte[] offersBytes, byte[] portBytes, byte[] addressBytes)
+        public bool SendOffers(byte[] offersBytes, byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
         {
 
             Dictionary<int, BetOffer> offers = (Dictionary<int, BetOffer>)Helper.ByteArrayToObject(offersBytes);

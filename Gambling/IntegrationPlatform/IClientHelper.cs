@@ -11,7 +11,7 @@ namespace Contracts
     public interface IClientHelper
     {
         [OperationContract]
-        bool CheckIfAlive(byte[] portBytes, byte[] addressBytes);
+        bool CheckIfAlive(byte[] portBytes, byte[] addressBytes,byte[] isItPrintClientBytes);
 
         [OperationContract]
         bool GetServiceIP(byte[] AddressStringBytes);
@@ -20,7 +20,7 @@ namespace Contracts
         bool SendGameResults(byte[] results, byte[] port,byte[] address);
 
         [OperationContract]
-        bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes);
+        bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes, byte[] isItPrintClientBytes);
 
         [OperationContract]
         bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port,byte[] address);

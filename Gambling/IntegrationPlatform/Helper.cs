@@ -14,14 +14,17 @@ namespace Contracts
     public static class Helper
     {
         public const string key = "123456781234567812345678";
-        public const int clientPrintPort = 22222;
+       // public const int clientPrintPort = 60304;
       //  public const int betServicePort = 12208;
-        public const int bankServicePort = 15000;
+        //public const int bankServicePort = 15000;
         public const int integrationHostPort = 9991;
 
         public const string integrationHostAddress = "localhost";
         public static string BetServerAddress = string.Empty;
         public static  string BankServerAddress = string.Empty;
+
+        
+
 
         public static byte[] ObjectToByteArray(object obj)
         {

@@ -15,7 +15,7 @@ namespace IntegrationPlatform
 
         public ClientHelper() { }
 
-        public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes)
+        public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
         {
             Object obj = Helper.Decrypt(portBytes);
             int port = (int)obj;
@@ -23,18 +23,21 @@ namespace IntegrationPlatform
             obj = Helper.Decrypt(addressBytes);
             string addressIPv4 = (string)obj;
 
+            obj = Helper.Decrypt(isItPrintClientBytes);
+            bool isItPrintClient = (bool)obj;
+
             NetTcpBinding binding = new NetTcpBinding();
 
             string address = "";
 
 
-            if (port == Helper.clientPrintPort)
+            if (isItPrintClient)
                 address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientPrint";
             else
                 address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientHelper";
 
             proxy = new ClientProxy(binding, address);
-            return proxy.CheckIfAlive(portBytes, addressBytes);
+            return proxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
         }
 
         public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo
@@ -69,7 +72,7 @@ namespace IntegrationPlatform
             return proxy.SendGameResults(results, portBytes, addressBytes);
         }
 
-        public bool SendOffers(byte[] offersBytes, byte[] portBytes, byte[] addressBytes)
+        public bool SendOffers(byte[] offersBytes, byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
         {
             Object obj = Helper.Decrypt(offersBytes);
             byte[] offers = Helper.ObjectToByteArray(obj);
@@ -82,16 +85,20 @@ namespace IntegrationPlatform
             byte[] addressb = Helper.ObjectToByteArray(obj);
             string addressIPv4 = (string)obj;
 
+            obj = Helper.Decrypt(isItPrintClientBytes);
+            byte[] isItPrintClientb = Helper.ObjectToByteArray(obj);
+            bool isItPrintClient = (bool)obj;
+
             NetTcpBinding binding = new NetTcpBinding();
 
             string address = "";
-            if (port == Helper.clientPrintPort)
+            if (isItPrintClient)
                 address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientPrint";
             else
                 address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientHelper";
 
             proxy = new ClientProxy(binding, address);
-            return proxy.SendOffers(offers, portB, addressb);
+            return proxy.SendOffers(offers, portB, addressb, isItPrintClientb);
         }
 
         public bool SendTicketResults(byte[] ticketBytes, byte[] isPassedBytes, byte[] portBytes,byte[] addressBytes)
