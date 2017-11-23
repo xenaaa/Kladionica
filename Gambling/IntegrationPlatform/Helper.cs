@@ -21,7 +21,7 @@ namespace Contracts
 
         public const string integrationHostAddress = "localhost";
         public static string BetServerAddress = string.Empty;
-        public static  string BankServerAddress = string.Empty;
+        public static string BankServerAddress = string.Empty;
 
         
 
@@ -43,12 +43,12 @@ namespace Contracts
 
         public static Object ByteArrayToObject(byte[] arrBytes)
         {
-           using (System.IO.MemoryStream stream = new System.IO.MemoryStream(arrBytes))
+            using (System.IO.MemoryStream stream = new System.IO.MemoryStream(arrBytes))
             {
                 stream.Position = 0;
                 object desObj = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter().Deserialize(stream);
                 return desObj;
-           }
+            }
 
         }
 
@@ -92,13 +92,11 @@ namespace Contracts
             if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
                 return addressIPv6;
 
-                addressIPv4 = addressIPv6;//ako je vracena adresa vec zapravo IPv4, moze se dasiti...
+            addressIPv4 = addressIPv6;//ako je vracena adresa vec zapravo IPv4, moze se dasiti...
 
 
             //byte[] encryptedAddress = Helper.Encrypt(addressIPv6);
 
-            
-           
             IPHostEntry ipHostEntry = Dns.GetHostEntry(ipAddress);
             foreach (IPAddress address in ipHostEntry.AddressList)
             {
@@ -108,6 +106,20 @@ namespace Contracts
             }
 
             return addressIPv4;
+        }
+
+        public static int GetPort()
+        {
+            string addressIPv4 = string.Empty;
+
+            OperationContext oOperationContext = OperationContext.Current;
+            MessageProperties oMessageProperties = oOperationContext.IncomingMessageProperties;
+
+            RemoteEndpointMessageProperty endpoint = oMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
+
+            int nPort = endpoint.Port;
+
+            return nPort;
         }
     }
 }

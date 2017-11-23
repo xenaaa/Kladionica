@@ -256,7 +256,7 @@ namespace Client
             if (proxy.CheckIfAlive())
             {
                 Console.WriteLine("gasga");
-                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort)); //treci parametar zbog intefejsa kasnije citamo adresu
+                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort)); 
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
@@ -371,7 +371,7 @@ namespace Client
             string password;
             if (proxy.CheckIfAlive())
             {
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("admin", "admin", "BankAdmin")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("adminBank", "admin", "BankAdmin")));
                 proxy.CreateAccount(Helper.ObjectToByteArray(new User("marina", "marina", "User")));
                 proxy.CreateAccount(Helper.ObjectToByteArray(new User("bojan", "bojan", "User")));
                 proxy.CreateAccount(Helper.ObjectToByteArray(new User("david", "david", "User")));
@@ -555,21 +555,20 @@ namespace Client
         private static void BetAdmin(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform";
-          
+            string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform";   
 
             ClientBetProxy proxy = new ClientBetProxy(binding, address);
             string password;
             if (proxy.CheckIfAlive())
             {
-                proxy.AddUser(Helper.ObjectToByteArray(new User("admin", "admin", "BetAdmin")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("adminBet", "admin", "BetAdmin")));
                 proxy.AddUser(Helper.ObjectToByteArray(new User("marina", "marina", "User")));
                 proxy.AddUser(Helper.ObjectToByteArray(new User("bojan", "bojan", "User")));
                 proxy.AddUser(Helper.ObjectToByteArray(new User("david", "david", "User")));
                 proxy.AddUser(Helper.ObjectToByteArray(new User("nicpa", "nicpa", "User")));
                 proxy.AddUser(Helper.ObjectToByteArray(new User("djole", "djole", "Reader")));
 
-                proxy.SendPort(Helper.ObjectToByteArray("admin"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort)); //treci parametar zbog intefejsa kasnije citamo adresu
+                proxy.SendPort(Helper.ObjectToByteArray("adminBet"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0),Helper.ObjectToByteArray(ClientPrintPort)); 
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do

@@ -36,8 +36,7 @@ namespace IntegrationPlatform
         {
             try
             {
-                factory.BankLogin(username, password, port,address);
-                return true;
+                return factory.BankLogin(username, password, port,address);
             }
             catch (Exception e)
             {
@@ -50,8 +49,7 @@ namespace IntegrationPlatform
         {
             try
             {
-                factory.CheckIfAlive();
-                return true;
+                return factory.CheckIfAlive();
             }
             catch (Exception e)
             {
@@ -64,8 +62,7 @@ namespace IntegrationPlatform
         {
             try
             {
-                factory.CreateAccount(user);
-                return true;
+                return factory.CreateAccount(user);
             }
             catch (Exception e)
             {
@@ -78,8 +75,20 @@ namespace IntegrationPlatform
         {
             try
             {
-                factory.Deposit(acc, username);
-                return true;
+                return factory.Deposit(acc, username);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
+        }
+
+        public bool IntrusionPrevention(byte[] user)
+        {
+            try
+            {
+                return factory.IntrusionPrevention(user);
             }
             catch (Exception e)
             {

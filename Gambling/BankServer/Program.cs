@@ -26,7 +26,8 @@ namespace BankServer
         }
         static void Main(string[] args)
         {
-            Thread.Sleep(2000);
+            Thread.Sleep(4000);
+
 
             string srvCertCN = "bankservice";
 
@@ -73,9 +74,6 @@ namespace BankServer
 
 
             proxy.GetServiceIP(Helper.Encrypt(address));
-
-
-
 
 
             Console.WriteLine("Bank service is started.");

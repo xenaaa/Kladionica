@@ -32,11 +32,24 @@ namespace IntegrationPlatform
 
 
             if (isItPrintClient)
-                address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientPrint";
+                address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
             else
-                address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientHelper";
+                address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
 
             proxy = new ClientProxy(binding, address);
+
+            if (!Program.proxies.ContainsKey(addressIPv4))
+            {
+                Dictionary<int, ClientProxy> di = new Dictionary<int, ClientProxy>();
+                di.Add(port, proxy);
+                Program.proxies.Add(addressIPv4, di);
+            }
+
+            //if (!Program.proxies2.ContainsKey(port))
+            //{
+            //    Program.proxies2.Add(port, proxy);
+            //}
+
             return proxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
         }
 
@@ -44,11 +57,7 @@ namespace IntegrationPlatform
         {
             string AddressString = Helper.Decrypt(AddressStringBytes) as string;
 
-
-            
-            
-                Helper.BetServerAddress = AddressString;
-            
+            Helper.BetServerAddress = AddressString;
 
             return true;
         }
@@ -66,7 +75,7 @@ namespace IntegrationPlatform
 
             NetTcpBinding binding = new NetTcpBinding();
 
-            string address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientPrint";
+            string address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
 
             proxy = new ClientProxy(binding, address);
             return proxy.SendGameResults(results, portBytes, addressBytes);
@@ -93,15 +102,15 @@ namespace IntegrationPlatform
 
             string address = "";
             if (isItPrintClient)
-                address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientPrint";
+                address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
             else
-                address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientHelper";
+                address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
 
             proxy = new ClientProxy(binding, address);
             return proxy.SendOffers(offers, portB, addressb, isItPrintClientb);
         }
 
-        public bool SendTicketResults(byte[] ticketBytes, byte[] isPassedBytes, byte[] portBytes,byte[] addressBytes)
+        public bool SendTicketResults(byte[] ticketBytes, byte[] isPassedBytes, byte[] portBytes, byte[] addressBytes)
         {
 
             Object obj = Helper.Decrypt(ticketBytes);
@@ -120,7 +129,7 @@ namespace IntegrationPlatform
 
             NetTcpBinding binding = new NetTcpBinding();
 
-            string address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientHelper";
+            string address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
 
             proxy = new ClientProxy(binding, address);
             return proxy.SendTicketResults(ticket, isPassed, portB, addressB);

@@ -52,6 +52,7 @@ namespace BetServer
 
         static void Main(string[] args)
         {
+           
             string srvCertCN = "betservice";
 
             NetTcpBinding binding = new NetTcpBinding();
@@ -205,7 +206,7 @@ namespace BetServer
                                 byte[] encryptedAddress;
 
                                 Dictionary<string, User> usersFromFile = new Dictionary<string, User>();
-                                Object obj = Persistance.ReadFromFile("betUsers");
+                                Object obj = Persistance.ReadFromFile("betUsers.txt");
                                 if (obj != null)
                                     usersFromFile = (Dictionary<string, User>)obj;
                                 List<string> adresses = new List<string>();
@@ -223,8 +224,7 @@ namespace BetServer
                                         {
                                             encryptedPrintPort = Helper.Encrypt(user.Value.PrintPort);
                                             if (proxy.CheckIfAlive(encryptedPrintPort, encryptedAddress, Helper.Encrypt(true)))
-                                            {
-                                                
+                                            {                                                
                                                 proxy.SendOffers(encryptedOffers, encryptedPrintPort, encryptedAddress, Helper.Encrypt(true));
 
                                             }
@@ -274,13 +274,13 @@ namespace BetServer
 
             List<Ticket> tickets = new List<Ticket>(); //lista tiketa koji se brisu iz liste
 
-            Object obj = Persistance.ReadFromFile("betUsers");
+            Object obj = Persistance.ReadFromFile("betUsers.txt");
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
             if (obj != null)
                 betUsersFromFile = (Dictionary<string, User>)obj;
 
 
-            obj = Persistance.ReadFromFile("results");
+            obj = Persistance.ReadFromFile("results.txt");
             Dictionary<int, Game> resultsFromFile = new Dictionary<int, Game>();
             if (obj != null)
                 resultsFromFile = (Dictionary<int, Game>)obj;
@@ -346,7 +346,7 @@ namespace BetServer
 
         private static bool SendTicketResults2(User user, Ticket ticket)//sve utakmice na tiketu gotove, salje se ishod
         {
-            Object obj = Persistance.ReadFromFile("results");
+            Object obj = Persistance.ReadFromFile("results.txt");
             Dictionary<int, Game> resultsFromFile = new Dictionary<int, Game>();
             if (obj != null)
                 resultsFromFile = (Dictionary<int, Game>)obj;
@@ -483,14 +483,14 @@ namespace BetServer
 
                             results.Add(game);
 
-                            Object obj = Persistance.ReadFromFile("results");
+                            Object obj = Persistance.ReadFromFile("results.txt");
                             Dictionary<int, Game> resultsFromFile = new Dictionary<int, Game>(); //citamo iz fajla rezultate
                             if (obj != null)
                                 resultsFromFile = (Dictionary<int, Game>)obj;
 
                             resultsFromFile.Add(betOffer.Id, game); //dodajemo utakmicu u listu zavrsenih utakmica                           
 
-                            Persistance.WriteToFile(resultsFromFile, "results"); //upisujemo u fajl
+                            Persistance.WriteToFile(resultsFromFile, "results.txt"); //upisujemo u fajl
 
                             finishedGame.Add(betOffer.Id);
 
@@ -533,7 +533,7 @@ namespace BetServer
                             //}
 
                             Dictionary<string, User> usersFromFile = new Dictionary<string, User>();//da li treba lock?
-                            Object obj = Persistance.ReadFromFile("betUsers");
+                            Object obj = Persistance.ReadFromFile("betUsers.txt");
                             if (obj != null)
                                 usersFromFile = (Dictionary<string, User>)obj;
 

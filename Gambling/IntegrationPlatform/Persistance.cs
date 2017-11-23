@@ -21,81 +21,32 @@ namespace Contracts
             File.WriteAllText("..\\..\\..\\BetServer\\bin\\Debug\\results.txt", string.Empty);
         }
 
-        public static bool WriteToFile(Object s, String type)
+        public static bool WriteToFile(Object s, String path)
         {
             byte[] encrypted = Helper.Encrypt(s);
 
-            switch (type)
+
+            lock (syncLock1)
             {
-                case "betUsers":
-                    {
-                        lock (syncLock1)
-                        {
-                            File.WriteAllText("betUsers.txt", string.Empty);
-                            File.WriteAllBytes("betUsers.txt", encrypted);
-                            break;
-                        }
-                    }
-                case "bankUsers":
-                    {
-                        lock (syncLock1)
-                        {
-                            File.WriteAllText("bankUsers.txt", string.Empty);
-                            File.WriteAllBytes("bankUsers.txt", encrypted);
-                            break;
-                        }
-                    }            
-                case "results":
-                    {
-                        lock (syncLock3)
-                        {
-                            File.WriteAllText("results.txt", string.Empty);
-                            File.WriteAllBytes("results.txt", encrypted);
-                            break;
-                        }
-                    }            
+                File.WriteAllText(path, string.Empty);
+                File.WriteAllBytes(path, encrypted);
             }
             return true;
         }
 
-        public static Object ReadFromFile(String type)
+        public static Object ReadFromFile(String path)
         {
             byte[] readBytes;
             Object obj = null;
 
-            switch (type)
+
+            lock (syncLock1)
             {
-                case "betUsers":
-                    {
-                        lock (syncLock1)
-                        {
-                            readBytes = File.ReadAllBytes("betUsers.txt");
-                            if (readBytes.Count() > 0)
-                                obj = Helper.Decrypt(readBytes);
-                            break;
-                        }
-                    }
-                case "bankUsers":
-                    {
-                        lock (syncLock1)
-                        {
-                            readBytes = File.ReadAllBytes("bankUsers.txt");
-                            if (readBytes.Count() > 0)
-                                obj = Helper.Decrypt(readBytes);
-                            break;
-                        }
-                    }               
-                case "results":
-                    {
-                        lock (syncLock3)
-                        {
-                            readBytes = File.ReadAllBytes("results.txt");
-                            if (readBytes.Count() > 0)
-                                obj = Helper.Decrypt(readBytes);
-                            break;
-                        }
-                    }     
+                readBytes = File.ReadAllBytes(path);
+                if (readBytes.Count() > 0)
+                    obj = Helper.Decrypt(readBytes);
             }
+
             return obj;
         }
     }
