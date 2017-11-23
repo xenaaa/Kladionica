@@ -52,6 +52,7 @@ namespace BetServer
 
         static void Main(string[] args)
         {
+           
             string srvCertCN = "betservice";
 
             NetTcpBinding binding = new NetTcpBinding();

@@ -21,8 +21,7 @@ namespace Client
         {
             try
             {
-                factory.CheckIfAlive();
-                return true;
+                return factory.CheckIfAlive();
             }
             catch (Exception e)
             {
@@ -35,8 +34,7 @@ namespace Client
         {
             try
             {
-                factory.SendPort(username, port, address);
-                return true;
+                return factory.SendPort(username, port, address);
             }
             catch (Exception e)
             {
@@ -49,8 +47,8 @@ namespace Client
         {
             try
             {
-                factory.BetLogin(username, password, port);
-                return true;
+               return factory.BetLogin(username, password, port);
+
             }
             catch (Exception e)
             {
@@ -63,8 +61,8 @@ namespace Client
         {
             try
             {
-                factory.AddUser(user);
-                return true;
+                return factory.AddUser(user);
+             
             }
             catch (Exception e)
             {
@@ -77,8 +75,8 @@ namespace Client
         {
             try
             {
-                factory.DeleteUser(username);
-                return true;
+                return factory.DeleteUser(username);
+          
             }
             catch (Exception e)
             {
@@ -91,8 +89,8 @@ namespace Client
         {
             try
             {
-                factory.EditUser(user);
-                return true;
+                return factory.EditUser(user);
+           
             }
             catch (Exception e)
             {
@@ -103,18 +101,16 @@ namespace Client
 
         public bool SendTicket(byte[] ticket, byte[] username)
         {
-            bool sent = false;
             try
             {
-                sent = factory.SendTicket(ticket, username);
-                Console.WriteLine("SendTicket() >> {0}", sent);
+                return factory.SendTicket(ticket, username);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Error while trying to SendTicket(). {0}", e.Message);
+                return false;
             }
 
-            return sent;
         }
 
         public bool Deposit(byte[] acc, byte[] username)
@@ -123,6 +119,11 @@ namespace Client
         }
 
         public bool GetServiceIP(byte[] AddressStringBytes)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IntrusionPrevention(byte[] user)
         {
             throw new NotImplementedException();
         }

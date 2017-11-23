@@ -34,37 +34,33 @@ namespace BankServer
             int port = (int)Helper.Decrypt(portBytes);
             string addressIPv4 = (string)Helper.Decrypt(addressBytes);
 
-            WindowsIdentity identity = (WindowsIdentity)Thread.CurrentPrincipal.Identity;
-
             Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
             Object obj = Persistance.ReadFromFile("bankUsers");
             if (obj != null)
                 bankUsersFromFile = (Dictionary<string, User>)obj;
 
-            if (identity.Name == username)
-            {
-                if (bankUsersFromFile.Keys.Contains(username))
-                {
-                    if (bankUsersFromFile[username].Password == password)//OKK?****
-                    {
-                        foreach (KeyValuePair<string, User> kvp in bankUsersFromFile)
-                        {
-                            if (kvp.Key == username)
-                            {
-                                kvp.Value.Address = addressIPv4;//valjda je ovo ok?
-                                break;
-                            }
-                        }
-                        Persistance.WriteToFile(bankUsersFromFile, "bankUsers");//*****
 
-                        Console.WriteLine("You successfully logged in!");
-                        return true;
-                    }
-                    else
+            if (bankUsersFromFile.Keys.Contains(username))
+            {
+                if (bankUsersFromFile[username].Password == password)//OKK?****
+                {
+                    foreach (KeyValuePair<string, User> kvp in bankUsersFromFile)
                     {
-                        Console.WriteLine("Your password is incorrect!");
-                        return false;
+                        if (kvp.Key == username)
+                        {
+                            kvp.Value.Address = addressIPv4;//valjda je ovo ok?
+                            break;
+                        }
                     }
+                    Persistance.WriteToFile(bankUsersFromFile, "bankUsers");//*****
+
+                    Console.WriteLine("You successfully logged in!");
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine("Your password is incorrect!");
+                    return false;
                 }
             }
             return false;
@@ -165,5 +161,49 @@ namespace BankServer
                 }
             }
         }
+
+        public bool IntrusionPrevention(byte[] user)
+        {
+            string username = (string)Helper.Decrypt(user);
+
+            Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("bankUsers");
+            if (obj != null)
+                bankUsersFromFile = (Dictionary<string, User>)obj;
+
+            if (!bankUsersFromFile.ContainsKey(username))
+            {
+                return false;
+            }
+            else
+            {
+                DeleteUser(user);
+                return true;
+            }
+        }
+
+        private bool DeleteUser(byte[] usernameBytes)
+        {
+            string username = (string)Helper.Decrypt(usernameBytes);
+
+            Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("bankUsers");
+            if (obj != null)
+                bankUsersFromFile = (Dictionary<string, User>)obj;
+
+            if (!bankUsersFromFile.ContainsKey(username))
+            {
+                Console.WriteLine("Error! There is no user {0} in BetService", username);
+                return false;
+            }
+            else
+            {
+                bankUsersFromFile.Remove(username);
+                Persistance.WriteToFile(bankUsersFromFile, "bankUsers");
+                Console.WriteLine("User {0} removed from BetService", username);
+                return true;
+            }
+        }
+
     }
 }

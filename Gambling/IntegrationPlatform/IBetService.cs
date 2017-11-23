@@ -36,5 +36,7 @@ namespace Contracts
 
         [OperationContract]
         bool GetServiceIP(byte[] AddressStringBytes);
+        [OperationContract]
+        bool IntrusionPrevention(byte[] user);
     }
 }
