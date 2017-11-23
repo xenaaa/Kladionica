@@ -32,6 +32,22 @@ namespace IntegrationPlatform
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
             //EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:"+ Helper.betServicePort + "/BetService"),
             //                          new X509CertificateEndpointIdentity(srvCert));
+
+            string IP = string.Empty;
+            var hostIP = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in hostIP.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    IP = ip.ToString();
+                }
+            }
+
+            if(!string.IsNullOrEmpty(IP) && Helper.BetServerAddress.Contains(IP))
+                Helper.BetServerAddress = Helper.BetServerAddress.Replace(IP,"localhost");
+
+
+
             EndpointAddress address = new EndpointAddress(new Uri(Helper.BetServerAddress),
                                     new X509CertificateEndpointIdentity(srvCert));
 
@@ -227,6 +243,18 @@ namespace IntegrationPlatform
             proxy.Deposit(accBytes, usernameBytes);
             return true;
 
+        }
+        public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo
+        {
+            string AddressString = Helper.Decrypt(AddressStringBytes) as string;
+
+
+
+            Helper.BankServerAddress = AddressString;
+
+
+
+            return true;
         }
     }
 }

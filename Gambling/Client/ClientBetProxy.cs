@@ -121,5 +121,10 @@ namespace Client
         {
             throw new NotImplementedException();
         }
+
+        public bool GetServiceIP(byte[] AddressStringBytes)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

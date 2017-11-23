@@ -204,7 +204,7 @@ namespace BetServer
             if (betUsersFromFile.ContainsKey(username))
             {
                 double a = betUsersFromFile[username].BetAccount.Amount;
-                if (betUsersFromFile[username].BetAccount.Amount > ticket.Payment)
+                if (betUsersFromFile[username].BetAccount.Amount >= ticket.Payment)
                 {
                     betUsersFromFile[username].BetAccount.Amount -= ticket.Payment;
                     betUsersFromFile[username].Tickets.Add(ticket);
@@ -240,6 +240,10 @@ namespace BetServer
             return true;
         }
 
+        public bool GetServiceIP(byte[] AddressStringBytes)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

@@ -42,14 +42,10 @@ namespace IntegrationPlatform
             string AddressString = Helper.Decrypt(AddressStringBytes) as string;
 
 
-            if (AddressString.Contains("BankService"))//banka salje adresu
-            {
-                Helper.BankServerAddress = AddressString;
-            }
-            else//bet salje adresu
-            {
+            
+            
                 Helper.BetServerAddress = AddressString;
-            }
+            
 
             return true;
         }

@@ -161,5 +161,10 @@ namespace IntegrationPlatform
                 return false;
             }
         }
+
+        public bool GetServiceIP(byte[] AddressStringBytes)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

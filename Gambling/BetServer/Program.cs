@@ -83,7 +83,23 @@ namespace BetServer
             BetServerProxy proxy;
             proxy = new BetServerProxy(binding, address2);
 
+
+            string IP = string.Empty;
+            var hostIP = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in hostIP.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    IP = ip.ToString();
+                }
+            }
+
+            address = address.Replace("localhost", IP);
+
+
             proxy.GetServiceIP(Helper.Encrypt(address));
+
+
 
 
             Console.WriteLine("Bet service is started.");

@@ -34,5 +34,7 @@ namespace Contracts
         [OperationContract]
         bool Deposit(byte[] acc, byte[] username);
 
+        [OperationContract]
+        bool GetServiceIP(byte[] AddressStringBytes);
     }
 }

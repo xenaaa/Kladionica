@@ -31,6 +31,25 @@ namespace IntegrationPlatform
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
             //EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.bankServicePort + "/BankService"),
             //                          new X509CertificateEndpointIdentity(srvCert));
+
+
+            string IP = string.Empty;
+            var hostIP = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (var ip in hostIP.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    IP = ip.ToString();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(IP) && Helper.BankServerAddress.Contains(IP))
+                Helper.BankServerAddress = Helper.BankServerAddress.Replace(IP, "localhost");
+
+
+
+
+
             EndpointAddress address = new EndpointAddress(new Uri(Helper.BankServerAddress),
                                      new X509CertificateEndpointIdentity(srvCert));
 

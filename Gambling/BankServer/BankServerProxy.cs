@@ -77,5 +77,20 @@ namespace BankServer
         {
             throw new NotImplementedException();
         }
+
+
+        public bool GetServiceIP(byte[] AddressStringBytes)
+        {
+            try
+            {
+                factory.GetServiceIP(AddressStringBytes);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
+        }
     }
 }
