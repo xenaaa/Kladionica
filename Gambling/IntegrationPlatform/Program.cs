@@ -54,6 +54,30 @@ namespace IntegrationPlatform
             Console.WriteLine("Press <enter> to stop service...");
 
 
+            //ZBOG DEPOZITA
+            address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform2";
+            ServiceHost hostBet2 = new ServiceHost(typeof(BetService));
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+            hostBet2.AddServiceEndpoint(typeof(IBetService), binding, address);
+
+
+            string srvCertCN = "bankserviceintegration";
+
+            hostBet2.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
+            hostBet2.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+
+            ///Set appropriate service's certificate on the host. Use CertManager class to obtain the certificate based on the "srvCertCN"
+            hostBet2.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+
+            hostBet2.Open();
+            Console.WriteLine("Bet Integration Platform  2 service is started.");
+            Console.WriteLine("Press <enter> to stop service...");
+
+
+
+
+
+            binding = new NetTcpBinding();
             address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BankIntegrationPlatform";
             ServiceHost hostBank = new ServiceHost(typeof(BankService));
             hostBank.AddServiceEndpoint(typeof(IBankService), binding, address);
@@ -80,12 +104,10 @@ namespace IntegrationPlatform
             hostClient.AddServiceEndpoint(typeof(IClientHelper), binding, address);
 
 
-
-
             hostClient.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
             hostClient.Description.Behaviors.Add(newAudit);
 
-            string srvCertCN = "betserviceintegration";
+            srvCertCN = "betserviceintegration";
 
             hostClient.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
             hostClient.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;

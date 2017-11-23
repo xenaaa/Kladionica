@@ -47,34 +47,7 @@ namespace IntegrationPlatform
                 byte[] encryptedUser = Helper.EncryptOnIntegration(usernameBytes);
                 byte[] encryptedPassword = Helper.EncryptOnIntegration(passwordBytes);
                 byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
-
-
-
-
-
-
-
-                //OperationContext oOperationContext = OperationContext.Current;
-                //MessageProperties oMessageProperties = oOperationContext.IncomingMessageProperties;
-
-                //RemoteEndpointMessageProperty endpoint = oMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
-
-                //string addressIPv6 = endpoint.Address;
-                //int nPort = endpoint.Port;
-
-
-                //byte[] encryptedAddress = Helper.Encrypt(addressIPv6);//ako je vracena adresa vec zapravo IPv4, moze se dasiti...
-
-                //IPAddress ipAddress = IPAddress.Parse(addressIPv6);
-                //IPHostEntry ipHostEntry = Dns.GetHostEntry(ipAddress);
-                //foreach (IPAddress address in ipHostEntry.AddressList)
-                //{
-                //    if (address.AddressFamily == AddressFamily.InterNetwork)
-                //        encryptedAddress = Helper.Encrypt(address.ToString());
-
-                //}
                 byte[] encryptedAddress = Helper.Encrypt(Helper.GetIP());
-
 
 
                 proxy.BankLogin(encryptedUser, encryptedPassword, encryptedPort, encryptedAddress);

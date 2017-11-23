@@ -148,5 +148,18 @@ namespace IntegrationPlatform
             }
         }
 
+        public bool Deposit(byte[] acc, byte[] username)
+        {
+            try
+            {
+                factory.Deposit(acc, username);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
+        }
     }
 }

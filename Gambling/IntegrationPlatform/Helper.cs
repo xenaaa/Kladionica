@@ -21,14 +21,6 @@ namespace Contracts
 
         public static byte[] ObjectToByteArray(object obj)
         {
-            //if (obj == null)
-            //    return null;
-            //BinaryFormatter bf = new BinaryFormatter();
-            //using (MemoryStream ms = new MemoryStream())
-            //{
-            //    bf.Serialize(ms, obj);
-            //    return ms.ToArray();
-            //}
             using (System.IO.MemoryStream stream = new System.IO.MemoryStream())
             {
                 System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
@@ -44,21 +36,13 @@ namespace Contracts
 
         public static Object ByteArrayToObject(byte[] arrBytes)
         {
-            //  using (var memStream = new MemoryStream())
+           using (System.IO.MemoryStream stream = new System.IO.MemoryStream(arrBytes))
             {
-                //var binForm = new BinaryFormatter();
-                //memStream.Write(arrBytes, 0, arrBytes.Length);
-                //memStream.Seek(0, SeekOrigin.Begin);
-                //var obj = binForm.Deserialize(memStream);
+                stream.Position = 0;
+                object desObj = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter().Deserialize(stream);
+                return desObj;
+           }
 
-                using (System.IO.MemoryStream stream = new System.IO.MemoryStream(arrBytes))
-                {
-                    stream.Position = 0;
-                    object desObj = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter().Deserialize(stream);
-                    return desObj;
-                }
-                //   return obj;
-            }
         }
 
         public static Object Decrypt(byte[] bytes)
@@ -97,13 +81,17 @@ namespace Contracts
             string addressIPv6 = endpoint.Address;
             int nPort = endpoint.Port;
 
+            IPAddress ipAddress = IPAddress.Parse(addressIPv6);
+            if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
+                return addressIPv6;
 
             addressIPv4 = addressIPv6;//ako je vracena adresa vec zapravo IPv4, moze se dasiti...
 
 
             //byte[] encryptedAddress = Helper.Encrypt(addressIPv6);
 
-            IPAddress ipAddress = IPAddress.Parse(addressIPv6);
+
+
             IPHostEntry ipHostEntry = Dns.GetHostEntry(ipAddress);
             foreach (IPAddress address in ipHostEntry.AddressList)
             {
@@ -113,9 +101,6 @@ namespace Contracts
             }
 
             return addressIPv4;
-
-
-
         }
     }
 }

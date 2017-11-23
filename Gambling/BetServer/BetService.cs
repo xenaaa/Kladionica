@@ -163,7 +163,7 @@ namespace BetServer
 
         public bool EditUser(byte[] userBytes)
         {
-            User user = (User)Helper.ByteArrayToObject(userBytes);
+            User user = (User)Helper.Decrypt(userBytes);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
             Object obj = Persistance.ReadFromFile("betUsers");
@@ -203,14 +203,45 @@ namespace BetServer
 
             if (betUsersFromFile.ContainsKey(username))
             {
-                betUsersFromFile[username].Tickets.Add(ticket);
-                Persistance.WriteToFile(betUsersFromFile, "betUsers");
-                return true;
+                double a = betUsersFromFile[username].BetAccount.Amount;
+                if (betUsersFromFile[username].BetAccount.Amount > ticket.Payment)
+                {
+                    betUsersFromFile[username].BetAccount.Amount -= ticket.Payment;
+                    betUsersFromFile[username].Tickets.Add(ticket);
+                    Persistance.WriteToFile(betUsersFromFile, "betUsers");
+                    return true;
+                }
+                else
+                    return false;
+                   
+            
             }
             else
                 return false;
         }
+
+        public bool Deposit(byte[] accBytes, byte[] usernameBytes)
+        {
+            string username = (string)Helper.Decrypt(usernameBytes);
+            Account acc = (Account)Helper.Decrypt(accBytes);
+
+            Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("betUsers");
+            if (obj != null)
+                betUsersFromFile = (Dictionary<string, User>)obj;
+
+            if (betUsersFromFile.ContainsKey(username))
+            {
+                User user = betUsersFromFile[username];
+                user.BetAccount.Amount += acc.Amount;
+
+                EditUser(Helper.Encrypt(user));
+            }
+            return true;
+        }
+
     }
 }
+
 
 

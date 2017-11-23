@@ -30,5 +30,9 @@ namespace Contracts
 
         [OperationContract]
         bool SendTicket(byte[] ticket, byte[] username);
+
+        [OperationContract]
+        bool Deposit(byte[] acc, byte[] username);
+
     }
 }

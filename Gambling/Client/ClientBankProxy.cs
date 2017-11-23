@@ -50,8 +50,6 @@ namespace Client
 
         public bool Deposit(byte[] acc, byte[] username)
         {
-
-
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             try
             {

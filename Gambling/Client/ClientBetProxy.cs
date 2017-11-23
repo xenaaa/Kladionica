@@ -117,5 +117,9 @@ namespace Client
             return sent;
         }
 
+        public bool Deposit(byte[] acc, byte[] username)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
