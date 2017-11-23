@@ -548,7 +548,6 @@ namespace BetServer
             }
             return true;
         }
-
         private static void DeleteFinishedGame(int game)
         {
             XmlDocument xmlDoc = new XmlDocument(); // Create an XML document object

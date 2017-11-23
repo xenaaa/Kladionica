@@ -134,31 +134,10 @@ namespace Client
         }
 
 
-        private static void MakeTicket(ClientBetProxy proxy, Dictionary<int, Game> bets)
+        private static void MakeTicket(ClientBetProxy proxy, Dictionary<int, Game> bets, int payment)
         {
             WindowsIdentity clientIdentity = WindowsIdentity.GetCurrent();
-            Ticket ticket = new Ticket(bets, 5);
-            //  t.Payment = 5;
-            // Dictionary<int, Game> bets = new Dictionary<int, Game>();
-
-
-            /* Game g = new Game();
-
-             g.Odds = ClientHelper.Offers[1001].Odds[1];
-             g.Tip = 1;
-             g.Won = false;
-             bets.Add(1001, g);
-             g = new Game();
-             g.Odds = ClientHelper.Offers[2002].Odds[0];
-             g.Tip = 0;
-             g.Won = false;
-             bets.Add(2002, g);
-             g = new Game();
-             g.Odds = ClientHelper.Offers[3002].Odds[2];
-             g.Tip = 2;
-             g.Won = false;
-             bets.Add(3002, g);*/
-            // t.Bets = bets;
+            Ticket ticket = new Ticket(bets, payment);
 
             if (proxy.SendTicket(Helper.ObjectToByteArray(ticket), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1])))
             {
@@ -321,8 +300,7 @@ namespace Client
 
                                         g.Tip = (int)inputValue;
                                         g.BetOffer = ClientHelper.Offers[code];
-                                        // g.Odds = ClientHelper.Offers[code].Odds[g.Tip];
-                                        //  g.Odds = betoffer.Odds[g.Tip];
+
                                         if (!bets.ContainsKey(code))
                                             bets.Add(code, g);//proveriti ako dodaje istu utakmicu
 
@@ -331,7 +309,14 @@ namespace Client
                                     {
                                         if (bets.Count > 0)
                                         {
-                                            MakeTicket(proxy, bets);
+                                            do
+                                            {
+                                                Console.WriteLine("\nPayment: ");
+                                                inputValue = CheckIfNumber(Console.ReadLine());
+                                            } while (inputValue == -1);
+                                            int payment = (int)inputValue;
+                                            MakeTicket(proxy, bets, payment);
+
                                         }
                                         break;
                                     }
@@ -381,7 +366,7 @@ namespace Client
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
-                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port),Helper.ObjectToByteArray(0)));
+                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)));
 
                 double inputValue = 0;
                 while (true)
@@ -391,10 +376,12 @@ namespace Client
                         Console.WriteLine("BANK ADMIN OPTIONS");
                         Console.WriteLine("Press 1 for creating new account.");
                         Console.WriteLine("Press 2 for deposit.");
-                        Console.WriteLine("Press 3 for exit.");
+                        Console.WriteLine("Press 3 for report based on addresses.");
+                        Console.WriteLine("Press 4 for report based on users.");
+                        Console.WriteLine("Press 5 for exit.");
                         inputValue = CheckIfNumber(Console.ReadLine());
 
-                    } while (inputValue != 1 && inputValue != 2 && inputValue != 3);
+                    } while (inputValue != 1 && inputValue != 2 && inputValue != 3 && inputValue != 4 && inputValue != 5);
 
 
                     if (inputValue == 1)
@@ -445,6 +432,101 @@ namespace Client
                         proxy.Deposit(Helper.ObjectToByteArray(new Account(amount, accountNumber)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
                     }
                     else if (inputValue == 3)
+                    {
+
+                        Dictionary<string, int> addresses = new Dictionary<string, int>(); ;
+
+                        string line;
+                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_2017-11-23.txt");
+                        while ((line = file.ReadLine()) != null)
+                        {
+                            if (line.Contains("deposited") || line.Contains("created"))
+                            {
+                                int first = line.IndexOf("address:") + "address:".Length;
+                                int last = line.IndexOf("- User", first);
+                                string add = line.Substring(first, last - first);
+
+                                // if (address != Helper.GetIP())
+                                {
+                                    if (add != "adminBet" && add != "adminBank")
+                                    {
+                                        if (addresses.ContainsKey(add))
+                                        {
+                                            addresses[add]++;
+                                        }
+                                        else
+                                        {
+                                            addresses.Add(add, 1);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        var sortedDict = from entry in addresses orderby entry.Value descending select entry;
+
+                        int counter = 2;
+                        if (counter > sortedDict.Count())
+                            counter = sortedDict.Count();
+
+                        foreach (var item in sortedDict)
+                        {
+                            Console.WriteLine(item);
+                            counter--;
+                            if (counter == 0)
+                                break;
+                        }
+
+                        file.Close();
+                    }
+
+                    else if (inputValue == 4)
+                    {
+                        Dictionary<string, int> users = new Dictionary<string, int>(); ;
+
+                        string line;
+
+                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_2017-11-23.txt");
+                        while ((line = file.ReadLine()) != null)
+                        {
+                            if (line.Contains("deposited") || line.Contains("created"))
+                            {
+
+                                int first = line.IndexOf("\\") + "\\".Length;
+                                int last = line.IndexOf(" ", first);
+                                string add = line.Substring(first, last - first);
+
+                                if (add != "adminBet" && add != "adminBank")
+                                {
+                                    if (users.ContainsKey(add))
+                                    {
+                                        users[add]++;
+                                    }
+                                    else
+                                    {
+                                        users.Add(add, 1);
+                                    }
+                                }
+                            }
+                        }
+
+                        var sortedDict = from entry in users orderby entry.Value descending select entry;
+
+                        int counter = 3;
+                        if (counter > sortedDict.Count())
+                            counter = sortedDict.Count();
+
+                        foreach (var item in sortedDict)
+                        {
+                            Console.WriteLine(item);
+                            counter--;
+                            if (counter == 0)
+                                break;
+                        }
+
+                        file.Close();
+                    }
+                    else if (inputValue == 5)
                         break;
                 }
             }
@@ -489,10 +571,12 @@ namespace Client
                         Console.WriteLine("Press 1 for adding new client.");
                         Console.WriteLine("Press 2 for editing client.");
                         Console.WriteLine("Press 3 for deleting client.");
-                        Console.WriteLine("Press 4 for exit.");
+                        Console.WriteLine("Press 4 for report based on addresses.");
+                        Console.WriteLine("Press 5 for report based on users.");
+                        Console.WriteLine("Press 6 for exit.");
                         inputValue = CheckIfNumber(Console.ReadLine());
 
-                    } while (inputValue != 1 && inputValue != 2 && inputValue != 3 && inputValue != 4);
+                    } while (inputValue != 1 && inputValue != 2 && inputValue != 3 && inputValue != 4 && inputValue != 5 && inputValue != 6);
 
                     if (inputValue == 1)
                     {
@@ -535,6 +619,100 @@ namespace Client
                         //proxy.DeleteUser(username);
                     }
                     else if (inputValue == 4)
+                    {
+
+                        Dictionary<string, int> addresses = new Dictionary<string, int>(); ;
+
+                        string line;
+                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_2017-11-23.txt");
+                        while ((line = file.ReadLine()) != null)
+                        {
+                            if (!line.Contains("created") && !line.Contains("deposited"))
+                            {
+                                int first = line.IndexOf("address:") + "address:".Length;
+                                int last = line.IndexOf("- User", first);
+                                string add = line.Substring(first, last - first);
+
+                                // if (address != Helper.GetIP())
+                                {
+                                    if (add != "adminBet" && add != "adminBank")
+                                    {
+                                        if (addresses.ContainsKey(add))
+                                        {
+                                            addresses[add]++;
+                                        }
+                                        else
+                                        {
+                                            addresses.Add(add, 1);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        var sortedDict = from entry in addresses orderby entry.Value descending select entry;
+
+                        int counter = 2;
+                        if (counter > sortedDict.Count())
+                            counter = sortedDict.Count();
+
+                        foreach (var item in sortedDict)
+                        {
+                            Console.WriteLine(item);
+                            counter--;
+                            if (counter == 0)
+                                break;
+                        }
+
+                        file.Close();
+                    }
+
+                    else if (inputValue == 5)
+                    {
+                        Dictionary<string, int> users = new Dictionary<string, int>(); ;
+
+                        string line;
+
+                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_2017-11-23.txt");
+                        while ((line = file.ReadLine()) != null)
+                        {
+                            if (!line.Contains("created") && !line.Contains("deposited"))
+                            {
+                                int first = line.IndexOf("\\") + "\\".Length;
+                                int last = line.IndexOf(" ", first);
+                                string add = line.Substring(first, last - first);
+
+                                if (add != "adminBet" && add != "adminBank")
+                                {
+                                    if (users.ContainsKey(add))
+                                    {
+                                        users[add]++;
+                                    }
+                                    else
+                                    {
+                                        users.Add(add, 1);
+                                    }
+                                }
+                            }
+                        }
+
+                        var sortedDict = from entry in users orderby entry.Value descending select entry;
+
+                        int counter = 3;
+                        if (counter > sortedDict.Count())
+                            counter = sortedDict.Count();
+
+                        foreach (var item in sortedDict)
+                        {
+                            Console.WriteLine(item);
+                            counter--;
+                            if (counter == 0)
+                                break;
+                        }
+
+                        file.Close();
+                    }
+                    else if (inputValue == 6)
                     {
                         break;
                     }
