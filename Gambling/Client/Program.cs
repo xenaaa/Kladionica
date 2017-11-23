@@ -30,7 +30,7 @@ namespace Client
             bool bankAdmin = false;
             bool betAdmin = false;
 
-
+           
             //proveriti da lie je jedan vec otvoren
            
 
