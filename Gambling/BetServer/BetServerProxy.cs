@@ -32,7 +32,7 @@ namespace BetServer
         {
             try
             {
-                return factory.CheckIfAlive(portBytes, addressBytes);
+                return factory.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
             }
             catch (Exception e)
             {
@@ -73,7 +73,7 @@ namespace BetServer
         {
             try
             {
-                return factory.SendOffers(offers, port, addressBytes);
+                return factory.SendOffers(offers, port, addressBytes, isItPrintClientBytes);
             }
             catch (Exception e)
             {

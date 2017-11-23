@@ -256,7 +256,7 @@ namespace Client
             if (proxy.CheckIfAlive())
             {
                 Console.WriteLine("gasga");
-                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort)); //treci parametar zbog intefejsa kasnije citamo adresu
+                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort)); 
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
@@ -568,7 +568,7 @@ namespace Client
                 proxy.AddUser(Helper.ObjectToByteArray(new User("nicpa", "nicpa", "User")));
                 proxy.AddUser(Helper.ObjectToByteArray(new User("djole", "djole", "Reader")));
 
-         //       proxy.SendPort(Helper.ObjectToByteArray("adminBet"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)); 
+                proxy.SendPort(Helper.ObjectToByteArray("adminBet"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0),Helper.ObjectToByteArray(ClientPrintPort)); 
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do

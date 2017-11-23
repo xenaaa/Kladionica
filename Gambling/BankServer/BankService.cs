@@ -35,7 +35,7 @@ namespace BankServer
             string addressIPv4 = (string)Helper.Decrypt(addressBytes);
 
             Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("bankUsers");
+            Object obj = Persistance.ReadFromFile("bankUsers.txt");
             if (obj != null)
                 bankUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -52,7 +52,7 @@ namespace BankServer
                             break;
                         }
                     }
-                    Persistance.WriteToFile(bankUsersFromFile, "bankUsers");//*****
+                    Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");//*****
 
                     Console.WriteLine("You successfully logged in!");
                     return true;
@@ -72,7 +72,7 @@ namespace BankServer
             User user = (User)Helper.Decrypt(userBytes);
 
             Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("bankUsers");
+            Object obj = Persistance.ReadFromFile("bankUsers.txt");
             if (obj != null)
                 bankUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -86,7 +86,7 @@ namespace BankServer
                 accNumb++;
                 User user1 = new User(user.Username, user.Password, user.Role, bankAcc, betAcc);
                 bankUsersFromFile.Add(user1.Username, user1);
-                Persistance.WriteToFile(bankUsersFromFile, "bankUsers");
+                Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");
                 Console.Write("Korisnik {0}", user1.Username);
                 return true;
             }
@@ -99,7 +99,7 @@ namespace BankServer
             string username = (string)Helper.Decrypt(usernameBytes);
 
             Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("bankUsers");
+            Object obj = Persistance.ReadFromFile("bankUsers.txt");
             if (obj != null)
                 bankUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -115,7 +115,7 @@ namespace BankServer
                 {
                     bankUsersFromFile[username].BankAccount.Amount -= acc.Amount; // povecavamo drugi
                     bankUsersFromFile[username].BetAccount.Amount += acc.Amount; // smanjujemo onaj s kog prebacujemo
-                    Persistance.WriteToFile(bankUsersFromFile, "bankUsers");
+                    Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");
 
                     string srvCertCN = "bankserviceintegration";
                     NetTcpBinding binding = new NetTcpBinding();
@@ -155,7 +155,7 @@ namespace BankServer
                     {
                         bankUsersFromFile[user.Value.Username].BankAccount.Amount += acc.Amount; // povecavamo drugi
                         bankUsersFromFile[username].BankAccount.Amount = bankUsersFromFile[username].BankAccount.Amount - acc.Amount; // smanjujemo onaj s kog prebacujemo
-                        Persistance.WriteToFile(bankUsersFromFile, "bankUsers");
+                        Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");
                         return true;
                     }
                 }
@@ -167,7 +167,7 @@ namespace BankServer
             string username = (string)Helper.Decrypt(user);
 
             Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("bankUsers");
+            Object obj = Persistance.ReadFromFile("bankUsers.txt");
             if (obj != null)
                 bankUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -187,7 +187,7 @@ namespace BankServer
             string username = (string)Helper.Decrypt(usernameBytes);
 
             Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("bankUsers");
+            Object obj = Persistance.ReadFromFile("bankUsers.txt");
             if (obj != null)
                 bankUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -199,7 +199,7 @@ namespace BankServer
             else
             {
                 bankUsersFromFile.Remove(username);
-                Persistance.WriteToFile(bankUsersFromFile, "bankUsers");
+                Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");
                 Console.WriteLine("User {0} removed from BetService", username);
                 return true;
             }

@@ -22,6 +22,9 @@ namespace IntegrationPlatform
     {
         private static readonly Logger loger = LogManager.GetLogger("Syslog");
 
+         public static Dictionary<string, Dictionary<int, ClientProxy>> proxies = new Dictionary<string, Dictionary<int, ClientProxy>>();
+       // public static Dictionary<int, ClientProxy> proxies2 = new Dictionary<int, ClientProxy>();
+
         private static DateTime start;
 
         static void Main(string[] args)
@@ -189,10 +192,10 @@ namespace IntegrationPlatform
                                 last = line.IndexOf(" ", first);
                                 username = line.Substring(first, last - first);
                                 first = line.IndexOf("address:") + "address:".Length;
-                                last = line.IndexOf(" ", first);
+                                last = line.IndexOf("Port:", first);
                                 string address = line.Substring(first, last - first);
                                 first = line.IndexOf("Port:") + "Port:".Length;
-                                last = line.IndexOf(" ", first);
+                                last = line.IndexOf("- User", first);
                                 string port = line.Substring(first, last - first);
                                 IntrusionPrevention(username, Convert.ToInt32(port), address);
                             }
@@ -217,7 +220,8 @@ namespace IntegrationPlatform
             BankService bs2 = new BankService();
             bs2.IntrusionPrevention(Helper.Encrypt(username));
 
-
+            proxies[address][port].Close();
+          //  proxies2[port].Close();
         }
     }
 }

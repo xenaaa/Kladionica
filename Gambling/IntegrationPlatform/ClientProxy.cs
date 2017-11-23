@@ -17,6 +17,7 @@ namespace IntegrationPlatform
         public ClientProxy() { }
         public ClientProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
+
             factory = this.CreateChannel();
 
         }
@@ -26,7 +27,7 @@ namespace IntegrationPlatform
             
             try
             {
-               return  factory.CheckIfAlive(portBytes, addressBytes);
+               return  factory.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
                
             }
             catch (Exception e)
@@ -60,7 +61,7 @@ namespace IntegrationPlatform
         {
             try
             {
-                return  factory.SendOffers(offers, port, addressBytes);
+                return  factory.SendOffers(offers, port, addressBytes, isItPrintClientBytes);
             }
             catch (Exception e)
             {

@@ -34,7 +34,7 @@ namespace Client
         {
             try
             {
-                return factory.SendPort(username, port, address);
+                return factory.SendPort(username, port, address,printPort);
             }
             catch (Exception e)
             {

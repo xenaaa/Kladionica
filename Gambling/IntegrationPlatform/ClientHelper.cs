@@ -32,11 +32,24 @@ namespace IntegrationPlatform
 
 
             if (isItPrintClient)
-                address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientPrint";
+                address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
             else
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
 
             proxy = new ClientProxy(binding, address);
+
+            if (!Program.proxies.ContainsKey(addressIPv4))
+            {
+                Dictionary<int, ClientProxy> di = new Dictionary<int, ClientProxy>();
+                di.Add(port, proxy);
+                Program.proxies.Add(addressIPv4, di);
+            }
+
+            //if (!Program.proxies2.ContainsKey(port))
+            //{
+            //    Program.proxies2.Add(port, proxy);
+            //}
+
             return proxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
         }
 
@@ -89,7 +102,7 @@ namespace IntegrationPlatform
 
             string address = "";
             if (isItPrintClient)
-                address = "net.tcp://"+ addressIPv4 + ":" + port + "/ClientPrint";
+                address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
             else
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
 

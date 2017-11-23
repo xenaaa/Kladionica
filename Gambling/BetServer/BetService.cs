@@ -39,7 +39,7 @@ namespace BetServer
             lock (PortLock)
             {
                 Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
-                Object obj = Persistance.ReadFromFile("betUsers");
+                Object obj = Persistance.ReadFromFile("betUsers.txt");
                 if (obj != null)
                     betUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -52,16 +52,7 @@ namespace BetServer
                 betUsersFromFile[username].Address = address;
                 betUsersFromFile[username].PrintPort = printPort;
 
-                Persistance.WriteToFile(betUsersFromFile, "betUsers");
-
-                List<int> portsFromFile = new List<int>();
-                obj = Persistance.ReadFromFile("ports");
-                if (obj != null)
-                    portsFromFile = (List<int>)obj;
-
-                portsFromFile.Add(port);
-
-                Persistance.WriteToFile(portsFromFile, "ports");
+                Persistance.WriteToFile(betUsersFromFile, "betUsers.txt");           
             }
             return true;
         }
@@ -76,7 +67,7 @@ namespace BetServer
             int port = (int)Helper.Decrypt(portBytes);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("betUsers");
+            Object obj = Persistance.ReadFromFile("betUsers.txt");
             if (obj != null)
                 betUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -103,7 +94,7 @@ namespace BetServer
             User user = (User)Helper.Decrypt(userBytes);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("betUsers");
+            Object obj = Persistance.ReadFromFile("betUsers.txt");
             if (obj != null)
                 betUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -114,7 +105,7 @@ namespace BetServer
                 lock (PortLock)
                 {
                     betUsersFromFile.Add(user.Username, user);
-                    Persistance.WriteToFile(betUsersFromFile, "betUsers");
+                    Persistance.WriteToFile(betUsersFromFile, "betUsers.txt");
                 }
 
                 Console.WriteLine("User {0} successfully added to BetUsers", user.Username);
@@ -135,7 +126,7 @@ namespace BetServer
             string username = (string)Helper.Decrypt(usernameBytes);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("betUsers");
+            Object obj = Persistance.ReadFromFile("betUsers.txt");
             if (obj != null)
                 betUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -147,7 +138,7 @@ namespace BetServer
             else
             {
                 betUsersFromFile.Remove(username);
-                Persistance.WriteToFile(betUsersFromFile, "betUsers");
+                Persistance.WriteToFile(betUsersFromFile, "betUsers.txt");
                 Console.WriteLine("User {0} removed from BetService", username);
                 return true;
             }
@@ -158,7 +149,7 @@ namespace BetServer
             User user = (User)Helper.Decrypt(userBytes);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("betUsers");
+            Object obj = Persistance.ReadFromFile("betUsers.txt");
             if (obj != null)
                 betUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -177,7 +168,7 @@ namespace BetServer
                         kvp.Value.Tickets = user.Tickets;
                     }
                 }
-                Persistance.WriteToFile(betUsersFromFile, "betUsers");
+                Persistance.WriteToFile(betUsersFromFile, "betUsers.txt");
                 return true;
             }
         }
@@ -189,7 +180,7 @@ namespace BetServer
             string username = (string)Helper.Decrypt(usernameBytes);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("betUsers");
+            Object obj = Persistance.ReadFromFile("betUsers.txt");
             if (obj != null)
                 betUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -200,7 +191,7 @@ namespace BetServer
                 {
                     betUsersFromFile[username].BetAccount.Amount -= ticket.Payment;
                     betUsersFromFile[username].Tickets.Add(ticket);
-                    Persistance.WriteToFile(betUsersFromFile, "betUsers");
+                    Persistance.WriteToFile(betUsersFromFile, "betUsers.txt");
                     return true;
                 }
                 else
@@ -218,7 +209,7 @@ namespace BetServer
             Account acc = (Account)Helper.Decrypt(accBytes);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("betUsers");
+            Object obj = Persistance.ReadFromFile("betUsers.txt");
             if (obj != null)
                 betUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -237,7 +228,7 @@ namespace BetServer
             string username = (string)Helper.Decrypt(user);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("betUsers");
+            Object obj = Persistance.ReadFromFile("betUsers.txt");
             if (obj != null)
                 betUsersFromFile = (Dictionary<string, User>)obj;
 

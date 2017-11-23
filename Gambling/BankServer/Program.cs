@@ -26,7 +26,7 @@ namespace BankServer
         }
         static void Main(string[] args)
         {
-            Thread.Sleep(3000);
+            Thread.Sleep(4000);
 
 
             string srvCertCN = "bankservice";
