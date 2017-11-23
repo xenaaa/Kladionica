@@ -331,7 +331,7 @@ namespace BetServer
 
 
             BetServerProxy proxy = new BetServerProxy(binding, address);
-            
+
             byte[] encryptedPort, encryptedAddress;
             encryptedPort = Helper.Encrypt(user.Port);
             encryptedAddress = Helper.Encrypt(user.Address);
@@ -343,7 +343,7 @@ namespace BetServer
 
                 proxy.SendTicketResults(encryptedTicket, encryptedWon, encryptedPort, encryptedAddress); // treba port od klijenta kom salje
             }
-            
+
 
             if (won)//koja je svrha
             {
@@ -449,127 +449,124 @@ namespace BetServer
                         } while (finished > 0);
 
 
-                        lock (ResultsLock)
+                        foreach (var item in finishedGame)
                         {
-
-                            foreach (var item in finishedGame)
-                            {
-                                DeleteFinishedGame(item);
-                            }
-
-
-                            //saljemo svima rezultate gotovih utakmica
-                            lock (BetService.PortLock)
-                            {
-                                string srvCertCN = "betserviceintegration";
-                                NetTcpBinding binding = new NetTcpBinding();
-                                binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-
-                                X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-                                EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
-                                                          new X509CertificateEndpointIdentity(srvCert));
-
-                                BetServerProxy proxy = new BetServerProxy(binding, address);
-
-                                byte[] encryptedPort, encryptedAddress;
-                                //foreach (KeyValuePair<string, User> user in BetService.BetUsers)
-                                //{
-                                //    encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
-                                //    encryptedAddress = Helper.Encrypt(user.Value.Address);
-
-                                //    if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
-                                //    {
-                                //        byte[] encryptedOffers = Helper.Encrypt(Offers);
-                                //        proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
-                                //    }
-                                //}
-
-                                Dictionary<string, User> usersFromFile = new Dictionary<string, User>();//da li treba lock?
-                                Object obj = Persistance.ReadFromFile("betUsers");
-                                if (obj != null)
-                                    usersFromFile = (Dictionary<string, User>)obj;
-
-
-
-
-                                List<string> adresses = new List<string>();
-                                foreach (KeyValuePair<string, User> user in usersFromFile)
-                                {
-                                    if (!string.IsNullOrEmpty(user.Value.Address))
-                                    {
-                                        //encryptedPort = Helper.Encrypt(user.Value.Port);
-                                        //encryptedAddress = Helper.Encrypt(user.Value.Address);
-
-                                        if (!adresses.Contains(user.Value.Address))
-                                            adresses.Add(user.Value.Address);
-
-                                        //if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
-                                        //{
-                                        //    byte[] encryptedOffers = Helper.Encrypt(Offers);
-                                        //    proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
-                                        //}
-                                    }
-                                    else
-                                        continue;
-                                }
-
-
-                                if (adresses.Count > 0)
-                                {
-                                    foreach (string address1 in adresses)
-                                    {
-                                        encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
-                                        encryptedAddress = Helper.Encrypt(address1);
-
-                                        if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
-                                        {
-                                            byte[] encryptedOffers = Helper.Encrypt(results);
-                                            proxy.SendGameResults(encryptedOffers, encryptedPort, encryptedAddress);
-
-                                        }
-                                    }
-                                    sendOffers = true;
-                                }
-                                checkUserGames = true;
-
-                                //encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
-
-                                //if (proxy.CheckIfAlive(encryptedPort))
-                                //{
-                                //    byte[] encryptedResults = Helper.Encrypt(results);
-                                //    proxy.SendGameResults(encryptedResults, encryptedPort); //treba i port da se salje
-                                //    sendOffers = true;
-                                //}
-
-                                //  }
-                            }
+                            DeleteFinishedGame(item);
                         }
-                        return true;
+
+
+                        //saljemo svima rezultate gotovih utakmica
+                        lock (BetService.PortLock)
+                        {
+                            string srvCertCN = "betserviceintegration";
+                            NetTcpBinding binding = new NetTcpBinding();
+                            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
+                            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+                            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+                                                      new X509CertificateEndpointIdentity(srvCert));
+
+                            BetServerProxy proxy = new BetServerProxy(binding, address);
+
+                            byte[] encryptedPort, encryptedAddress;
+                            //foreach (KeyValuePair<string, User> user in BetService.BetUsers)
+                            //{
+                            //    encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+                            //    encryptedAddress = Helper.Encrypt(user.Value.Address);
+
+                            //    if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
+                            //    {
+                            //        byte[] encryptedOffers = Helper.Encrypt(Offers);
+                            //        proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
+                            //    }
+                            //}
+
+                            Dictionary<string, User> usersFromFile = new Dictionary<string, User>();//da li treba lock?
+                            Object obj = Persistance.ReadFromFile("betUsers");
+                            if (obj != null)
+                                usersFromFile = (Dictionary<string, User>)obj;
+
+
+
+
+                            List<string> adresses = new List<string>();
+                            foreach (KeyValuePair<string, User> user in usersFromFile)
+                            {
+                                if (!string.IsNullOrEmpty(user.Value.Address))
+                                {
+                                    //encryptedPort = Helper.Encrypt(user.Value.Port);
+                                    //encryptedAddress = Helper.Encrypt(user.Value.Address);
+
+                                    if (!adresses.Contains(user.Value.Address))
+                                        adresses.Add(user.Value.Address);
+
+                                    //if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
+                                    //{
+                                    //    byte[] encryptedOffers = Helper.Encrypt(Offers);
+                                    //    proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
+                                    //}
+                                }
+                                else
+                                    continue;
+                            }
+
+
+                            if (adresses.Count > 0)
+                            {
+                                foreach (string address1 in adresses)
+                                {
+                                    encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+                                    encryptedAddress = Helper.Encrypt(address1);
+
+                                    if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
+                                    {
+                                        byte[] encryptedOffers = Helper.Encrypt(results);
+                                        proxy.SendGameResults(encryptedOffers, encryptedPort, encryptedAddress);
+
+                                    }
+                                }
+                                sendOffers = true;
+                            }
+                            checkUserGames = true;
+
+                            //encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
+
+                            //if (proxy.CheckIfAlive(encryptedPort))
+                            //{
+                            //    byte[] encryptedResults = Helper.Encrypt(results);
+                            //    proxy.SendGameResults(encryptedResults, encryptedPort); //treba i port da se salje
+                            //    sendOffers = true;
+                            //}
+
+                            //  }
+                        }
+
                     }
+
                 }
             }
+            return true;
         }
-
         private static void DeleteFinishedGame(int game)
         {
             XmlDocument xmlDoc = new XmlDocument(); // Create an XML document object
-            
-                if (File.Exists("offers.xml"))
+
+            if (File.Exists("offers.xml"))
+            {
+                xmlDoc.Load("offers.xml");
+
+                Offers.Remove(game); //brisemo utakmicu iz liste ponuda
+                XmlNode node = xmlDoc.SelectSingleNode("descendant::PAIR[ID=" + game + "]");
+
+                if (node != null)
                 {
-                    xmlDoc.Load("offers.xml");
-
-                    Offers.Remove(game); //brisemo utakmicu iz liste ponuda
-                    XmlNode node = xmlDoc.SelectSingleNode("descendant::PAIR[ID=" + game + "]");
-
-                    if (node != null)
-                    {
-                        XmlNode parent = node.ParentNode;
-                        parent.RemoveChild(node);
-                    }
-
-                    xmlDoc.Save("offers.xml");
+                    XmlNode parent = node.ParentNode;
+                    parent.RemoveChild(node);
                 }
-            
+
+                xmlDoc.Save("offers.xml");
+            }
+
         }
     }
 }

@@ -19,7 +19,6 @@ namespace Contracts
             File.WriteAllText("..\\..\\..\\BetServer\\bin\\Debug\\betUsers.txt", string.Empty);
             File.WriteAllText("..\\..\\..\\BankServer\\bin\\Debug\\bankUsers.txt", string.Empty);
             File.WriteAllText("..\\..\\..\\BetServer\\bin\\Debug\\results.txt", string.Empty);
-            File.WriteAllText("..\\..\\..\\BetServer\\bin\\Debug\\ports.txt", string.Empty);
         }
 
         public static bool WriteToFile(Object s, String type)
@@ -54,16 +53,7 @@ namespace Contracts
                             File.WriteAllBytes("results.txt", encrypted);
                             break;
                         }
-                    }
-                case "ports":
-                    {
-                        lock (syncLock4)
-                        {
-                            File.WriteAllText("ports.txt", string.Empty);
-                            File.WriteAllBytes("ports.txt", encrypted);
-                            break;
-                        }
-                    }
+                    }            
             }
             return true;
         }
@@ -104,18 +94,7 @@ namespace Contracts
                                 obj = Helper.Decrypt(readBytes);
                             break;
                         }
-                    }
-                case "ports":
-                    {
-                        lock (syncLock4)
-                        {
-                            readBytes = File.ReadAllBytes("ports.txt");
-                            if (readBytes.Count() > 0)
-                                obj = Helper.Decrypt(readBytes);
-                            break;
-                        }
-
-                    }
+                    }     
             }
             return obj;
         }

@@ -281,11 +281,6 @@ namespace IntegrationPlatform
                 //}
                 string addressIPv4 = Helper.GetIP();
 
-                loger.Debug("User {0} sent ticket from address {1}.", username, addressIPv4);
-
-
-
-
                 proxy.SendTicket(encryptedTicket, encryptedUsername);
                 Audit.TicketSent(principal.Identity.Name.Split('\\')[1].ToString());
 
