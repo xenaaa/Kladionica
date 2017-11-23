@@ -544,6 +544,7 @@ namespace Client
         {
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform";
+          
 
             ClientBetProxy proxy = new ClientBetProxy(binding, address);
             string password;

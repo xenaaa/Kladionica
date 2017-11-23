@@ -444,6 +444,7 @@ namespace BetServer
                         } while (finished > 0);
 
 
+
                         foreach (var item in finishedGame)
                         {
                             DeleteFinishedGame(item);
@@ -534,10 +535,10 @@ namespace BetServer
                             //}
 
                             //  }
+
                         }
 
                     }
-
                 }
             }
             return true;
