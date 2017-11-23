@@ -15,7 +15,7 @@ namespace Contracts
     {
         public const string key = "123456781234567812345678";
         public const int clientPrintPort = 22222;
-        public const int betServicePort = 17000;
+        public const int betServicePort = 12208;
         public const int bankServicePort = 15000;
         public const int integrationHostPort = 9991;
 
@@ -97,13 +97,17 @@ namespace Contracts
             string addressIPv6 = endpoint.Address;
             int nPort = endpoint.Port;
 
+            IPAddress ipAddress = IPAddress.Parse(addressIPv6);
+            if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
+                return addressIPv6;
 
-            addressIPv4 = addressIPv6;//ako je vracena adresa vec zapravo IPv4, moze se dasiti...
+                addressIPv4 = addressIPv6;//ako je vracena adresa vec zapravo IPv4, moze se dasiti...
 
 
             //byte[] encryptedAddress = Helper.Encrypt(addressIPv6);
 
-            IPAddress ipAddress = IPAddress.Parse(addressIPv6);
+            
+           
             IPHostEntry ipHostEntry = Dns.GetHostEntry(ipAddress);
             foreach (IPAddress address in ipHostEntry.AddressList)
             {
