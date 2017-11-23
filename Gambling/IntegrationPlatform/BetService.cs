@@ -187,13 +187,15 @@ namespace IntegrationPlatform
         }
 
 
-        public bool SendPort(byte[] usernameBytes, byte[] portBytes, byte[] addressBytes)
+        public bool SendPort(byte[] usernameBytes, byte[] portBytes, byte[] addressBytes, byte[] printPortBytes)
         {
             byte[] encryptedUsername = Helper.EncryptOnIntegration(usernameBytes);
             byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
             byte[] encryptedAddress = Helper.Encrypt(Helper.GetIP());
+            byte[] encryptedprintPort = Helper.EncryptOnIntegration(printPortBytes);
+            
 
-            return proxy.SendPort(encryptedUsername, encryptedPort, encryptedAddress);
+            return proxy.SendPort(encryptedUsername, encryptedPort, encryptedAddress, encryptedprintPort);
         }
 
 

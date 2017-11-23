@@ -30,7 +30,7 @@ namespace Client
             }
         }
 
-        public bool SendPort(byte[] username, byte[] port, byte[] address)
+        public bool SendPort(byte[] username, byte[] port, byte[] address,byte[] printPort)
         {
             try
             {

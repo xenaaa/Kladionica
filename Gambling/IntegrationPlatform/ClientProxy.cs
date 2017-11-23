@@ -21,7 +21,7 @@ namespace IntegrationPlatform
 
         }
 
-        public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes)
+        public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
         {
             
             try
@@ -56,7 +56,7 @@ namespace IntegrationPlatform
         }
 
         //   public bool SendOffers(Dictionary<int, BetOffer> offers, int port)
-        public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes)
+        public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes,byte[] isItPrintClientBytes)
         {
             try
             {

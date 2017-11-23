@@ -120,11 +120,11 @@ namespace IntegrationPlatform
 
 
 
-        public bool SendPort(byte[] username, byte[] port, byte[] address)
+        public bool SendPort(byte[] username, byte[] port, byte[] address,byte[] printPort)
         {
             try
             {
-                factory.SendPort(username, port, address);
+                factory.SendPort(username, port, address, printPort);
                 return true;
             }
             catch (Exception e)
