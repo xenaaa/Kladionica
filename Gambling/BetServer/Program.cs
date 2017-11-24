@@ -42,7 +42,7 @@ namespace BetServer
             set { resultsLock = value; }
         }
         static int FreeTcpPort()
-        {
+        {       
             TcpListener l = new TcpListener(IPAddress.Loopback, 0);
             l.Start();
             int port = ((IPEndPoint)l.LocalEndpoint).Port;
@@ -52,7 +52,9 @@ namespace BetServer
 
         static void Main(string[] args)
         {
-           
+
+
+            Persistance.EmptyBetFiles();
             string srvCertCN = "betservice";
 
             NetTcpBinding binding = new NetTcpBinding();

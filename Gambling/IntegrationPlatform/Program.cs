@@ -29,13 +29,11 @@ namespace IntegrationPlatform
 
         static void Main(string[] args)
         {
-            Persistance.EmptyFiles();
-
             start = DateTime.Now;
 
             NetTcpBinding binding = new NetTcpBinding();
 
-            string address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform";
+            string address = "net.tcp://"+Helper.integrationHostAddress+":" + Helper.integrationHostPort + "/BetIntegrationPlatform";
             ServiceHost hostBet = new ServiceHost(typeof(BetService));
             hostBet.AddServiceEndpoint(typeof(IBetService), binding, address);
 
@@ -63,7 +61,7 @@ namespace IntegrationPlatform
 
 
             //ZBOG DEPOZITA
-            address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BetIntegrationPlatform2";
+            address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform2";
             ServiceHost hostBet2 = new ServiceHost(typeof(BetService));
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             hostBet2.AddServiceEndpoint(typeof(IBetService), binding, address);
@@ -85,7 +83,7 @@ namespace IntegrationPlatform
 
 
             binding = new NetTcpBinding();
-            address = "net.tcp://localhost:" + Helper.integrationHostPort + "/BankIntegrationPlatform";
+            address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BankIntegrationPlatform";
             ServiceHost hostBank = new ServiceHost(typeof(BankService));
             hostBank.AddServiceEndpoint(typeof(IBankService), binding, address);
 
@@ -105,7 +103,7 @@ namespace IntegrationPlatform
 
 
 
-            address = "net.tcp://localhost:" + Helper.integrationHostPort + "/ClientIntegrationPlatform";
+            address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/ClientIntegrationPlatform";
             ServiceHost hostClient = new ServiceHost(typeof(ClientHelper));
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             hostClient.AddServiceEndpoint(typeof(IClientHelper), binding, address);

@@ -48,8 +48,6 @@ namespace IntegrationPlatform
 
 
 
-
-
             EndpointAddress address = new EndpointAddress(new Uri(Helper.BankServerAddress),
                                      new X509CertificateEndpointIdentity(srvCert));
 

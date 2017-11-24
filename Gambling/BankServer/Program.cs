@@ -26,9 +26,8 @@ namespace BankServer
         }
         static void Main(string[] args)
         {
-            Thread.Sleep(4000);
 
-
+            Persistance.EmptyBankFiles();
             string srvCertCN = "bankservice";
 
             NetTcpBinding binding = new NetTcpBinding();

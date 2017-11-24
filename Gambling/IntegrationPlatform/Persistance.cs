@@ -14,11 +14,15 @@ namespace Contracts
         private static object syncLock3 = new object();
         private static object syncLock4 = new object();
 
-        public static void EmptyFiles()
+        public static void EmptyBetFiles()
         {
             File.WriteAllText("..\\..\\..\\BetServer\\bin\\Debug\\betUsers.txt", string.Empty);
-            File.WriteAllText("..\\..\\..\\BankServer\\bin\\Debug\\bankUsers.txt", string.Empty);
             File.WriteAllText("..\\..\\..\\BetServer\\bin\\Debug\\results.txt", string.Empty);
+        }
+
+        public static void EmptyBankFiles()
+        {
+            File.WriteAllText("..\\..\\..\\BankServer\\bin\\Debug\\bankUsers.txt", string.Empty);
         }
 
         public static bool WriteToFile(Object s, String path)

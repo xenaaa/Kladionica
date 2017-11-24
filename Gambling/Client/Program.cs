@@ -324,10 +324,20 @@ namespace Client
                                     } while (inputValue == -1);
 
                                     g.Tip = (int)inputValue;
-                                    g.BetOffer = ClientHelper.Offers[code];
 
-                                    if (!bets.ContainsKey(code))
-                                        bets.Add(code, g);//proveriti ako dodaje istu utakmicu
+                                    if (ClientHelper.Offers.ContainsKey(code))
+                                    {
+                                        g.BetOffer = ClientHelper.Offers[code];
+
+                                        if (!bets.ContainsKey(code))
+                                            bets.Add(code, g);//proveriti ako dodaje istu utakmicu
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("This game finished");
+                                    }
+
+                                
 
                                 }
                                 else if (inputValue == 2)
