@@ -73,7 +73,7 @@ namespace BetServer
 
             if (betUsersFromFile.Keys.Contains(username))
             {
-                if (betUsersFromFile[username].Password == password)
+                if (betUsersFromFile[username].Password.First() == password.First())
                 {
                     Console.WriteLine("You successfully logged in!");
                     return true;
@@ -175,7 +175,7 @@ namespace BetServer
         }
 
 
-        public bool SendTicket(byte[] ticketBytes, byte[] usernameBytes)
+        public bool SendTicket(byte[] ticketBytes, byte[] usernameBytes, byte[] portBytes)
         {
             Ticket ticket = (Ticket)Helper.Decrypt(ticketBytes);
             string username = (string)Helper.Decrypt(usernameBytes);

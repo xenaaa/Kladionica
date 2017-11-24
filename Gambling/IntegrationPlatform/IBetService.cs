@@ -29,7 +29,7 @@ namespace Contracts
         bool EditUser(byte[] user);
 
         [OperationContract]
-        bool SendTicket(byte[] ticket, byte[] username);
+        bool SendTicket(byte[] ticket, byte[] username, byte[] port);
 
         [OperationContract]
         bool Deposit(byte[] acc, byte[] username);

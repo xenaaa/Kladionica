@@ -25,18 +25,19 @@ namespace Client
             return port;
         }
         static int ClientPrintPort;
+        static int port;
         static void Main(string[] args)
         {
             bool bankAdmin = false;
             bool betAdmin = false;
 
-           
+
             //proveriti da lie je jedan vec otvoren
-           
+
 
             NetTcpBinding binding = new NetTcpBinding();
 
-            int port = FreeTcpPort();
+            port = FreeTcpPort();
 
             //Console.WriteLine("Enter port: ");
             //int port = Convert.ToInt32(Console.ReadLine());
@@ -47,29 +48,6 @@ namespace Client
             host.AddServiceEndpoint(typeof(IClientHelper), binding, address);
 
             host.Open();
-           
-            Process[] clientPrint = Process.GetProcessesByName("ClientPrint");
-            if (clientPrint.Length == 0)
-            {
-                Process p = new Process();
-                string path = Directory.GetCurrentDirectory();
-                path = path.Replace("Client", "ClientPrint");
-                p.StartInfo.WorkingDirectory = @path;
-                p.StartInfo.FileName = @path + @"\ClientPrint.exe";
-
-                ClientPrintPort = FreeTcpPort();
-
-                p.StartInfo.Arguments = ClientPrintPort.ToString();
-
-               
-
-                p.StartInfo.UseShellExecute = true;
-
-                p.StartInfo.CreateNoWindow = false;
-                p.Start();
-            }
-
-
 
 
             Console.WriteLine("Client service is started.");
@@ -102,6 +80,30 @@ namespace Client
                 {
                     Console.WriteLine(name.ToString());
                     betAdmin = true;
+                }
+            }
+
+            if (!bankAdmin)
+            {
+                Process[] clientPrint = Process.GetProcessesByName("ClientPrint");
+                if (clientPrint.Length == 0)
+                {
+                    Process p = new Process();
+                    string path = Directory.GetCurrentDirectory();
+                    path = path.Replace("Client", "ClientPrint");
+                    p.StartInfo.WorkingDirectory = @path;
+                    p.StartInfo.FileName = @path + @"\ClientPrint.exe";
+
+                    ClientPrintPort = FreeTcpPort();
+
+                    p.StartInfo.Arguments = ClientPrintPort.ToString();
+
+
+
+                    p.StartInfo.UseShellExecute = true;
+
+                    p.StartInfo.CreateNoWindow = false;
+                    p.Start();
                 }
             }
 
@@ -155,7 +157,7 @@ namespace Client
             WindowsIdentity clientIdentity = WindowsIdentity.GetCurrent();
             Ticket ticket = new Ticket(bets, payment);
 
-            if (proxy.SendTicket(Helper.ObjectToByteArray(ticket), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1])))
+            if (proxy.SendTicket(Helper.ObjectToByteArray(ticket), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("\n************************************TICKET**************************************\n");
@@ -179,7 +181,7 @@ namespace Client
         private static void BankService(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://"+Helper.integrationHostAddress+":" + Helper.integrationHostPort + "/BankIntegrationPlatform";
+            string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BankIntegrationPlatform";
             ClientBankProxy proxy = new ClientBankProxy(binding, address);
 
             double inputValue = 0;
@@ -245,7 +247,7 @@ namespace Client
 
 
         private static void BetService(WindowsIdentity clientIdentity, int port)
-        {        
+        {
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform";
             ClientBetProxy proxy = new ClientBetProxy(binding, address);
@@ -255,15 +257,15 @@ namespace Client
 
             if (proxy.CheckIfAlive())
             {
-                
-                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort)); 
+
+                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort));
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
                 {
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
-                    
+
                 } while (!proxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port)));
 
                 // proxy.AddUser(new User("lala", "lala", "Admin")); provjera autorizacije
@@ -337,7 +339,7 @@ namespace Client
                                         Console.WriteLine("This game finished");
                                     }
 
-                                
+
 
                                 }
                                 else if (inputValue == 2)
@@ -382,11 +384,11 @@ namespace Client
             if (proxy.CheckIfAlive())
             {
                 proxy.CreateAccount(Helper.ObjectToByteArray(new User("adminBank", new HashSet<string>() { "admin" }, "BankAdmin")));
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("marina", new HashSet<string>() { "admin" }, "User")));
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("bojan", new HashSet<string>() { "admin" }, "User")));
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("david", new HashSet<string>() { "admin" }, "User")));
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("nicpa", new HashSet<string>() { "admin" }, "User")));
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("djole", new HashSet<string>() { "admin" } , "Reader")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("marina", new HashSet<string>() { "marina" }, "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("bojan", new HashSet<string>() { "bojan" }, "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("david", new HashSet<string>() { "david" }, "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("nicpa", new HashSet<string>() { "nicpa" }, "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("djole", new HashSet<string>() { "djole" }, "Reader")));
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
@@ -424,7 +426,7 @@ namespace Client
                         password = Console.ReadLine();
                         Console.WriteLine("Enter role:");
                         string role = Console.ReadLine();
-                        proxy.CreateAccount(Helper.ObjectToByteArray(new User(username, new HashSet<string>() { password },role)));
+                        proxy.CreateAccount(Helper.ObjectToByteArray(new User(username, new HashSet<string>() { password }, role)));
 
                     }
 
@@ -565,20 +567,20 @@ namespace Client
         private static void BetAdmin(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform";   
+            string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform";
 
             ClientBetProxy proxy = new ClientBetProxy(binding, address);
             string password;
             if (proxy.CheckIfAlive())
             {
                 proxy.AddUser(Helper.ObjectToByteArray(new User("adminBet", new HashSet<string>() { "admin" }, "BetAdmin")));
-                proxy.AddUser(Helper.ObjectToByteArray(new User("marina", new HashSet<string>() { "admin" }, "User")));
-                proxy.AddUser(Helper.ObjectToByteArray(new User("bojan", new HashSet<string>() { "admin" }, "User")));
-                proxy.AddUser(Helper.ObjectToByteArray(new User("david", new HashSet<string>() { "admin" }, "User")));
-                proxy.AddUser(Helper.ObjectToByteArray(new User("nicpa", new HashSet<string>() { "admin" }, "User")));
-                proxy.AddUser(Helper.ObjectToByteArray(new User("djole", new HashSet<string>() { "admin" }, "Reader")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("marina", new HashSet<string>() { "marina" }, "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("bojan", new HashSet<string>() { "bojan" }, "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("david", new HashSet<string>() { "david" }, "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("nicpa", new HashSet<string>() { "nicpa" }, "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("djole", new HashSet<string>() { "djole" }, "Reader")));
 
-                proxy.SendPort(Helper.ObjectToByteArray("adminBet"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0),Helper.ObjectToByteArray(ClientPrintPort)); 
+                proxy.SendPort(Helper.ObjectToByteArray("adminBet"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort));
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do

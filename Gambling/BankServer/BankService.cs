@@ -42,7 +42,7 @@ namespace BankServer
 
             if (bankUsersFromFile.Keys.Contains(username))
             {
-                if (bankUsersFromFile[username].Password == password)//OKK?****
+                if (bankUsersFromFile[username].Password.First() == password.First())//OKK?****
                 {
                     foreach (KeyValuePair<string, User> kvp in bankUsersFromFile)
                     {

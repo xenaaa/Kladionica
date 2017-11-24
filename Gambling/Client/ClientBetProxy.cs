@@ -99,11 +99,11 @@ namespace Client
             }
         }
 
-        public bool SendTicket(byte[] ticket, byte[] username)
+        public bool SendTicket(byte[] ticket, byte[] username, byte[] port)
         {
             try
             {
-                return factory.SendTicket(ticket, username);
+                return factory.SendTicket(ticket, username, port);
             }
             catch (Exception e)
             {

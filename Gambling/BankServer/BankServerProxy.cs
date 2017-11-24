@@ -82,13 +82,12 @@ namespace BankServer
         {
             throw new NotImplementedException();
         }
-
-        public bool SendTicket(byte[] ticket, byte[] username)
+        public bool IntrusionPrevention(byte[] user)
         {
             throw new NotImplementedException();
         }
 
-        public bool IntrusionPrevention(byte[] user)
+        public bool SendTicket(byte[] ticket, byte[] username, byte[] port)
         {
             throw new NotImplementedException();
         }

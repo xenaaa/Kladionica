@@ -137,20 +137,6 @@ namespace IntegrationPlatform
             string username = (string)Helper.ByteArrayToObject(usernameBytes);
 
 
-            //da nadjemo port
-            Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("..\\..\\..\\BetServer\\bin\\Debug\\betUsers.txt");
-            if (obj != null)
-                betUsersFromFile = (Dictionary<string, User>)obj;
-
-            int port = 0;
-            if (betUsersFromFile.Keys.Contains(username))
-            {
-                port = betUsersFromFile[username].Port;
-            }
-
-
-
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("BetAdmin"))
             {
@@ -161,14 +147,14 @@ namespace IntegrationPlatform
                 if (proxy.DeleteUser(encryptedUser))
                 {
                     Audit.DeleteUser(principal.Identity.Name.Split('\\')[1].ToString(), username);
-                    loger.Info("IP address: {0} Port: {1} - User {2} is deleted.", Helper.GetIP(), port, username);
+                    loger.Info("IP address: {0} Port: {1} - User {2} is deleted.", Helper.GetIP(), Helper.GetPort(), username);
                     allowed = true;
                 }
 
                 else
                 {
                     Audit.DeleteUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), username, "error");
-                    loger.Warn("IP address: {0} Port: {1} - Failed to delete user {2}.", Helper.GetIP(), port, username);
+                    loger.Warn("IP address: {0} Port: {1} - Failed to delete user {2}.", Helper.GetIP(), Helper.GetPort(), username);
                     allowed = false;
                 }
             }
@@ -176,7 +162,7 @@ namespace IntegrationPlatform
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "DeleteUser", "not authorized");
                 Audit.DeleteUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), username, "not authorized");
-                loger.Warn("IP address: {0} Port: {1} - Failed to delete user {2} (not authorized).", Helper.GetIP(), port, username);
+                loger.Warn("IP address: {0} Port: {1} - Failed to delete user {2} (not authorized).", Helper.GetIP(), Helper.GetPort(), username);
                 allowed = false;
             }
             return allowed;
@@ -230,24 +216,13 @@ namespace IntegrationPlatform
         }
 
 
-        public bool SendTicket(byte[] ticketBytes, byte[] usernameBytes)
+        public bool SendTicket(byte[] ticketBytes, byte[] usernameBytes, byte[] portBytes)
         {
             bool allowed = false;
 
             string username = (string)Helper.ByteArrayToObject(usernameBytes);
 
-            //da nadjemo port
-            Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("..\\..\\..\\BetServer\\bin\\Debug\\betUsers.txt");
-            if (obj != null)
-                betUsersFromFile = (Dictionary<string, User>)obj;
-
-            int port = 0;
-            if (betUsersFromFile.Keys.Contains(username))
-            {
-                port = betUsersFromFile[username].Port;
-            }
-
+            int port = (int)Helper.ByteArrayToObject(portBytes);
 
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("User"))
@@ -256,11 +231,11 @@ namespace IntegrationPlatform
 
                 byte[] encryptedTicket = Helper.EncryptOnIntegration(ticketBytes);
                 byte[] encryptedUsername = Helper.EncryptOnIntegration(usernameBytes);
-
+                byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
 
                 string addressIPv4 = Helper.GetIP();
 
-                if (proxy.SendTicket(encryptedTicket, encryptedUsername))
+                if (proxy.SendTicket(encryptedTicket, encryptedUsername, encryptedPort))
                 {
                     Audit.TicketSent(principal.Identity.Name.Split('\\')[1].ToString());
                     loger.Info("IP address: {0} Port: {1} - Ticket sent.", Helper.GetIP(), port);
