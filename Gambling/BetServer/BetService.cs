@@ -34,7 +34,7 @@ namespace BetServer
             return true;
         }
 
-        public bool SendPort(byte[] usernameBytes, byte[] portBytes, byte[] addressBytes,byte[] printPortBytes)
+        public bool SendPort(byte[] usernameBytes, byte[] portBytes, byte[] addressBytes, byte[] printPortBytes)
         {
             lock (PortLock)
             {
@@ -52,7 +52,7 @@ namespace BetServer
                 betUsersFromFile[username].Address = address;
                 betUsersFromFile[username].PrintPort = printPort;
 
-                Persistance.WriteToFile(betUsersFromFile, "betUsers.txt");           
+                Persistance.WriteToFile(betUsersFromFile, "betUsers.txt");
             }
             return true;
         }
@@ -92,8 +92,8 @@ namespace BetServer
         {
             //dekpricija
             User user = (User)Helper.Decrypt(userBytes);
-           
-           
+
+
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
             Object obj = Persistance.ReadFromFile("betUsers.txt");
             if (obj != null)
@@ -119,7 +119,7 @@ namespace BetServer
                 return false;
             }
 
-            
+
         }
 
         public bool DeleteUser(byte[] usernameBytes)
@@ -210,7 +210,10 @@ namespace BetServer
             Account acc = (Account)Helper.Decrypt(accBytes);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
+
             Object obj = Persistance.ReadFromFile("betUsers.txt");
+
+
             if (obj != null)
                 betUsersFromFile = (Dictionary<string, User>)obj;
 
@@ -252,6 +255,3 @@ namespace BetServer
 
     }
 }
-
-
-

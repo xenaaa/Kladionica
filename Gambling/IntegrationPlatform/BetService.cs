@@ -40,14 +40,19 @@ namespace IntegrationPlatform
                     IP = ip.ToString();
                 }
             }
+            if (!string.IsNullOrEmpty(Helper.BetServerAddress))
+            {/*provera jer ce banka pozvati endpoint koji implementira BetService, ali ovde postoji pravljenje novog endpointa koj nama u sustini ne treba u tom trenutku
+                da smo pravili novi contract ova provera nam ne bi trebala jer bi postojao novi endpoint......*/
+                if (!string.IsNullOrEmpty(IP) && Helper.BetServerAddress.Contains(IP))
+                    Helper.BetServerAddress = Helper.BetServerAddress.Replace(IP, "localhost");
 
-            if (!string.IsNullOrEmpty(IP) && Helper.BetServerAddress.Contains(IP))
-                Helper.BetServerAddress = Helper.BetServerAddress.Replace(IP, "localhost");
 
-            EndpointAddress address = new EndpointAddress(new Uri(Helper.BetServerAddress),
-                                    new X509CertificateEndpointIdentity(srvCert));
+                EndpointAddress address = new EndpointAddress(new Uri(Helper.BetServerAddress),
+                                        new X509CertificateEndpointIdentity(srvCert));
 
-            proxy = new BetServiceProxy(binding, address);
+                proxy = new BetServiceProxy(binding, address);
+
+            }
         }
 
         public bool BetLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes)
@@ -77,6 +82,7 @@ namespace IntegrationPlatform
                     loger.Warn("IP address: {0} Port: {1} - Bet login failed.", Helper.GetIP(), port);
                     allowed = false;
                 }
+
             }
 
             else
@@ -92,7 +98,9 @@ namespace IntegrationPlatform
 
         public bool CheckIfAlive()
         {
+
             return proxy.CheckIfAlive();
+
         }
 
 
@@ -120,6 +128,7 @@ namespace IntegrationPlatform
                     loger.Warn("IP address: {0} Port: {1} - Failed to add user {2}.", Helper.GetIP(), Helper.GetPort(), user.Username);
                     allowed = false;
                 }
+
             }
             else
             {
@@ -128,6 +137,9 @@ namespace IntegrationPlatform
                 loger.Warn("IP address: {0} Port: {1} - Failed to add user {2} (not authorized).", Helper.GetIP(), Helper.GetPort(), user.Username);
                 allowed = false;
             }
+
+
+
             return allowed;
         }
 
@@ -157,6 +169,7 @@ namespace IntegrationPlatform
                     loger.Warn("IP address: {0} Port: {1} - Failed to delete user {2}.", Helper.GetIP(), Helper.GetPort(), username);
                     allowed = false;
                 }
+
             }
             else
             {
@@ -192,6 +205,8 @@ namespace IntegrationPlatform
                     loger.Warn("IP address: {0} Port: {1} - Failed to edit user {2}.", Helper.GetIP(), user.Port, user.Username.ToString());
                     allowed = false;
                 }
+
+
             }
             else
             {
@@ -213,6 +228,8 @@ namespace IntegrationPlatform
             byte[] encryptedprintPort = Helper.EncryptOnIntegration(printPortBytes);
 
             return proxy.SendPort(encryptedUsername, encryptedPort, encryptedAddress, encryptedprintPort);
+
+         
         }
 
 
@@ -247,6 +264,7 @@ namespace IntegrationPlatform
                     loger.Warn("IP address: {0} Port: {1} - Failed to send ticket.", Helper.GetIP(), port);
                     allowed = false;
                 }
+
             }
             else
             {
@@ -263,6 +281,9 @@ namespace IntegrationPlatform
 
             return proxy.Deposit(accBytes, usernameBytes);
 
+
+
+
         }
 
         public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo
@@ -274,7 +295,9 @@ namespace IntegrationPlatform
 
         public bool IntrusionPrevention(byte[] user)
         {
+
             return proxy.IntrusionPrevention(user);
+
         }
     }
 }

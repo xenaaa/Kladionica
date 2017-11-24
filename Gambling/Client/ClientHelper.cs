@@ -133,8 +133,16 @@ namespace Client
 
         public bool CloseProxy()
         {
-            Program.betProxy.Close();
-            Program.bankProxy.Close();
+            try
+            {
+                Program.betProxy.Close();
+                Program.bankProxy.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
             return true;
         }
     }

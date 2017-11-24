@@ -39,7 +39,10 @@ namespace IntegrationPlatform
             {
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
             }
+
+
             proxy = new ClientProxy(binding, address);
+
 
             if (!Program.proxies.ContainsKey(addressIPv4))
             {
@@ -60,11 +63,15 @@ namespace IntegrationPlatform
             //}
 
             return proxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
+
+           
         }
 
         public bool CloseProxy()
         {
+
             return proxy.CloseProxy();
+
         }
 
         public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo
@@ -92,7 +99,10 @@ namespace IntegrationPlatform
             string address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
 
             proxy = new ClientProxy(binding, address);
+
             return proxy.SendGameResults(results, portBytes, addressBytes);
+
+
         }
 
         public bool SendOffers(byte[] offersBytes, byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
@@ -122,6 +132,8 @@ namespace IntegrationPlatform
 
             proxy = new ClientProxy(binding, address);
             return proxy.SendOffers(offers, portB, addressb, isItPrintClientb);
+
+            
         }
 
         public bool SendTicketResults(byte[] ticketBytes, byte[] isPassedBytes, byte[] portBytes, byte[] addressBytes)
@@ -147,6 +159,8 @@ namespace IntegrationPlatform
 
             proxy = new ClientProxy(binding, address);
             return proxy.SendTicketResults(ticket, isPassed, portB, addressB);
+
+
         }
 
 

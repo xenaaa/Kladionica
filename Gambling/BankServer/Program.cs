@@ -45,8 +45,15 @@ namespace BankServer
 
             ///Set appropriate service's certificate on the host. Use CertManager class to obtain the certificate based on the "srvCertCN"
             host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+            try
+            {
+                host.Open();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
-            host.Open();
 
             string srvCertCN2 = "bankserviceintegration";
             binding = new NetTcpBinding();
@@ -57,7 +64,7 @@ namespace BankServer
                                       new X509CertificateEndpointIdentity(srvCert));
 
             BankServerProxy proxy;
-            proxy = new BankServerProxy(binding, address2);
+          
 
             string IP=string.Empty;
             var hostIP = Dns.GetHostEntry(Dns.GetHostName());
@@ -71,8 +78,23 @@ namespace BankServer
 
             address=address.Replace("localhost", IP);
 
-
-            proxy.GetServiceIP(Helper.Encrypt(address));
+            while (true)
+            {
+                proxy = new BankServerProxy(binding, address2);
+                if (proxy.GetServiceIP(Helper.Encrypt(address)))
+                {
+                    proxy.Close();
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Server not responding!");
+                    proxy.Abort();
+                    Thread.Sleep(1000);
+                    continue;
+                }
+            }
+           
 
 
             Console.WriteLine("Bank service is started.");

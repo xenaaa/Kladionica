@@ -126,13 +126,15 @@ namespace BankServer
                                               new X509CertificateEndpointIdentity(srvCert));
 
                     BankServerProxy proxy;
-                    proxy = new BankServerProxy(binding, address);
-
                     byte[] encryptedAccount = Helper.Encrypt(acc);
                     byte[] encryptedUername = Helper.Encrypt(username);
 
+                    proxy = new BankServerProxy(binding, address);
                     proxy.Deposit(encryptedAccount, encryptedUername);
                     return true;
+
+
+                    return false;
                 }
             }
             else

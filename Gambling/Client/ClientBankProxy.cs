@@ -17,14 +17,21 @@ namespace Client
 
         public ClientBankProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
-            factory = this.CreateChannel();
+            try
+            {
+                factory = this.CreateChannel();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         public bool CheckIfAlive()
         {
             try
             {
-                return  factory.CheckIfAlive();
+                return factory.CheckIfAlive();
             }
             catch (Exception e)
             {
@@ -33,11 +40,11 @@ namespace Client
             }
         }
 
-        public bool BankLogin(byte[] username, byte[] password, byte[] port,byte[] address)
+        public bool BankLogin(byte[] username, byte[] password, byte[] port, byte[] address)
         {
             try
             {
-                return  factory.BankLogin(username, password, port,address);
+                return factory.BankLogin(username, password, port, address);
             }
             catch (Exception e)
             {

@@ -28,15 +28,22 @@ namespace IntegrationPlatform
             /// Set appropriate client's certificate on the channel. Use CertManager class to obtain the certificate based on the "cltCertCN"
             this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
 
-            factory = this.CreateChannel();
+            try
+            {
+                factory = this.CreateChannel();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
 
-        public bool BankLogin(byte[] username, byte[] password, byte[] port,byte[] address)
+        public bool BankLogin(byte[] username, byte[] password, byte[] port, byte[] address)
         {
             try
             {
-                return factory.BankLogin(username, password, port,address);
+                return factory.BankLogin(username, password, port, address);
             }
             catch (Exception e)
             {

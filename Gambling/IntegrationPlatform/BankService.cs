@@ -50,10 +50,12 @@ namespace IntegrationPlatform
                                      new X509CertificateEndpointIdentity(srvCert));
 
             proxy = new BankServiceProxy(binding, address);
+
         }
 
-        public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes,byte[] addressBytes)
+        public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes, byte[] addressBytes)
         {
+
             bool allowed = false;
             string username = (string)Helper.ByteArrayToObject(usernameBytes);
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
@@ -66,7 +68,6 @@ namespace IntegrationPlatform
                 byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
                 byte[] encryptedAddress = Helper.Encrypt(Helper.GetIP());
 
-
                 if (proxy.BankLogin(encryptedUser, encryptedPassword, encryptedPort, encryptedAddress))
                 {
 
@@ -77,25 +78,30 @@ namespace IntegrationPlatform
                 }
                 else
                 {
-                    Audit.LogInFailed(principal.Identity.Name.Split('\\')[1].ToString(),"wrong password");
+                    Audit.LogInFailed(principal.Identity.Name.Split('\\')[1].ToString(), "wrong password");
                     loger.Warn("IP address: {0} Port: {1} - Bank login failed.", Helper.GetIP(), Helper.GetPort());
                     allowed = false;
                 }
+
             }
 
             else
-            {            
+            {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser", "not authorized");
                 Audit.LogInFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
                 loger.Warn("IP address: {0} Port: {1} - Bank login failed (not authorized).", Helper.GetIP(), Helper.GetPort());
                 allowed = false;
             }
             return allowed;
+
         }
 
         public bool CheckIfAlive()
         {
+
             return proxy.CheckIfAlive();
+
+            return false;
         }
 
         public bool Deposit(byte[] accBytes, byte[] usernameBytes)
@@ -121,17 +127,18 @@ namespace IntegrationPlatform
                 }
                 else
                 {
-                    Audit.DepositFailed(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString(),"error");
+                    Audit.DepositFailed(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString(), "error");
                     loger.Warn("IP address: {0} Port: {1} - Deposit failed.", Helper.GetIP(), Helper.GetPort());
                     allowed = false;
                 }
+
             }
             else
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "Deposit", "not authorized");
                 Audit.DepositFailed(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString(), "not authorized");
                 loger.Warn("IP address: {0} : Port: {1} - Deposit failed (not authorized).", Helper.GetIP(), Helper.GetPort());
-                allowed = false;   
+                allowed = false;
             }
             return allowed;
         }
@@ -155,10 +162,12 @@ namespace IntegrationPlatform
                 }
                 else
                 {
-                    Audit.CreateAccountFailed(principal.Identity.Name.Split('\\')[1].ToString(),"error");
+                    Audit.CreateAccountFailed(principal.Identity.Name.Split('\\')[1].ToString(), "error");
                     loger.Warn("IP address: {0} Port: {1} - Failed to create user {2}.", Helper.GetIP(), Helper.GetPort(), user.Username);
                     allowed = false;
                 }
+
+
             }
             else
             {
@@ -167,13 +176,18 @@ namespace IntegrationPlatform
                 loger.Warn("IP address: {0} Port: {1} - Failed to create user {2} (not authorized).", Helper.GetIP(), Helper.GetPort(), user.Username);
             }
 
+
+
             return allowed;
         }
 
         public bool IntrusionPrevention(byte[] user)
         {
             byte[] encryptedUser = Helper.EncryptOnIntegration(user);
+
             return proxy.IntrusionPrevention(user);
+
+
         }
     }
 }

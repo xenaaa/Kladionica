@@ -28,7 +28,14 @@ namespace IntegrationPlatform
             /// Set appropriate client's certificate on the channel. Use CertManager class to obtain the certificate based on the "cltCertCN"
             this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
             //  Console.WriteLine(this.Credentials.ClientCertificate.Certificate.ToString());
-            factory = this.CreateChannel();
+            try
+            {
+                factory = this.CreateChannel();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         public bool AddUser(byte[] user)
@@ -120,7 +127,7 @@ namespace IntegrationPlatform
 
 
 
-        public bool SendPort(byte[] username, byte[] port, byte[] address,byte[] printPort)
+        public bool SendPort(byte[] username, byte[] port, byte[] address, byte[] printPort)
         {
             try
             {

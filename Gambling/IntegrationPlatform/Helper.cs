@@ -19,7 +19,7 @@ namespace Contracts
         //public const int bankServicePort = 15000;
         public const int integrationHostPort = 42855;
 
-        public const string integrationHostAddress = "10.1.212.159";
+        public const string integrationHostAddress = "localhost";
         public static string BetServerAddress = string.Empty;
         public static string BankServerAddress = string.Empty;
 

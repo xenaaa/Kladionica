@@ -17,18 +17,24 @@ namespace IntegrationPlatform
         public ClientProxy() { }
         public ClientProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
-
-            factory = this.CreateChannel();
+            try
+            {
+                factory = this.CreateChannel();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
         }
 
         public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
         {
-            
+
             try
             {
-               return  factory.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
-               
+                return factory.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
+
             }
             catch (Exception e)
             {
@@ -56,7 +62,7 @@ namespace IntegrationPlatform
             throw new NotImplementedException();
         }
 
-        public bool SendGameResults(byte[] results, byte[] port,byte[] address)
+        public bool SendGameResults(byte[] results, byte[] port, byte[] address)
         {
             try
             {
@@ -71,11 +77,11 @@ namespace IntegrationPlatform
         }
 
         //   public bool SendOffers(Dictionary<int, BetOffer> offers, int port)
-        public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes,byte[] isItPrintClientBytes)
+        public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes, byte[] isItPrintClientBytes)
         {
             try
             {
-                return  factory.SendOffers(offers, port, addressBytes, isItPrintClientBytes);
+                return factory.SendOffers(offers, port, addressBytes, isItPrintClientBytes);
             }
             catch (Exception e)
             {
@@ -84,7 +90,7 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port,byte[] address)
+        public bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port, byte[] address)
         {
             try
             {

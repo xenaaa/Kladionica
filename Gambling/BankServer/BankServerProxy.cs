@@ -17,7 +17,7 @@ namespace BankServer
         public BankServerProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
 
-            string cltCertCN = "bankserviceclient"; 
+            string cltCertCN = "bankserviceclient";
 
             this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
             this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
@@ -25,14 +25,21 @@ namespace BankServer
             /// Set appropriate client's certificate on the channel. Use CertManager class to obtain the certificate based on the "cltCertCN"
             this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
             //  Console.WriteLine(this.Credentials.ClientCertificate.Certificate.ToString());
-            factory = this.CreateChannel();
+            try
+            {
+                factory = this.CreateChannel();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         public bool Deposit(byte[] acc, byte[] username)
         {
             try
             {
-              return factory.Deposit(acc, username);
+                return factory.Deposit(acc, username);
             }
             catch (Exception e)
             {
@@ -78,7 +85,7 @@ namespace BankServer
             throw new NotImplementedException();
         }
 
-        public bool SendPort(byte[] username, byte[] port, byte[] address,byte[] printPort)
+        public bool SendPort(byte[] username, byte[] port, byte[] address, byte[] printPort)
         {
             throw new NotImplementedException();
         }

@@ -48,9 +48,14 @@ namespace Client
 
             ServiceHost host = new ServiceHost(typeof(ClientHelper));
             host.AddServiceEndpoint(typeof(IClientHelper), binding, address);
-
-            host.Open();
-
+            try
+            {
+                host.Open();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: {0}", e.Message);
+            }
 
             Console.WriteLine("Client service is started.");
             Console.WriteLine("Press <enter> to stop service...");
@@ -178,12 +183,14 @@ namespace Client
                 Console.WriteLine("\n*********************************************************************************");
                 Console.ForegroundColor = ConsoleColor.White;
             }
+
         }
 
         private static void BankService(WindowsIdentity clientIdentity, int port)
         {
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BankIntegrationPlatform";
+
             bankProxy = new ClientBankProxy(binding, address);
 
             double inputValue = 0;
@@ -244,6 +251,7 @@ namespace Client
             }
             else
                 Console.WriteLine("Server is down");
+
         }
 
 
@@ -252,6 +260,7 @@ namespace Client
         {
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform";
+
             betProxy = new ClientBetProxy(binding, address);
 
             double inputValue = 0;
@@ -372,6 +381,7 @@ namespace Client
             }
             else
                 Console.WriteLine("Server is down");
+
         }
 
 
@@ -562,6 +572,8 @@ namespace Client
                         break;
                 }
             }
+
+
         }
 
 
@@ -749,6 +761,7 @@ namespace Client
                     }
                 }
             }
+
         }
 
         private static double CheckIfNumber(string input)

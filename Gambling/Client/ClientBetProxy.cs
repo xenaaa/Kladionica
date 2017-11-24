@@ -15,7 +15,14 @@ namespace Client
 
         public ClientBetProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
-            factory = this.CreateChannel();
+            try
+            {
+                factory = this.CreateChannel();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
         public bool CheckIfAlive()
         {
@@ -30,11 +37,11 @@ namespace Client
             }
         }
 
-        public bool SendPort(byte[] username, byte[] port, byte[] address,byte[] printPort)
+        public bool SendPort(byte[] username, byte[] port, byte[] address, byte[] printPort)
         {
             try
             {
-                return factory.SendPort(username, port, address,printPort);
+                return factory.SendPort(username, port, address, printPort);
             }
             catch (Exception e)
             {
@@ -47,7 +54,7 @@ namespace Client
         {
             try
             {
-               return factory.BetLogin(username, password, port);
+                return factory.BetLogin(username, password, port);
 
             }
             catch (Exception e)
@@ -62,7 +69,7 @@ namespace Client
             try
             {
                 return factory.AddUser(user);
-             
+
             }
             catch (Exception e)
             {
@@ -76,7 +83,7 @@ namespace Client
             try
             {
                 return factory.DeleteUser(username);
-          
+
             }
             catch (Exception e)
             {
@@ -90,7 +97,7 @@ namespace Client
             try
             {
                 return factory.EditUser(user);
-           
+
             }
             catch (Exception e)
             {

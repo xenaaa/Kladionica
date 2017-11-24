@@ -25,7 +25,14 @@ namespace BetServer
             /// Set appropriate client's certificate on the channel. Use CertManager class to obtain the certificate based on the "cltCertCN"
             this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
             //  Console.WriteLine(this.Credentials.ClientCertificate.Certificate.ToString());
-            factory = this.CreateChannel();
+            try
+            {
+                factory = this.CreateChannel();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
@@ -51,7 +58,7 @@ namespace BetServer
         {
             try
             {
-                return  factory.GetServiceIP(AddressStringBytes);
+                return factory.GetServiceIP(AddressStringBytes);
             }
             catch (Exception e)
             {
@@ -64,7 +71,7 @@ namespace BetServer
         {
             try
             {
-                return  factory.SendGameResults(results, port,address);
+                return factory.SendGameResults(results, port, address);
             }
             catch (Exception e)
             {
@@ -87,11 +94,11 @@ namespace BetServer
             }
         }
 
-        public bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port,byte[] address)
+        public bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port, byte[] address)
         {
             try
             {
-                return  factory.SendTicketResults(ticket, isPassed, port, address);
+                return factory.SendTicketResults(ticket, isPassed, port, address);
             }
             catch (Exception e)
             {

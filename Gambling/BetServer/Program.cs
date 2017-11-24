@@ -42,7 +42,7 @@ namespace BetServer
             set { resultsLock = value; }
         }
         static int FreeTcpPort()
-        {       
+        {
             TcpListener l = new TcpListener(IPAddress.Loopback, 0);
             l.Start();
             int port = ((IPEndPoint)l.LocalEndpoint).Port;
@@ -72,19 +72,25 @@ namespace BetServer
             ///Set appropriate service's certificate on the host. Use CertManager class to obtain the certificate based on the "srvCertCN"
             host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
 
-
-            host.Open();
+            try
+            {
+                host.Open();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
             string srvCertCN2 = "betserviceintegration";
             binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN2);
-            EndpointAddress address2 = new EndpointAddress(new Uri("net.tcp://"+Helper.integrationHostAddress+":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+            EndpointAddress address2 = new EndpointAddress(new Uri("net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             BetServerProxy proxy;
-            proxy = new BetServerProxy(binding, address2);
+            // proxy = new BetServerProxy(binding, address2);
 
 
             string IP = string.Empty;
@@ -100,8 +106,22 @@ namespace BetServer
             address = address.Replace("localhost", IP);
 
 
-            proxy.GetServiceIP(Helper.Encrypt(address));
-
+            while (true)
+            {
+                proxy = new BetServerProxy(binding, address2);
+                if (proxy.GetServiceIP(Helper.Encrypt(address)))
+                {
+                    proxy.Close();
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Server not responding!");
+                    proxy.Abort();
+                    Thread.Sleep(1000);
+                    continue;
+                }
+            }
 
 
 
@@ -131,7 +151,7 @@ namespace BetServer
                     CheckUserGames();
             }
 
-            host.Close();
+            host.Close();//nece se host zatvoriti
         }
 
         private static void SendOffers() //slanje ponude kijentu svakih 5 minuta
@@ -197,10 +217,11 @@ namespace BetServer
                                 binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
                                 X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-                                EndpointAddress address = new EndpointAddress(new Uri("net.tcp://"+Helper.integrationHostAddress+":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+                                EndpointAddress address = new EndpointAddress(new Uri("net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
                                                           new X509CertificateEndpointIdentity(srvCert));
 
                                 BetServerProxy proxy;
+
                                 proxy = new BetServerProxy(binding, address);
 
                                 byte[] encryptedPort;
@@ -226,7 +247,7 @@ namespace BetServer
                                         {
                                             encryptedPrintPort = Helper.Encrypt(user.Value.PrintPort);
                                             if (proxy.CheckIfAlive(encryptedPrintPort, encryptedAddress, Helper.Encrypt(true)))
-                                            {                                                
+                                            {
                                                 proxy.SendOffers(encryptedOffers, encryptedPrintPort, encryptedAddress, Helper.Encrypt(true));
 
                                             }
@@ -234,10 +255,10 @@ namespace BetServer
                                         }
                                         if (proxy.CheckIfAlive(encryptedPort, encryptedAddress, Helper.Encrypt(false)))
                                         {
-                                           
-                                            proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress,Helper.Encrypt(false));
 
-                                           
+                                            proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress, Helper.Encrypt(false));
+
+
                                         }
                                     }
                                     else
@@ -245,21 +266,7 @@ namespace BetServer
                                 }
 
 
-                                //if (adresses.Count > 0)
-                                //{
-                                //    foreach (string address1 in adresses)
-                                //    {
-                                //        encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
-                                //        encryptedAddress = Helper.Encrypt(address1);
 
-                                //        if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
-                                //        {
-                                //            byte[] encryptedOffers = Helper.Encrypt(Offers);
-                                //            proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
-
-                                //        }
-                                //    }
-                                //}
                             }
                         }
                     }
@@ -377,7 +384,7 @@ namespace BetServer
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://"+Helper.integrationHostAddress+":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
                                       new X509CertificateEndpointIdentity(srvCert));
 
             BetServerProxy proxy = new BetServerProxy(binding, address);
@@ -396,16 +403,17 @@ namespace BetServer
 
 
 
+
             if (won)//koja je svrha
             {
                 User changeUser = user;
                 BetService betService = new BetService();
                 changeUser.BetAccount.Amount += ticket.CashPrize;
                 betService.EditUser(Helper.Encrypt(changeUser));
-                return true;
+
             }
 
-            return true; 
+            return true;
         }
 
 
@@ -516,23 +524,13 @@ namespace BetServer
                             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
                             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-                            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://"+Helper.integrationHostAddress+":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+                            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
                                                       new X509CertificateEndpointIdentity(srvCert));
 
                             BetServerProxy proxy = new BetServerProxy(binding, address);
 
                             byte[] encryptedPort, encryptedAddress, encryptedPrintPort;
-                            //foreach (KeyValuePair<string, User> user in BetService.BetUsers)
-                            //{
-                            //    encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
-                            //    encryptedAddress = Helper.Encrypt(user.Value.Address);
 
-                            //    if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
-                            //    {
-                            //        byte[] encryptedOffers = Helper.Encrypt(Offers);
-                            //        proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
-                            //    }
-                            //}
 
                             Dictionary<string, User> usersFromFile = new Dictionary<string, User>();//da li treba lock?
                             Object obj = Persistance.ReadFromFile("betUsers.txt");
@@ -548,8 +546,7 @@ namespace BetServer
                             {
                                 if (!string.IsNullOrEmpty(user.Value.Address))
                                 {
-                                    //encryptedPort = Helper.Encrypt(user.Value.Port);
-                                    //encryptedAddress = Helper.Encrypt(user.Value.Address);
+
 
                                     if (!adresses.Contains(user.Value.Address))
                                     {
@@ -565,45 +562,14 @@ namespace BetServer
                                         adresses.Add(user.Value.Address);
                                         sendOffers = true;
                                     }
-                                    //if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
-                                    //{
-                                    //    byte[] encryptedOffers = Helper.Encrypt(Offers);
-                                    //    proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress);
-                                    //}
+
                                 }
                                 else
                                     continue;
                             }
                             checkUserGames = true;
 
-                            //if (adresses.Count > 0)
-                            //{
-                            //    foreach (string address1 in adresses)
-                            //    {
-                            //        encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
-                            //        encryptedAddress = Helper.Encrypt(address1);
 
-                            //        if (proxy.CheckIfAlive(encryptedPort, encryptedAddress))
-                            //        {
-                            //            byte[] encryptedOffers = Helper.Encrypt(results);
-                            //            proxy.SendGameResults(encryptedOffers, encryptedPort, encryptedAddress);
-
-                            //        }
-                            //    }
-                               
-                            //}
-                            
-
-                            //encryptedPort = Helper.Encrypt(Helper.clientPrintPort);
-
-                            //if (proxy.CheckIfAlive(encryptedPort))
-                            //{
-                            //    byte[] encryptedResults = Helper.Encrypt(results);
-                            //    proxy.SendGameResults(encryptedResults, encryptedPort); //treba i port da se salje
-                            //    sendOffers = true;
-                            //}
-
-                            //  }
 
                         }
 
@@ -635,5 +601,3 @@ namespace BetServer
         }
     }
 }
-
-
