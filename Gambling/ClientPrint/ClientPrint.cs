@@ -61,5 +61,10 @@ namespace ClientPrint
         {
             throw new NotImplementedException();
         }
+
+        public bool CloseProxy()
+        {
+            return true;
+        }
     }
 }

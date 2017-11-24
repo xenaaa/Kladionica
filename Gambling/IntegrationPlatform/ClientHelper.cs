@@ -32,10 +32,13 @@ namespace IntegrationPlatform
 
 
             if (isItPrintClient)
+            {
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
+            }
             else
+            {
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
-
+            }
             proxy = new ClientProxy(binding, address);
 
             if (!Program.proxies.ContainsKey(addressIPv4))
@@ -44,6 +47,12 @@ namespace IntegrationPlatform
                 di.Add(port, proxy);
                 Program.proxies.Add(addressIPv4, di);
             }
+            else
+            {
+                if (!Program.proxies[addressIPv4].ContainsKey(port))
+                    Program.proxies[addressIPv4].Add(port, proxy);
+            }
+
 
             //if (!Program.proxies2.ContainsKey(port))
             //{
@@ -51,6 +60,11 @@ namespace IntegrationPlatform
             //}
 
             return proxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
+        }
+
+        public bool CloseProxy()
+        {
+            return proxy.CloseProxy();
         }
 
         public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo

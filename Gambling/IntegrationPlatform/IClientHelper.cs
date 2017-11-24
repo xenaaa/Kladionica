@@ -24,5 +24,9 @@ namespace Contracts
 
         [OperationContract]
         bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port,byte[] address);
+
+        [OperationContract]
+       bool CloseProxy();
+
     }
 }

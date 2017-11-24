@@ -154,7 +154,8 @@ namespace IntegrationPlatform
 
             int counter = 0;
 
-            System.IO.StreamReader file = new System.IO.StreamReader("ESB_2017-11-23.txt");
+
+            System.IO.StreamReader file = new System.IO.StreamReader("ESB_"+DateTime.Now.ToString("yyyy-MM-dd")+".txt");
 
             string temp = file.ReadLine();
 
@@ -189,11 +190,11 @@ namespace IntegrationPlatform
                                 first = line.IndexOf("\\") + "\\".Length;
                                 last = line.IndexOf(" ", first);
                                 username = line.Substring(first, last - first);
-                                first = line.IndexOf("address:") + "address:".Length;
-                                last = line.IndexOf("Port:", first);
+                                first = line.IndexOf("address: ") + "address: ".Length;
+                                last = line.IndexOf(" Port:", first);
                                 string address = line.Substring(first, last - first);
-                                first = line.IndexOf("Port:") + "Port:".Length;
-                                last = line.IndexOf("- User", first);
+                                first = line.IndexOf("Port: ") + "Port: ".Length;
+                                last = line.IndexOf(" - ", first);
                                 string port = line.Substring(first, last - first);
                                 IntrusionPrevention(username, Convert.ToInt32(port), address);
                             }
@@ -218,8 +219,14 @@ namespace IntegrationPlatform
             BankService bs2 = new BankService();
             bs2.IntrusionPrevention(Helper.Encrypt(username));
 
-            proxies[address][port].Close();
-          //  proxies2[port].Close();
+            foreach (var item in proxies[address].Values)
+            {
+                item.CloseProxy();
+                item.Abort();
+                item.Close();
+            }
+           // proxies[address][port].Close();
+
         }
     }
 }

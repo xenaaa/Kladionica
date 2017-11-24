@@ -37,6 +37,20 @@ namespace IntegrationPlatform
             }
         }
 
+        public bool CloseProxy()
+        {
+            try
+            {
+                return factory.CloseProxy();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
+        }
+
         public bool GetServiceIP(byte[] AddressStringBytes)
         {
             throw new NotImplementedException();

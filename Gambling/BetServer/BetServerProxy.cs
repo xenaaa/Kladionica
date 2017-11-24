@@ -42,6 +42,11 @@ namespace BetServer
 
         }
 
+        public bool CloseProxy()
+        {
+            throw new NotImplementedException();
+        }
+
         public bool GetServiceIP(byte[] AddressStringBytes)
         {
             try

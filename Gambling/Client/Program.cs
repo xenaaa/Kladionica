@@ -26,6 +26,8 @@ namespace Client
         }
         static int ClientPrintPort;
         static int port;
+        public static ClientBetProxy betProxy;
+        public static ClientBankProxy bankProxy;
         static void Main(string[] args)
         {
             bool bankAdmin = false;
@@ -182,18 +184,18 @@ namespace Client
         {
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BankIntegrationPlatform";
-            ClientBankProxy proxy = new ClientBankProxy(binding, address);
+            bankProxy = new ClientBankProxy(binding, address);
 
             double inputValue = 0;
             string password;
-            if (proxy.CheckIfAlive())
+            if (bankProxy.CheckIfAlive())
             {
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
                 {
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
-                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)));
+                } while (!bankProxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)));
 
                 while (true)
                 {
@@ -234,7 +236,7 @@ namespace Client
                             }
                         } while (inputValue == -1);
 
-                        proxy.Deposit(Helper.ObjectToByteArray(new Account(amount, accountNumber)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
+                        bankProxy.Deposit(Helper.ObjectToByteArray(new Account(amount, accountNumber)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]));
                     }
                     else if (inputValue == 2)
                         break;
@@ -250,15 +252,15 @@ namespace Client
         {
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform";
-            ClientBetProxy proxy = new ClientBetProxy(binding, address);
+            betProxy = new ClientBetProxy(binding, address);
 
             double inputValue = 0;
             string password;
 
-            if (proxy.CheckIfAlive())
+            if (betProxy.CheckIfAlive())
             {
 
-                proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort));
+                betProxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort));
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
@@ -266,7 +268,7 @@ namespace Client
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
-                } while (!proxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port)));
+                } while (!betProxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port)));
 
                 // proxy.AddUser(new User("lala", "lala", "Admin")); provjera autorizacije
 
@@ -352,7 +354,7 @@ namespace Client
                                             inputValue = CheckIfNumber(Console.ReadLine());
                                         } while (inputValue == -1);
                                         int payment = (int)inputValue;
-                                        MakeTicket(proxy, bets, payment);
+                                        MakeTicket(betProxy, bets, payment);
 
                                     }
                                     break;
@@ -467,7 +469,7 @@ namespace Client
                         Dictionary<string, int> addresses = new Dictionary<string, int>(); ;
 
                         string line;
-                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_2017-11-23.txt");
+                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_" + DateTime.Now.ToShortDateString() + ".txt");
                         while ((line = file.ReadLine()) != null)
                         {
                             if (line.Contains("deposited") || line.Contains("created"))
@@ -516,7 +518,7 @@ namespace Client
 
                         string line;
 
-                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_2017-11-23.txt");
+                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_" + DateTime.Now.ToShortDateString() + ".txt");
                         while ((line = file.ReadLine()) != null)
                         {
                             if (line.Contains("deposited") || line.Contains("created"))
@@ -653,7 +655,7 @@ namespace Client
                         Dictionary<string, int> addresses = new Dictionary<string, int>(); ;
 
                         string line;
-                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_2017-11-23.txt");
+                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_" + DateTime.Now.ToShortDateString() + ".txt");
                         while ((line = file.ReadLine()) != null)
                         {
                             if (!line.Contains("created") && !line.Contains("deposited"))
@@ -702,7 +704,7 @@ namespace Client
 
                         string line;
 
-                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_2017-11-23.txt");
+                        System.IO.StreamReader file = new System.IO.StreamReader("..\\..\\..\\IntegrationPlatform\\bin\\Debug\\ESB_" + DateTime.Now.ToShortDateString() + ".txt");
                         while ((line = file.ReadLine()) != null)
                         {
                             if (!line.Contains("created") && !line.Contains("deposited"))
