@@ -30,7 +30,7 @@ namespace BankServer
         public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes, byte[] addressBytes)
         {
             string username = (string)Helper.Decrypt(usernameBytes);
-            string password = (string)Helper.Decrypt(passwordBytes);
+            HashSet<string> password = (HashSet<string>)Helper.Decrypt(passwordBytes);
             int port = (int)Helper.Decrypt(portBytes);
             string addressIPv4 = (string)Helper.Decrypt(addressBytes);
 

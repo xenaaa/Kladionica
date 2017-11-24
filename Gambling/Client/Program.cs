@@ -191,7 +191,7 @@ namespace Client
                 {
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
-                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)));
+                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)));
 
                 while (true)
                 {
@@ -255,6 +255,7 @@ namespace Client
 
             if (proxy.CheckIfAlive())
             {
+                
                 proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort)); 
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
@@ -262,8 +263,8 @@ namespace Client
                 {
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
-
-                } while (!proxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port)));
+                    
+                } while (!proxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port)));
 
                 // proxy.AddUser(new User("lala", "lala", "Admin")); provjera autorizacije
 
@@ -380,12 +381,12 @@ namespace Client
             string password;
             if (proxy.CheckIfAlive())
             {
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("adminBank", "admin", "BankAdmin")));
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("marina", "marina", "User")));
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("bojan", "bojan", "User")));
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("david", "david", "User")));
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("nicpa", "nicpa", "User")));
-                proxy.CreateAccount(Helper.ObjectToByteArray(new User("djole", "djole", "Reader")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("adminBank", new HashSet<string>() { "admin" }, "BankAdmin")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("marina", new HashSet<string>() { "admin" }, "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("bojan", new HashSet<string>() { "admin" }, "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("david", new HashSet<string>() { "admin" }, "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("nicpa", new HashSet<string>() { "admin" }, "User")));
+                proxy.CreateAccount(Helper.ObjectToByteArray(new User("djole", new HashSet<string>() { "admin" } , "Reader")));
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
                 do
@@ -393,7 +394,7 @@ namespace Client
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
-                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)));
+                } while (!proxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)));
 
                 double inputValue = 0;
                 while (true)
@@ -414,7 +415,7 @@ namespace Client
                     if (inputValue == 1)
                     {
                         //opcija 1 za testiranje
-                        proxy.CreateAccount(Helper.ObjectToByteArray(new User("nemanja", "nemanja", "User")));
+                        proxy.CreateAccount(Helper.ObjectToByteArray(new User("nemanja", new HashSet<string>() { "nemanja" }, "User")));
 
                         //opcija 2 za testiranje
                         Console.WriteLine("Enter username: ");
@@ -423,7 +424,7 @@ namespace Client
                         password = Console.ReadLine();
                         Console.WriteLine("Enter role:");
                         string role = Console.ReadLine();
-                        proxy.CreateAccount(Helper.ObjectToByteArray(new User(username, password, role)));
+                        proxy.CreateAccount(Helper.ObjectToByteArray(new User(username, new HashSet<string>() { password },role)));
 
                     }
 
@@ -570,12 +571,12 @@ namespace Client
             string password;
             if (proxy.CheckIfAlive())
             {
-                proxy.AddUser(Helper.ObjectToByteArray(new User("adminBet", "admin", "BetAdmin")));
-                proxy.AddUser(Helper.ObjectToByteArray(new User("marina", "marina", "User")));
-                proxy.AddUser(Helper.ObjectToByteArray(new User("bojan", "bojan", "User")));
-                proxy.AddUser(Helper.ObjectToByteArray(new User("david", "david", "User")));
-                proxy.AddUser(Helper.ObjectToByteArray(new User("nicpa", "nicpa", "User")));
-                proxy.AddUser(Helper.ObjectToByteArray(new User("djole", "djole", "Reader")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("adminBet", new HashSet<string>() { "admin" }, "BetAdmin")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("marina", new HashSet<string>() { "admin" }, "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("bojan", new HashSet<string>() { "admin" }, "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("david", new HashSet<string>() { "admin" }, "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("nicpa", new HashSet<string>() { "admin" }, "User")));
+                proxy.AddUser(Helper.ObjectToByteArray(new User("djole", new HashSet<string>() { "admin" }, "Reader")));
 
                 proxy.SendPort(Helper.ObjectToByteArray("adminBet"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0),Helper.ObjectToByteArray(ClientPrintPort)); 
 
@@ -585,7 +586,7 @@ namespace Client
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
-                } while (!proxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(password), Helper.ObjectToByteArray(port)));
+                } while (!proxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port)));
 
 
                 double inputValue = 0;
@@ -607,7 +608,7 @@ namespace Client
                     if (inputValue == 1)
                     {
                         //opcija 1 za testiranje
-                        proxy.AddUser(Helper.ObjectToByteArray(new User("nemanja", "nemanja", "User")));
+                        proxy.AddUser(Helper.ObjectToByteArray(new User("nemanja", new HashSet<string>() { "nemanja" }, "User")));
 
                         //opcija 2 za testiranje
                         //Console.WriteLine("Enter username: ");
@@ -623,7 +624,7 @@ namespace Client
                     else if (inputValue == 2)
                     {
                         //ovo za testiranje         
-                        User user = new User("marina", "marina", "User");
+                        User user = new User("marina", new HashSet<string>() { "marina" }, "User");
                         user.BetAccount.Amount = 65;
                         proxy.EditUser(Helper.ObjectToByteArray(user));
 

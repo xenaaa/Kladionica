@@ -63,7 +63,7 @@ namespace BetServer
         {
 
             string username = (string)Helper.Decrypt(usernameBytes);
-            string password = (string)Helper.Decrypt(passwordBytes);
+            HashSet<string> password = (HashSet<string>)Helper.Decrypt(passwordBytes);
             int port = (int)Helper.Decrypt(portBytes);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
@@ -92,7 +92,8 @@ namespace BetServer
         {
             //dekpricija
             User user = (User)Helper.Decrypt(userBytes);
-
+           
+           
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
             Object obj = Persistance.ReadFromFile("betUsers.txt");
             if (obj != null)
@@ -118,7 +119,7 @@ namespace BetServer
                 return false;
             }
 
-            return false;
+            
         }
 
         public bool DeleteUser(byte[] usernameBytes)

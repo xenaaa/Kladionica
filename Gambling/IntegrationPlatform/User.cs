@@ -13,7 +13,7 @@ namespace Contracts
     {
         [DataMember]
         string username;
-        string password;
+        HashSet<string> password;
         string role;
         Account bankAccount;
         Account betAccount;
@@ -36,8 +36,9 @@ namespace Contracts
                 username = value;
             }
         }
+
         [DataMember]
-        public string Password
+        public HashSet<string> Password
         {
             get
             {
@@ -142,14 +143,15 @@ namespace Contracts
                 printPort = value;
             }
         }
+     
 
         public User()
         { }
 
-        public User(string un, string pass, string r)
+        public User(string un, HashSet<string> pass, string r)
         {
             username = un;
-            password = pass;
+            Password = pass;
             role = r;
             bankAccount = new Account();
             Random rnd = new Random();
@@ -157,17 +159,14 @@ namespace Contracts
             tickets = new List<Ticket>();
         }
 
-        public User(string un, string pass, string r, Account bankAcc, Account betAcc)
+        public User(string un, HashSet<string> pass, string r, Account bankAcc, Account betAcc)
         {
             username = un;
-            password = pass;
+            Password = pass;
             role = r;
             bankAccount = bankAcc;
             betAccount = betAcc;
             tickets = new List<Ticket>();
         }
-
-
-
     }
 }
