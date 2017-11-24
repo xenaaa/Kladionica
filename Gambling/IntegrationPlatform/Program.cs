@@ -221,8 +221,7 @@ namespace IntegrationPlatform
 
             foreach (var item in proxies[address].Values)
             {
-                item.CloseProxy();
-                item.Abort();
+                item.CloseProxy();             
                 item.Close();
             }
            // proxies[address][port].Close();

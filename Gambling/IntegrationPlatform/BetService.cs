@@ -111,13 +111,13 @@ namespace IntegrationPlatform
                 if (proxy.AddUser(encryptedUser))
                 {
                     Audit.AddUser(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString());
-                    loger.Info("IP address: {0} Port: {1} - User {2} is added.", Helper.GetIP(), user.Port, user.Username);
+                    loger.Info("IP address: {0} Port: {1} - User {2} is added.", Helper.GetIP(), Helper.GetPort(), user.Username);
                     allowed = true;
                 }
                 else
                 {
                     Audit.AddUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString(), "error");
-                    loger.Warn("IP address: {0} Port: {1} - Failed to add user {2}.", Helper.GetIP(), user.Port, user.Username);
+                    loger.Warn("IP address: {0} Port: {1} - Failed to add user {2}.", Helper.GetIP(), Helper.GetPort(), user.Username);
                     allowed = false;
                 }
             }
@@ -125,7 +125,7 @@ namespace IntegrationPlatform
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser", "not authorized");
                 Audit.AddUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString(), "not authorized");
-                loger.Warn("IP address: {0} Port: {1} - Failed to add user {2} (not authorized).", Helper.GetIP(), user.Port, user.Username);
+                loger.Warn("IP address: {0} Port: {1} - Failed to add user {2} (not authorized).", Helper.GetIP(), Helper.GetPort(), user.Username);
                 allowed = false;
             }
             return allowed;
