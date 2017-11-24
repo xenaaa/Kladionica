@@ -30,8 +30,6 @@ namespace IntegrationPlatform
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
-            //EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:"+ Helper.betServicePort + "/BetService"),
-            //                          new X509CertificateEndpointIdentity(srvCert));
 
             string IP = string.Empty;
             var hostIP = Dns.GetHostEntry(Dns.GetHostName());
@@ -70,28 +68,24 @@ namespace IntegrationPlatform
                 {
                     Audit.AuthenticationSuccess(principal.Identity.Name.Split('\\')[1].ToString());
                     Audit.LogIn(principal.Identity.Name.Split('\\')[1].ToString());
-                    loger.Info("IP address: {0} Port: {1} - User {2} logged in.", Helper.GetIP(), port, username);
+                    loger.Info("IP address: {0} Port: {1} - Bet login successful.", Helper.GetIP(), port);
                     allowed = true;
                 }
                 else
                 {
-
                     Audit.LogInFailed(principal.Identity.Name.Split('\\')[1].ToString(), "wrong password");
-                    loger.Warn("IP address: {0} Port: {1} - User {2} failed to log in.", Helper.GetIP(), port, username);
+                    loger.Warn("IP address: {0} Port: {1} - Bet login failed.", Helper.GetIP(), port);
                     allowed = false;
                 }
             }
 
             else
             {
-
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser", "not authorized");
                 Audit.LogInFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
-
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "BetLogin", "not authorized");
-                loger.Warn("IP address: {0} Port: {1} - User {2} not authorized to log in.", Helper.GetIP(), port, username);
-
-                return false;
+                loger.Warn("IP address: {0} Port: {1} -Bet login failed (not authorized).", Helper.GetIP(), port);
+                allowed = false;
             }
             return allowed;
         }
@@ -113,19 +107,26 @@ namespace IntegrationPlatform
                 Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser");
 
                 byte[] encryptedUser = Helper.EncryptOnIntegration(userBytes);
-                proxy.AddUser(encryptedUser);
 
-                loger.Info("IP address: {0} Port: {1} - User {2} has been added.", Helper.GetIP(), user.Port, user.Username);
-
-                Audit.AddUser(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString());
-                allowed = true;
+                if (proxy.AddUser(encryptedUser))
+                {
+                    Audit.AddUser(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString());
+                    loger.Info("IP address: {0} Port: {1} - User {2} is added.", Helper.GetIP(), user.Port, user.Username);
+                    allowed = true;
+                }
+                else
+                {
+                    Audit.AddUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString(), "error");
+                    loger.Warn("IP address: {0} Port: {1} - Failed to add user {2}.", Helper.GetIP(), user.Port, user.Username);
+                    allowed = false;
+                }
             }
             else
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser", "not authorized");
                 Audit.AddUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString(), "not authorized");
-
-                loger.Warn("IP address: {0} Port: {1} - User {2} not authorized to add.", Helper.GetIP(), user.Port, user.Username);
+                loger.Warn("IP address: {0} Port: {1} - Failed to add user {2} (not authorized).", Helper.GetIP(), user.Port, user.Username);
+                allowed = false;
             }
             return allowed;
         }
@@ -157,20 +158,26 @@ namespace IntegrationPlatform
 
                 byte[] encryptedUser = Helper.EncryptOnIntegration(usernameBytes);
 
-                proxy.DeleteUser(encryptedUser);
+                if (proxy.DeleteUser(encryptedUser))
+                {
+                    Audit.DeleteUser(principal.Identity.Name.Split('\\')[1].ToString(), username);
+                    loger.Info("IP address: {0} Port: {1} - User {2} is deleted.", Helper.GetIP(), port, username);
+                    allowed = true;
+                }
 
-                Audit.DeleteUser(principal.Identity.Name.Split('\\')[1].ToString(), username);
-
-                loger.Info("IP address: {0} Port: {1} - User {2} has been deleted.", Helper.GetIP(), port, username);
-
-                allowed = true;
+                else
+                {
+                    Audit.DeleteUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), username, "error");
+                    loger.Warn("IP address: {0} Port: {1} - Failed to delete user {2}.", Helper.GetIP(), port, username);
+                    allowed = false;
+                }
             }
             else
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "DeleteUser", "not authorized");
                 Audit.DeleteUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), username, "not authorized");
-
-                loger.Warn("IP address: {0} Port: {1} - User {2} is not authorized to delete.", Helper.GetIP(), port, username);
+                loger.Warn("IP address: {0} Port: {1} - Failed to delete user {2} (not authorized).", Helper.GetIP(), port, username);
+                allowed = false;
             }
             return allowed;
         }
@@ -186,21 +193,29 @@ namespace IntegrationPlatform
                 Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "editUser");
 
                 byte[] encryptedUser = Helper.EncryptOnIntegration(userBytes);
-                proxy.EditUser(encryptedUser);
 
-                Audit.EditUser(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString());
-
-                loger.Info("IP address: {0} Port: {1} - User {2} has been edited.", Helper.GetIP(), user.Port, user.Username.ToString());
-                allowed = true;
+                if (proxy.EditUser(encryptedUser))
+                {
+                    Audit.EditUser(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString());
+                    loger.Info("IP address: {0} Port: {1} - User {2} is edited.", Helper.GetIP(), user.Port, user.Username.ToString());
+                    allowed = true;
+                }
+                else
+                {
+                    Audit.EditUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString(), "error");
+                    loger.Warn("IP address: {0} Port: {1} - Failed to edit user {2}.", Helper.GetIP(), user.Port, user.Username.ToString());
+                    allowed = false;
+                }
             }
             else
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "EditUser", "not authorized");
                 Audit.EditUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString(), "not authorized");
-
-                loger.Warn("IP address: {0} Port: {1} - User {2} not authorized to edit.", Helper.GetIP(), user.Port, user.Username.ToString());
+                loger.Warn("IP address: {0} Port: {1} - Failed to edit user {2} (not authorized).", Helper.GetIP(), user.Port, user.Username.ToString());
+                allowed = false;
             }
             return allowed;
+
         }
 
 
@@ -245,29 +260,36 @@ namespace IntegrationPlatform
 
                 string addressIPv4 = Helper.GetIP();
 
-                proxy.SendTicket(encryptedTicket, encryptedUsername);
-                Audit.TicketSent(principal.Identity.Name.Split('\\')[1].ToString());
-
-                loger.Info("IP address: {0} Port: {1} - User {2} sent ticket.", Helper.GetIP(), port, username);
-
-                allowed = true;
+                if (proxy.SendTicket(encryptedTicket, encryptedUsername))
+                {
+                    Audit.TicketSent(principal.Identity.Name.Split('\\')[1].ToString());
+                    loger.Info("IP address: {0} Port: {1} - Ticket sent.", Helper.GetIP(), port);
+                    allowed = true;
+                }
+                else
+                {
+                    Audit.TicketSentFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not enough money");
+                    loger.Warn("IP address: {0} Port: {1} - Failed to send ticket.", Helper.GetIP(), port);
+                    allowed = false;
+                }
             }
             else
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "sendticket", "not authorized");
                 Audit.TicketSentFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
-
-                loger.Warn("IP address: {0} Port: {1} - User {2} not authorized to send ticket.", Helper.GetIP(), port, username);
+                loger.Warn("IP address: {0} Port: {1} - Failed to send ticket (not authorized).", Helper.GetIP(), port);
+                allowed = false;
             }
             return allowed;
         }
 
         public bool Deposit(byte[] accBytes, byte[] usernameBytes)
         {
-            proxy.Deposit(accBytes, usernameBytes);
-            return true;
+
+            return proxy.Deposit(accBytes, usernameBytes);
 
         }
+
         public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo
         {
             string AddressString = Helper.Decrypt(AddressStringBytes) as string;
@@ -277,8 +299,7 @@ namespace IntegrationPlatform
 
         public bool IntrusionPrevention(byte[] user)
         {
-            proxy.IntrusionPrevention(user);
-            return true;
+            return proxy.IntrusionPrevention(user);
         }
     }
 }

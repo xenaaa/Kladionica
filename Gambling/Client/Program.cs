@@ -255,7 +255,6 @@ namespace Client
 
             if (proxy.CheckIfAlive())
             {
-                Console.WriteLine("gasga");
                 proxy.SendPort(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort)); 
 
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
