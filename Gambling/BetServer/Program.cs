@@ -128,8 +128,6 @@ namespace BetServer
 
 
 
-            Console.WriteLine("Bet service is started.");
-            Console.WriteLine("Press <enter> to stop service...");
 
             BetService bs = new BetService();
 
@@ -147,13 +145,25 @@ namespace BetServer
                 SendGameResults();
             }).Start();
 
-
-            while (true)
+            new Thread(() =>
             {
-                if (checkUserGames)
+                Thread.CurrentThread.IsBackground = true;
                     CheckUserGames();
-            }
+            }).Start();
 
+            //while (true)
+            //{
+
+            //    if (checkUserGames)
+            //        CheckUserGames();
+            //    else
+            //        Thread.Sleep();
+            //}
+
+            Console.WriteLine("Bet service is started.");
+            Console.WriteLine("Press <enter> to stop service...");
+
+            Console.ReadLine();
             host.Close();//nece se host zatvoriti
         }
 
@@ -178,7 +188,7 @@ namespace BetServer
                         {
                             break;
                         }
-                        //     now = DateTime.Now;
+                        Thread.Sleep(200);
                     } while (start.AddSeconds(15) > DateTime.Now);
 
                     sendOffers = false;
@@ -280,6 +290,21 @@ namespace BetServer
 
         private static bool CheckUserGames()//svake 2 sekunde proverava da li su se zavrsile sve utakmice na tiketima za svakog User-a pojedinacno. Ako su sve utakmice na tiketu zavrsene tikes se salje na proveru i brise
         {
+            while (true)
+            {
+                DateTime start = DateTime.Now;
+                //   DateTime now;
+
+                do
+                {
+                    if (checkUserGames)
+                    {
+                        break;
+                    }
+                    Thread.Sleep(200);
+                } while (start.AddMilliseconds(500) > DateTime.Now);
+
+
             checkUserGames = false;
             bool allGamesDone = true;
             Ticket t = new Ticket();
@@ -352,6 +377,7 @@ namespace BetServer
 
                 }
 
+            }
             }
             return true;
         }
@@ -430,17 +456,23 @@ namespace BetServer
 
             List<int> finishedGame = new List<int>();
 
-            int index;
-            int home;
-            int away;
-            int tip;
-            int offersNumber;
-            int finished;
-            int j;
+            int index, home, away, tip, offersNumber, finished, j;
 
+            Dictionary<string, User> usersFromFile = new Dictionary<string, User>();
+            Object obj;
             while (true)
             {
+
+
                 Thread.Sleep(20000);
+
+
+
+                obj = Persistance.ReadFromFile("betUsers.txt");
+                if (obj != null)
+                    usersFromFile = (Dictionary<string, User>)obj;
+                if (usersFromFile.Values.Any(x => x.Role == "User" && !string.IsNullOrEmpty(x.Address)))
+                {
 
                 j = 0;
                 if (Offers.Count > 0)
@@ -496,7 +528,7 @@ namespace BetServer
 
                             results.Add(game);
 
-                            Object obj = Persistance.ReadFromFile("results.txt");
+                                obj = Persistance.ReadFromFile("results.txt");
                             Dictionary<int, Game> resultsFromFile = new Dictionary<int, Game>(); //citamo iz fajla rezultate
                             if (obj != null)
                                 resultsFromFile = (Dictionary<int, Game>)obj;
@@ -535,10 +567,7 @@ namespace BetServer
                             byte[] encryptedPort, encryptedAddress, encryptedPrintPort;
 
 
-                            Dictionary<string, User> usersFromFile = new Dictionary<string, User>();//da li treba lock?
-                            Object obj = Persistance.ReadFromFile("betUsers.txt");
-                            if (obj != null)
-                                usersFromFile = (Dictionary<string, User>)obj;
+
 
 
 
@@ -575,6 +604,7 @@ namespace BetServer
 
                     }
                 }
+            }
             }
             return true;
         }

@@ -13,7 +13,7 @@ namespace Contracts
     {
         [DataMember]
         string username;
-        HashSet<string> password;
+        string password;
         string role;
         Account bankAccount;
         Account betAccount;
@@ -38,7 +38,7 @@ namespace Contracts
         }
 
         [DataMember]
-        public HashSet<string> Password
+        public string Password
         {
             get
             {
@@ -148,7 +148,7 @@ namespace Contracts
         public User()
         { }
 
-        public User(string un, HashSet<string> pass, string r)
+        public User(string un, string pass, string r)
         {
             username = un;
             Password = pass;
@@ -159,7 +159,7 @@ namespace Contracts
             tickets = new List<Ticket>();
         }
 
-        public User(string un, HashSet<string> pass, string r, Account bankAcc, Account betAcc)
+        public User(string un, string pass, string r, Account bankAcc, Account betAcc)
         {
             username = un;
             Password = pass;

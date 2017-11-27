@@ -81,7 +81,7 @@ namespace Client
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("\nWin: " + ticket.CashPrize);
                         Console.ForegroundColor = ConsoleColor.White;
-                        Console.WriteLine("\n*********************************************************************************");
+                        Console.WriteLine("\n*********************************************************************************\n");
 
 
 
@@ -117,7 +117,7 @@ namespace Client
                         }
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine("\nWin: 0");
-                        Console.WriteLine("**********************************************************************************"); ;
+                        Console.WriteLine("\n**********************************************************************************\n"); ;
                     }
                     Monitor.Exit(PrintLock);
                 }

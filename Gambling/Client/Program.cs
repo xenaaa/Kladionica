@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
@@ -16,13 +17,22 @@ namespace Client
 {
     class Program
     {
+        static int FreeTcpPort()
+        {
+            TcpListener l = new TcpListener(IPAddress.Loopback, 0);
+            l.Start();
+            int port = ((IPEndPoint)l.LocalEndpoint).Port;
+            l.Stop();
+            return port;
+        }
         static int ClientPrintPort;
         static int port;
-        static bool BetDisconnected;
-        static bool BankDisconnected;
 
         private static ClientBetProxy betProxy;
         private static ClientBankProxy bankProxy;
+        static bool BetDisconnected;
+        static bool BankDisconnected;
+
 
         public static ClientBetProxy BetProxy
         {
@@ -50,25 +60,24 @@ namespace Client
             }
         }
 
-        static int FreeTcpPort()
-        {
-            TcpListener l = new TcpListener(IPAddress.Loopback, 0);
-            l.Start();
-            int port = ((IPEndPoint)l.LocalEndpoint).Port;
-            l.Stop();
-            return port;
-        }
 
+        public static SHA512 shaHash;
         static void Main(string[] args)
         {
             bool bankAdmin = false;
             bool betAdmin = false;
+            shaHash = SHA512.Create();
 
-            port = FreeTcpPort();
-            Console.WriteLine(port);
+            //proveriti da lie je jedan vec otvoren
+
 
             NetTcpBinding binding = new NetTcpBinding();
 
+            port = FreeTcpPort();
+
+            //Console.WriteLine("Enter port: ");
+            //int port = Convert.ToInt32(Console.ReadLine());
+            //int port = Convert.ToInt32(args[0]);
             string address = "net.tcp://localhost:" + port + "/ClientHelper";
 
             ServiceHost host = new ServiceHost(typeof(ClientHelper));
@@ -93,6 +102,7 @@ namespace Client
             binding2.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
 
             WindowsIdentity clientIdentity = WindowsIdentity.GetCurrent();
+            Console.WriteLine("\n\nGRUPEEEE\n");
             foreach (IdentityReference group in clientIdentity.Groups)
             {
 
@@ -106,7 +116,6 @@ namespace Client
                     Console.WriteLine(name.ToString());
                     bankAdmin = true;
                 }
-
                 //ako je admin kladionice dole mu posebne opcije dajemo
                 if (name.ToString().Contains("\\BetAdmin"))
                 {
@@ -115,7 +124,6 @@ namespace Client
                 }
             }
 
-            //ako nije admin banke otvaramo mu poseban prozor za prikaz ponuda i rezultat
             if (!bankAdmin)
             {
                 Process[] clientPrint = Process.GetProcessesByName("ClientPrint");
@@ -130,6 +138,9 @@ namespace Client
                     ClientPrintPort = FreeTcpPort();
 
                     p.StartInfo.Arguments = ClientPrintPort.ToString();
+
+
+
                     p.StartInfo.UseShellExecute = true;
 
                     p.StartInfo.CreateNoWindow = false;
@@ -139,18 +150,11 @@ namespace Client
 
             if (bankAdmin)
             {
-             //   while (true)
-                {
-                    BankAdmin(clientIdentity, port);
-                   // Thread.Sleep(3000);
-                }
+                BankAdmin(clientIdentity, port);
             }
             else if (betAdmin)
             {
-             //   while (true)
-                {
-                    BetAdmin(clientIdentity, port);
-                }
+                BetAdmin(clientIdentity, port);
             }
 
             else
@@ -185,368 +189,50 @@ namespace Client
                     }
                 }
             }
-            Console.WriteLine("Press any key to exit..");
-            Console.ReadLine();
             host.Close();
         }
 
-        private static void BetAdmin(WindowsIdentity clientIdentity, int port)
+
+        private static bool MakeTicket(Dictionary<int, Game> bets, int payment)
         {
-            NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform";
-
-            BetProxy = new ClientBetProxy(binding, address);
-
-            BetDisconnected = false;
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-                CheckBetConnection();
-            }).Start();
-
-
-            string password;
+            WindowsIdentity clientIdentity = WindowsIdentity.GetCurrent();
+            Ticket ticket = new Ticket(bets, payment);
 
             if (!BetDisconnected)
             {
-                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("adminBet", new HashSet<string>() { "admin" }, "BetAdmin")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("marina", new HashSet<string>() { "marina" }, "User")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("bojan", new HashSet<string>() { "bojan" }, "User")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("david", new HashSet<string>() { "david" }, "User")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("nicpa", new HashSet<string>() { "nicpa" }, "User")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("djole", new HashSet<string>() { "djole" }, "Reader")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                BetProxy.SendPort(Helper.ObjectToByteArray("adminBet"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort));
-
-                Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
-
-                while (true)
+                if (betProxy.SendTicket(Helper.ObjectToByteArray(ticket), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
                 {
-                    if (BetDisconnected)
-                        break;
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\n************************************TICKET**************************************\n");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.WriteLine("-----------------------------------------------------------------------------------");
+                    Console.WriteLine("ID |       HOME        |       AWAY        |       ODDS      |       TIP       ");
+                    Console.WriteLine("-----------------------------------------------------------------------------------");
 
-                    Console.WriteLine("Enter password:");
-                    password = Console.ReadLine();
+                    foreach (KeyValuePair<int, Game> item in ticket.Bets)
+                    {
+                        Console.WriteLine(String.Format("{0,-10} {1,-10}          {2,-10}             {3,-5}           {4,-5}  ", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.BetOffer.Odds[item.Value.Tip], item.Value.Tip));
+                    }
 
-                    if (!BetProxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port)))
-                        Console.WriteLine("Wrong password. Try again");
-                    else
-                        break;
-
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\nPossible win: " + ticket.CashPrize);
+                    Console.WriteLine("\n*********************************************************************************");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
 
-                double inputValue = 0;
-                while (true)
+                else
                 {
-                    if (BetDisconnected)
-                        break;
-
-                    do
-                    {
-                        if (BetDisconnected)
-                            break;
-                        Console.WriteLine("\n*******BET ADMIN OPTIONS*******\n");
-                        Console.WriteLine("Press 1 for adding new client.");
-                        Console.WriteLine("Press 2 for editing client.");
-                        Console.WriteLine("Press 3 for deleting client.");
-                        Console.WriteLine("Press 4 for report.");
-                        Console.WriteLine("Press 5 for exit.");
-                        inputValue = CheckIfNumber(Console.ReadLine());
-
-                    } while (inputValue != 1 && inputValue != 2 && inputValue != 3 && inputValue != 4 && inputValue != 5);
-
-                    if (inputValue == 1)
-                    {
-                        //opcija 1 za testiranj
-                        if (BetDisconnected)
-                            break;
-
-                        if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("nemanja", new HashSet<string>() { "nemanja" }, "User")), Helper.ObjectToByteArray(port)))
-                            Console.WriteLine("User already exists");
-
-                        //opcija 2 za testiranje
-                        //Console.WriteLine("Enter username: ");
-                        //string username = Console.ReadLine();
-                        //Console.WriteLine("Enter password:");
-                        //password = Console.ReadLine();
-                        //Console.WriteLine("Enter role:");
-                        //string role = Console.ReadLine();
-                        // if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User(username, new HashSet<string>() { password }, role))))
-                        //    Console.WriteLine("User already exists");
-
-                    }
-
-                    else if (inputValue == 2)
-                    {
-                        //ovo za testiranje         
-                        User user = new User("marina", new HashSet<string>() { "marina" }, "User");
-                        user.BetAccount.Amount = 65;
-
-                        if (BetDisconnected)
-                            break;
-                        if (!BetProxy.EditUser(Helper.ObjectToByteArray(user), Helper.ObjectToByteArray(port)))
-                            Console.WriteLine("User doesn't exist");
-
-
-                        //ili ovo za testiranje
-                        //Console.WriteLine("Enter username: ");
-                        //string username = Console.ReadLine();
-                        //User user2 = new User(username, username, "User");
-                        //user2.BetAccount.Amount = 1000;
-                        //if(!BetProxy.EditUser(user2));
-                        //Console.WriteLine("User doesn't exist");
-                    }
-                    else if (inputValue == 3)
-                    {
-                        //ovo za testiranje   
-                        if (BetDisconnected)
-                            break;
-
-                        if (!BetProxy.DeleteUser(Helper.ObjectToByteArray("marina"), Helper.ObjectToByteArray(port)))
-                            Console.WriteLine("User doesn't exist");
-
-                        //ili ovo za testiranje
-                        //Console.WriteLine("Enter username: ");
-                        //string username = Console.ReadLine();
-                        //if(!BetProxy.DeleteUser(username));
-                        //Console.WriteLine("User doesn't exist");
-                    }
-                    else if (inputValue == 4)
-                    {
-                        if (BetDisconnected)
-                            break;
-
-                        List<Dictionary<string, int>> dictionaries = BetProxy.Report();
-
-                        if (dictionaries != null)
-                        {
-                            if (File.Exists("report.txt"))
-                            {
-                                File.WriteAllText("report.txt", string.Empty);
-                            }
-                            else
-                            {
-                                File.Create("report.txt");
-                            }
-
-                            using (var sw = new StreamWriter("report.txt", true))
-                            {
-                                sw.WriteLine("ADDRESSES\n");
-                                foreach (var item in dictionaries[0])
-                                {
-                                    sw.WriteLine(item);
-                                }
-
-                                sw.WriteLine("USERS\n");
-                                foreach (var item in dictionaries[1])
-                                {
-                                    sw.WriteLine(item);
-                                }
-
-                                sw.Close();
-                            }
-                        }
-                    }
-
-                    else if (inputValue == 5)
-                    {
-                        break;
-                    }
+                    Console.WriteLine("Your ticket is not send! (You don't have permission to send ticket or you don't have enough money.");
                 }
             }
-        }
-
-
-        private static void BankAdmin(WindowsIdentity clientIdentity, int port)
-        {
-            NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BankIntegrationPlatform";
-
-            bankProxy = new ClientBankProxy(binding, address);
-
-            BankDisconnected = false;
-            new Thread(() =>
+            else
             {
-                Thread.CurrentThread.IsBackground = true;
-                CheckBankConnection();
-            }).Start();
-
-
-            string password;
-            if (!BankDisconnected)
-            {
-                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("adminBank", new HashSet<string>() { "admin" }, "BankAdmin")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("marina", new HashSet<string>() { "marina" }, "User")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("bojan", new HashSet<string>() { "bojan" }, "User")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("david", new HashSet<string>() { "david" }, "User")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("nicpa", new HashSet<string>() { "nicpa" }, "User")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("djole", new HashSet<string>() { "djole" }, "Reader")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
-
-                Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
-                while (true)
-                {
-                    Console.WriteLine("Enter password:");
-
-                    if (BankDisconnected)
-                        break;
-
-                    password = Console.ReadLine();
-                    if (!bankProxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)))
-                        Console.WriteLine("Wrong password. Try again");
-                    else
-                        break;
-                }
-
-
-                double inputValue = 0;
-                while (true)
-                {
-                    if (BankDisconnected)
-                        break;
-
-                    do
-                    {
-                        if (BankDisconnected)
-                            break;
-                        Console.WriteLine("\n*****BANK ADMIN OPTIONS******\n");
-                        Console.WriteLine("Press 1 for creating new account.");
-                        Console.WriteLine("Press 2 for deposit.");
-                        Console.WriteLine("Press 3 for report.");
-                        Console.WriteLine("Press 4 for exit.");
-                        inputValue = CheckIfNumber(Console.ReadLine());
-
-                    } while (inputValue != 1 && inputValue != 2 && inputValue != 3 && inputValue != 4);
-
-
-                    if (inputValue == 1)
-                    {
-                        //opcija 1 za testiranje
-                        if (BankDisconnected)
-                            break;
-                        if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("nemanja", new HashSet<string>() { "nemanja" }, "User")), Helper.ObjectToByteArray(port)))
-                            Console.WriteLine("User already exists");
-
-                        //opcija 2 za testiranje
-                        //Console.WriteLine("Enter username: ");
-                        //string username = Console.ReadLine();
-                        //Console.WriteLine("Enter password:");
-                        //password = Console.ReadLine();
-                        //Console.WriteLine("Enter role:");
-                        //string role = Console.ReadLine();
-                        //if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User(username, new HashSet<string>() { password }, role))))
-                        //    Console.WriteLine("User already exists");
-
-                    }
-
-                    else if (inputValue == 2)
-                    {
-                        //ovo za testiranje
-                        if (BankDisconnected)
-                            break;
-                        if (!bankProxy.Deposit(Helper.ObjectToByteArray(new Account(4, 12)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
-                            Console.WriteLine("Deposit failed");
-
-                        if (BankDisconnected)
-                            break;
-                        if (!bankProxy.Deposit(Helper.ObjectToByteArray(new Account(4, 15)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]),Helper.ObjectToByteArray(port)))
-                            Console.WriteLine("Deposit failed");
-
-                        //ili ovo za testiranje
-                        int accountNumber = 0;
-                        double amount = 0;
-                        do
-                        {
-                            if (BankDisconnected)
-                                break;
-                            Console.WriteLine("Enter account number: ");
-                            inputValue = CheckIfNumber(Console.ReadLine());
-                            if (inputValue != -1)
-                            {
-                                accountNumber = (int)inputValue;
-                            }
-                        } while (inputValue == -1);
-
-                        do
-                        {
-                            if (BankDisconnected)
-                                break;
-                            Console.WriteLine("Enter amount:");
-                            inputValue = CheckIfNumber(Console.ReadLine());
-                            if (inputValue != -1)
-                            {
-                                amount = inputValue;
-                            }
-                        } while (inputValue == -1);
-
-                        if (BankDisconnected)
-                            break;
-                        if (!bankProxy.Deposit(Helper.ObjectToByteArray(new Account(amount, accountNumber)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]),Helper.ObjectToByteArray(port)))
-                            Console.WriteLine("Deposit failed");
-                    }
-                    else if (inputValue == 3)
-                    {
-                        if (BankDisconnected)
-                            break;
-                        List<Dictionary<string, int>> dictionaries = bankProxy.Report();
-
-                        if (dictionaries != null)
-                        {
-
-                            if (File.Exists("report.txt"))
-                            {
-                                File.WriteAllText("report.txt", string.Empty);
-                            }
-                            else
-                            {
-                                File.Create("report.txt");
-                            }
-
-                            using (var sw = new StreamWriter("report.txt", true))
-                            {
-                                sw.WriteLine("ADDRESSES\n");
-                                foreach (var item in dictionaries[0])
-                                {
-                                    sw.WriteLine(item);
-                                }
-
-                                sw.WriteLine("USERS\n");
-                                foreach (var item in dictionaries[1])
-                                {
-                                    sw.WriteLine(item);
-                                }
-
-                                sw.Close();
-                            }
-                        }
-                    }
-                    else if (inputValue == 4)
-                        break;
-                }
+                Console.WriteLine("You are disconnected.\n");
+                BetDisconnected = true;
+                return false;
             }
+            return true;
         }
-
 
         private static void BankService(WindowsIdentity clientIdentity, int port)
         {
@@ -570,19 +256,18 @@ namespace Client
                 Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
 
                 while (true)
-                {               
-                    Console.WriteLine("Enter password:");                
+                {
+                    Console.WriteLine("Enter password:");
                     if (BankDisconnected)
                         break;
 
                     password = Console.ReadLine();
 
-                    if (!BankProxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password }), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)))
+                    if (!BankProxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(GetSha512Hash(shaHash, password)), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)))
                         Console.WriteLine("Wrong password. Try again");
                     else
                         break;
                 }
-
 
                 while (true)
                 {
@@ -645,14 +330,12 @@ namespace Client
             }
             else
                 Console.WriteLine("Server is down");
-
         }
 
 
 
         private static void BetService(WindowsIdentity clientIdentity, int port)
         {
-
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform";
 
@@ -683,8 +366,7 @@ namespace Client
                     Console.WriteLine("Enter password:");
                     password = Console.ReadLine();
 
-                    if (!BetProxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(new HashSet<string>() { password
-    }), Helper.ObjectToByteArray(port)))
+                    if (!BetProxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(GetSha512Hash(shaHash, password)), Helper.ObjectToByteArray(port)))
                         Console.WriteLine("Wrong password. Try again");
                     else
                         break;
@@ -696,6 +378,7 @@ namespace Client
                 Dictionary<int, Game> bets;
                 Game g;
                 int code;
+
 
                 while (true)
                 {
@@ -741,6 +424,7 @@ namespace Client
                                     {
                                         if (BetDisconnected)
                                             break;
+
                                         Console.WriteLine("\nGame code: ");
                                         inputValue = CheckIfNumber(Console.ReadLine());
                                     } while (inputValue == -1);
@@ -772,8 +456,10 @@ namespace Client
                                     }
                                     else
                                     {
-                                        Console.WriteLine("This game already finished");
+                                        Console.WriteLine("This game finished");
                                     }
+
+
 
                                 }
                                 else if (inputValue == 2)
@@ -789,8 +475,8 @@ namespace Client
                                         } while (inputValue == -1);
 
                                         int payment = (int)inputValue;
-
                                         MakeTicket(bets, payment);
+
                                     }
                                     break;
                                 }
@@ -807,47 +493,357 @@ namespace Client
             }
             else
                 Console.WriteLine("Server is down");
+
         }
 
-        private static bool MakeTicket(Dictionary<int, Game> bets, int payment)
+
+        private static void BankAdmin(WindowsIdentity clientIdentity, int port)
         {
-            WindowsIdentity clientIdentity = WindowsIdentity.GetCurrent();
-            Ticket ticket = new Ticket(bets, payment);
+            NetTcpBinding binding = new NetTcpBinding();
+            string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BankIntegrationPlatform";
+
+            bankProxy = new ClientBankProxy(binding, address);
+
+            BankDisconnected = false;
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                CheckBankConnection();
+            }).Start();
+
+
+            string password;
+            if (!BankDisconnected)
+            {
+                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("adminBank", GetSha512Hash(shaHash, "admin"), "BankAdmin")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("adminBank", GetSha512Hash(shaHash, "admin"), "BankAdmin")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("marina", GetSha512Hash(shaHash, "marina"), "User")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("bojan", GetSha512Hash(shaHash, "bojan"), "User")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("david", GetSha512Hash(shaHash, "david"), "User")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("nicpa", GetSha512Hash(shaHash, "nicpa"), "User")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("djole", GetSha512Hash(shaHash, "djole"), "Reader")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+
+                Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
+                while (true)
+                {
+                    Console.WriteLine("Enter password:");
+
+                    if (BankDisconnected)
+                        break;
+
+                    password = Console.ReadLine();
+                    if (!BankProxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(GetSha512Hash(shaHash, password)), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)))
+                        Console.WriteLine("Wrong password. Try again");
+                    else
+                        break;
+                }
+
+
+
+                double inputValue = 0;
+                while (true)
+                {
+                    if (BankDisconnected)
+                        break;
+
+                    do
+                    {
+                        if (BankDisconnected)
+                            break;
+                        Console.WriteLine("\n*****BANK ADMIN OPTIONS******\n");
+                        Console.WriteLine("Press 1 for creating new account.");
+                        Console.WriteLine("Press 2 for deposit.");
+                        Console.WriteLine("Press 3 for report.");
+                        Console.WriteLine("Press 4 for exit.");
+                        inputValue = CheckIfNumber(Console.ReadLine());
+
+                    } while (inputValue != 1 && inputValue != 2 && inputValue != 3 && inputValue != 4);
+
+
+                    if (inputValue == 1)
+                    {
+
+                        if (BankDisconnected)
+                            break;
+
+                        //opcija 1 za testiranje
+                        if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("nemanja", GetSha512Hash(shaHash, "nemanja"), "User")), Helper.ObjectToByteArray(port)))
+                            Console.WriteLine("User already exists");
+
+                        //opcija 2 za testiranje
+                        //Console.WriteLine("Enter username: ");
+                        //string username = Console.ReadLine();
+                        //Console.WriteLine("Enter password:");
+                        //password = Console.ReadLine();
+                        //Console.WriteLine("Enter role:");
+                        //string role = Console.ReadLine();
+                        //if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User(username, GetSha512Hash(shaHash, password), role))))
+                        //    Console.WriteLine("User already exists");
+
+                    }
+
+                    else if (inputValue == 2)
+                    {
+                        //ovo za testiranje
+                        if (BankDisconnected)
+                            break;
+                        if (!bankProxy.Deposit(Helper.ObjectToByteArray(new Account(4, 12)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
+
+                            Console.WriteLine("Deposit failed");
+                        if (BankDisconnected)
+                            break;
+                        if (!bankProxy.Deposit(Helper.ObjectToByteArray(new Account(4, 15)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
+                            Console.WriteLine("Deposit failed");
+
+                        //ili ovo za testiranje
+                        int accountNumber = 0;
+                        double amount = 0;
+                        do
+                        {
+                            if (BankDisconnected)
+                                break;
+                            Console.WriteLine("Enter account number: ");
+                            inputValue = CheckIfNumber(Console.ReadLine());
+                            if (inputValue != -1)
+                            {
+                                accountNumber = (int)inputValue;
+                            }
+                        } while (inputValue == -1);
+
+                        do
+                        {
+                            if (BankDisconnected)
+                                break;
+                            Console.WriteLine("Enter amount:");
+                            inputValue = CheckIfNumber(Console.ReadLine());
+                            if (inputValue != -1)
+                            {
+                                amount = inputValue;
+                            }
+                        } while (inputValue == -1);
+
+                        if (BankDisconnected)
+                            break;
+                        if (!bankProxy.Deposit(Helper.ObjectToByteArray(new Account(amount, accountNumber)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
+                            Console.WriteLine("Deposit failed");
+                    }
+
+                    else if (inputValue == 3)
+                    {
+                        if (BankDisconnected)
+                            break;
+                        List<Dictionary<string, int>> dictionaries = bankProxy.Report();
+
+                        if (dictionaries != null)
+                        {
+
+                            if (File.Exists("report.txt"))
+                            {
+                                File.WriteAllText("report.txt", string.Empty);
+                            }
+                            else
+                            {
+                                File.Create("report.txt");
+                            }
+
+                            using (var sw = new StreamWriter("report.txt", true))
+                            {
+                                sw.WriteLine("ADDRESSES\n");
+                                foreach (var item in dictionaries[0])
+                                {
+                                    sw.WriteLine(item);
+                                }
+
+                                sw.WriteLine("USERS\n");
+                                foreach (var item in dictionaries[1])
+                                {
+                                    sw.WriteLine(item);
+                                }
+
+                                sw.Close();
+                            }
+                        }
+                    }
+                    else if (inputValue == 4)
+                        break;
+                }
+            }
+        }
+
+
+
+        private static void BetAdmin(WindowsIdentity clientIdentity, int port)
+        {
+            NetTcpBinding binding = new NetTcpBinding();
+            string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform";
+
+            BetProxy = new ClientBetProxy(binding, address);
+
+            BetDisconnected = false;
+            new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                CheckBetConnection();
+            }).Start();
+
+
+            string password;
 
             if (!BetDisconnected)
             {
-                if (betProxy.SendTicket(Helper.ObjectToByteArray(ticket), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
-                {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("\n************************************TICKET**************************************\n");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("-----------------------------------------------------------------------------------");
-                    Console.WriteLine("ID |       HOME        |       AWAY        |       ODDS      |       TIP       ");
-                    Console.WriteLine("-----------------------------------------------------------------------------------");
+                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("adminBet", GetSha512Hash(shaHash, "admin"), "BetAdmin")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("marina", GetSha512Hash(shaHash, "marina"), "User")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("bojan", GetSha512Hash(shaHash, "bojan"), "User")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("david", GetSha512Hash(shaHash, "david"), "User")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("nicpa", GetSha512Hash(shaHash, "nicpa"), "User")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
+                if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("djole", GetSha512Hash(shaHash, "djole"), "Reader")), Helper.ObjectToByteArray(port)))
+                    Console.WriteLine("User already exists");
 
-                    foreach (KeyValuePair<int, Game> item in ticket.Bets)
+                BetProxy.SendPort(Helper.ObjectToByteArray("adminBet"), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0), Helper.ObjectToByteArray(ClientPrintPort));
+
+                Console.WriteLine("Your username is: " + clientIdentity.Name.Split('\\')[1]);
+
+                while (true)
+                {
+                    if (BetDisconnected)
+                        break;
+
+                    Console.WriteLine("Enter password:");
+                    password = Console.ReadLine();
+
+                    if (!BetProxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(GetSha512Hash(shaHash, password)), Helper.ObjectToByteArray(port)))
+                        Console.WriteLine("Wrong password. Try again");
+                    else
+                        break;
+                }
+
+
+                double inputValue = 0;
+                while (true)
+                {
+                    if (BetDisconnected)
+                        break;
+                    do
                     {
-                        Console.WriteLine(String.Format("{0,-10} {1,-10}          {2,-10}             {3,-5}           {4,-5}  ", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.BetOffer.Odds[item.Value.Tip], item.Value.Tip));
+                        if (BetDisconnected)
+                            break;
+                        Console.WriteLine("\n*******BET ADMIN OPTIONS*******\n");
+                        Console.WriteLine("Press 1 for adding new client.");
+                        Console.WriteLine("Press 2 for editing client.");
+                        Console.WriteLine("Press 3 for deleting client.");
+                        Console.WriteLine("Press 4 for report.");
+                        Console.WriteLine("Press 5 for exit.");
+                        inputValue = CheckIfNumber(Console.ReadLine());
+
+                    } while (inputValue != 1 && inputValue != 2 && inputValue != 3 && inputValue != 4 && inputValue != 5);
+
+                    if (inputValue == 1)
+                    {
+                        if (BetDisconnected)
+                            break;
+                        //opcija 1 za testiranje
+                        if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User("nemanja", GetSha512Hash(shaHash, "nemanja"), "User")), Helper.ObjectToByteArray(port)))
+                            Console.WriteLine("User already exists");
+                        //opcija 2 za testiranje
+                        //Console.WriteLine("Enter username: ");
+                        //string username = Console.ReadLine();
+                        //Console.WriteLine("Enter password:");
+                        //password = Console.ReadLine();
+                        //Console.WriteLine("Enter role:");
+                        //string role = Console.ReadLine();
+                        // if (!BetProxy.AddUser(Helper.ObjectToByteArray(new User(username, new HashSet<string>() { password }, role))))
+                        //    Console.WriteLine("User already exists");
                     }
 
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("\nPossible win: " + ticket.CashPrize);
-                    Console.WriteLine("\n*********************************************************************************");
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
+                    else if (inputValue == 2)
+                    {
+                        //ovo za testiranje         
+                        User user = new User("marina", GetSha512Hash(shaHash, "marina"), "User");
+                        user.BetAccount.Amount = 65;
 
-                else
-                {
-                    Console.WriteLine("Your ticket is not send! (You don't have permission to send ticket or you don't have enough money.");
+                        if (BetDisconnected)
+                            break;
+                        if (!BetProxy.EditUser(Helper.ObjectToByteArray(user), Helper.ObjectToByteArray(port)))
+                            Console.WriteLine("User doesn't exist");
+
+                        //ili ovo za testiranje
+                        //Console.WriteLine("Enter username: ");
+                        //string username = Console.ReadLine();
+                        //User user2 = new User(username, username, "User");
+                        //user2.BetAccount.Amount = 1000;
+                        //if(!BetProxy.EditUser(user2));
+                        //Console.WriteLine("User doesn't exist");
+                    }
+
+                    else if (inputValue == 3)
+                    {
+                        if (BetDisconnected)
+                            break;
+                        //ovo za testiranje                               
+                        if (!BetProxy.DeleteUser(Helper.ObjectToByteArray("marina"), Helper.ObjectToByteArray(port)))
+                            Console.WriteLine("User doesn't exist");
+                        //ili ovo za testiranje
+                        //Console.WriteLine("Enter username: ");
+                        //string username = Console.ReadLine();
+                        //if(!BetProxy.DeleteUser(username));
+                        //Console.WriteLine("User doesn't exist");
+                    }
+                    else if (inputValue == 4)
+                    {
+                        if (BetDisconnected)
+                            break;
+
+                        List<Dictionary<string, int>> dictionaries = BetProxy.Report();
+
+                        if (dictionaries != null)
+                        {
+                            if (File.Exists("report.txt"))
+                            {
+                                File.WriteAllText("report.txt", string.Empty);
+                            }
+                            else
+                            {
+                                File.Create("report.txt");
+                            }
+
+                            using (var sw = new StreamWriter("report.txt", true))
+                            {
+                                sw.WriteLine("ADDRESSES\n");
+                                foreach (var item in dictionaries[0])
+                                {
+                                    sw.WriteLine(item);
+                                }
+
+                                sw.WriteLine("USERS\n");
+                                foreach (var item in dictionaries[1])
+                                {
+                                    sw.WriteLine(item);
+                                }
+
+                                sw.Close();
+                            }
+                        }
+                    }
+
+                    else if (inputValue == 5)
+                    {
+                        break;
+                    }
                 }
             }
-            else
-            {
-                Console.WriteLine("You are disconnected.\n");
-                BetDisconnected = true;
-                return false;
-            }
-            return true;
+
         }
 
         private static double CheckIfNumber(string input)
@@ -863,6 +859,7 @@ namespace Client
                 return retValue;
             }
         }
+
 
         private static void CheckBetConnection()
         {
@@ -889,6 +886,26 @@ namespace Client
                 }
                 Thread.Sleep(3000);
             }
+        }
+
+        static string GetSha512Hash(SHA512 shaHash, string input)
+        {
+            // Convert the input string to a byte array and compute the hash.
+            byte[] data = shaHash.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+            // Create a new Stringbuilder to collect the bytes
+            // and create a string.
+            StringBuilder sBuilder = new StringBuilder();
+
+            // Loop through each byte of the hashed data 
+            // and format each one as a hexadecimal string.
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+
+            // Return the hexadecimal string.
+            return sBuilder.ToString();
         }
     }
 }
