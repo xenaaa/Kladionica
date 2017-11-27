@@ -182,7 +182,7 @@ namespace IntegrationPlatform
                 int last;
                 string username, address;
 
-                int counter = 0;
+                
 
                 Dictionary<string, int> attempts;
 
@@ -236,7 +236,9 @@ namespace IntegrationPlatform
                                 List<string> matches;
                                 if (attempts.Values.Any(x => x == 3))
                                 {
+
                                     matches = attempts.Where(x => x.Value == 3).Select(x => x.Key).ToList();
+                                    attempts[address] = 0;
                                     start = DateTime.Now;
                                     first = line.IndexOf("\\") + "\\".Length;
                                     last = line.IndexOf(" ", first);
@@ -250,10 +252,7 @@ namespace IntegrationPlatform
                                     IntrusionPrevention(username/*, Convert.ToInt32(port)*/, matches);
                                 }
                             }
-                            else
-                            {
-                                counter = 0;
-                            }
+                            
                         }
                     }
                 }
@@ -263,6 +262,7 @@ namespace IntegrationPlatform
 
         private static void IntrusionPrevention(string username/*, int port*/, List<string> addresses)
         {
+
             foreach (string address in addresses)//bice uvek samo jedna, ali ajde...
             {
                 foreach (var item in proxies[address].Values)
