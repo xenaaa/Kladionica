@@ -176,85 +176,106 @@ namespace IntegrationPlatform
         {
             if (File.Exists("ESB_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt"))//da ne iskace ako fajl ne postoji za novi dan
             {
-                string prev_line;
+                //string prev_line;
                 string line;
                 int first;
                 int last;
                 string username, address;
+                bool fresh = true;
 
-                
 
-                Dictionary<string, int> attempts;
+                Dictionary<string, IntrusionTry> attempts;
 
                 StreamReader file = new StreamReader("ESB_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt");
 
                 string temp = file.ReadLine();
 
-                prev_line = temp.Substring(15, temp.Length - 15);
+                //   prev_line = temp.Substring(15, temp.Length - 15);
 
-                if (prev_line != null)
+                //  if (prev_line != null)
+                //    {
+                attempts = new Dictionary<string, IntrusionTry>();
+                while ((line = file.ReadLine()) != null)
                 {
-                    attempts = new Dictionary<string, int>();
-                    while ((line = file.ReadLine()) != null)
+                    string time = line.Substring(0, 15);
+                    string date = time.Substring(0, 6) + " 2017" + time.Substring(6, time.Length - 6);
+
+                    if (Convert.ToDateTime(date) >= start)
                     {
-                        string time = line.Substring(0, 15);
-                        string date = time.Substring(0, 6) + " 2017" + time.Substring(6, time.Length - 6);
-
-                        if (Convert.ToDateTime(date) >= start)
+                        if (fresh)
                         {
-
-                            if (line.Contains("Warn"))
+                            if (Convert.ToDateTime(date) == start)
+                            /*moze se dogoditi da pri drugom ulazu u finkciju imamo vise starih unosa u istom vremenu. Ti unosi bi bili obradjeni kao novi.
+                             To je greska
+                             Zato ako je funkcija tek probudjena i imamo poklapanje vremena, preskacemo te unose, ako se posle dogodi vise unosa u logeru sa istim vremenom
+                             fresh ce biti false i ono ce biti obradjeni*/
                             {
-                                first = line.IndexOf(" - ") + " - ".Length;
-                                last = line.IndexOf(".", first);
-                                string add = line.Substring(first, last - first);
+                                continue;
+                            }
+                            else
+                                fresh = false;
+                        }
 
-                                //if (line.Substring(15, line.Length - 15) == prev_line)
-                                //    counter++;
-                                //else
-                                //    counter = 0;
+                        start = Convert.ToDateTime(date);
+                        if (line.Contains("Warn"))
+                        {
+                            first = line.IndexOf(" - ") + " - ".Length;
+                            last = line.IndexOf(".", first);
+                            string add = line.Substring(first, last - first);
 
-                                first = line.IndexOf("address: ") + "address: ".Length;
-                                last = line.IndexOf(" Port:", first);
-                                address = line.Substring(first, last - first);
+                            //if (line.Substring(15, line.Length - 15) == prev_line)
+                            //    counter++;
+                            //else
+                            //    counter = 0;
 
-                                if (!attempts.ContainsKey(address))
+                            first = line.IndexOf("address: ") + "address: ".Length;
+                            last = line.IndexOf(" Port:", first);
+                            address = line.Substring(first, last - first);
+
+                            if (!attempts.ContainsKey(address))
+                            {
+                                attempts.Add(address, new IntrusionTry(1, Convert.ToDateTime(date)));
+                            }
+                            else
+                            {
+                                //if (DateTime.Now - Convert.ToDateTime(date) < TimeSpan.FromMinutes(3))
+                                if (DateTime.Now - attempts[address].LastTry < TimeSpan.FromMinutes(3))
+                                /*ako je unos pogresen u manje od 3 minuta, ako je razmak izmedju greske vise od 3 minuta pokusaji se vracaju na 1*/
                                 {
-                                    attempts.Add(address, 1);
+                                    attempts[address].Attempt += 1;
+                                    attempts[address].LastTry = Convert.ToDateTime(date);
                                 }
                                 else
                                 {
-                                    if (DateTime.Now - Convert.ToDateTime(date) < TimeSpan.FromMinutes(3))
-                                        /*ako je unos pogresen u manje od 3 minuta, ako je razmak izmedju greske vise od 3 minuta pokusaji se vracaju na 1*/
-                                        attempts[address] += 1;
-                                    else
-                                        attempts[address] = 1;
-                                }
-
-                                prev_line = line.Substring(15, line.Length - 15);
-
-                                List<string> matches;
-                                if (attempts.Values.Any(x => x == 3))
-                                {
-
-                                    matches = attempts.Where(x => x.Value == 3).Select(x => x.Key).ToList();
-                                    attempts[address] = 0;
-                                    start = DateTime.Now;
-                                    first = line.IndexOf("\\") + "\\".Length;
-                                    last = line.IndexOf(" ", first);
-                                    username = line.Substring(first, last - first);
-                                    //first = line.IndexOf("address: ") + "address: ".Length;
-                                    //last = line.IndexOf(" Port:", first);
-                                    //address = line.Substring(first, last - first);
-                                    //first = line.IndexOf("Port: ") + "Port: ".Length;
-                                    //last = line.IndexOf(" - ", first);
-                                    //string port = line.Substring(first, last - first);
-                                    IntrusionPrevention(username/*, Convert.ToInt32(port)*/, matches);
+                                    attempts[address].Attempt = 1;
+                                    attempts[address].LastTry = Convert.ToDateTime(date);
                                 }
                             }
-                            
+
+                            //prev_line = line.Substring(15, line.Length - 15);
+
+                            List<string> matches;
+                            if (attempts.Values.Any(x => x.Attempt == 3))
+                            {
+
+                                matches = attempts.Where(x => x.Value.Attempt == 3).Select(x => x.Key).ToList();
+                                attempts[address].Attempt = 0;
+                                //start = DateTime.Now;
+                                first = line.IndexOf("\\") + "\\".Length;
+                                last = line.IndexOf(" ", first);
+                                username = line.Substring(first, last - first);
+                                //first = line.IndexOf("address: ") + "address: ".Length;
+                                //last = line.IndexOf(" Port:", first);
+                                //address = line.Substring(first, last - first);
+                                //first = line.IndexOf("Port: ") + "Port: ".Length;
+                                //last = line.IndexOf(" - ", first);
+                                //string port = line.Substring(first, last - first);
+                                IntrusionPrevention(username/*, Convert.ToInt32(port)*/, matches);
+                            }
                         }
+
                     }
+                    //  }
                 }
                 file.Close();
             }

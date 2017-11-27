@@ -49,6 +49,7 @@
     <Compile Include="IBankService.cs" />
     <Compile Include="IBetService.cs" />
     <Compile Include="IClientHelper.cs" />
+    <Compile Include="IntrusionTry.cs" />
     <Compile Include="Persistance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Ticket.cs" />
