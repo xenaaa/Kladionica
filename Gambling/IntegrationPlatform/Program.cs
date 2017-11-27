@@ -183,10 +183,11 @@ namespace IntegrationPlatform
                 string line;
                 int first;
                 int last;
-                string username;
+                string username,address;
 
                 int counter = 0;
 
+                Dictionary<string, int> attempts;
 
                 StreamReader file = new StreamReader("ESB_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt");
 
@@ -196,6 +197,7 @@ namespace IntegrationPlatform
 
                 if (prev_line != null)
                 {
+                    attempts = new Dictionary<string, int>();
                     while ((line = file.ReadLine()) != null)
                     {
                         string time = line.Substring(0, 15);
@@ -210,26 +212,45 @@ namespace IntegrationPlatform
                                 last = line.IndexOf(".", first);
                                 string add = line.Substring(first, last - first);
 
-                                if (line.Substring(15, line.Length - 15) == prev_line)
-                                    counter++;
+                                //if (line.Substring(15, line.Length - 15) == prev_line)
+                                //    counter++;
+                                //else
+                                //    counter = 0;
+
+                                first = line.IndexOf("address: ") + "address: ".Length;
+                                last = line.IndexOf(" Port:", first);
+                                address = line.Substring(first, last - first);
+
+                                if (!attempts.ContainsKey(address))
+                                {
+                                    attempts.Add(address, 1);
+                                }
                                 else
-                                    counter = 0;
+                                {
+                                    if (DateTime.Now - Convert.ToDateTime(date) < TimeSpan.FromMinutes(3))
+                                        /*ako je unos pogresen u manje od 3 minuta, ako je razmak izmedju greske vise od 3 minuta pokusaji se vracaju na 1*/
+                                        attempts[address] += 1;
+                                    else
+                                        attempts[address] = 1;
+                                }
 
                                 prev_line = line.Substring(15, line.Length - 15);
 
-                                if (counter == 3)
+                                List<string> matches;
+                                if (attempts.Values.Any(x => x == 3))
                                 {
+                                    matches = attempts.Where(x => x.Value == 3).Select(x=>x.Key).ToList();
                                     start = DateTime.Now;
                                     first = line.IndexOf("\\") + "\\".Length;
                                     last = line.IndexOf(" ", first);
                                     username = line.Substring(first, last - first);
-                                    first = line.IndexOf("address: ") + "address: ".Length;
-                                    last = line.IndexOf(" Port:", first);
-                                    string address = line.Substring(first, last - first);
-                                    first = line.IndexOf("Port: ") + "Port: ".Length;
-                                    last = line.IndexOf(" - ", first);
-                                    string port = line.Substring(first, last - first);
-                                    IntrusionPrevention(username, Convert.ToInt32(port), address);
+                                    //first = line.IndexOf("address: ") + "address: ".Length;
+                                    //last = line.IndexOf(" Port:", first);
+                                    //address = line.Substring(first, last - first);
+                                    //first = line.IndexOf("Port: ") + "Port: ".Length;
+                                    //last = line.IndexOf(" - ", first);
+                                    //string port = line.Substring(first, last - first);
+                                    IntrusionPrevention(username/*, Convert.ToInt32(port)*/, matches);
                                 }
                             }
                             else
@@ -246,17 +267,20 @@ namespace IntegrationPlatform
             }
         }
 
-        private static void IntrusionPrevention(string username, int port, string address)
+        private static void IntrusionPrevention(string username/*, int port*/, List<string> addresses)
         {
             BetService bs = new BetService();
             bs.IntrusionPrevention(Helper.Encrypt(username));
             BankService bs2 = new BankService();
             bs2.IntrusionPrevention(Helper.Encrypt(username));
 
-            foreach (var item in proxies[address].Values)
+            foreach (string address in addresses)//bice uvek samo jedna, ali ajde...
             {
-                item.CloseProxy();
-                item.Close();
+                foreach (var item in proxies[address].Values)
+                {
+                    item.CloseProxy();
+                    item.Close();
+                }
             }
             // proxies[address][port].Close();
 
