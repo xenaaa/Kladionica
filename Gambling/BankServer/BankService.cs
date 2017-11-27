@@ -30,7 +30,7 @@ namespace BankServer
         public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes, byte[] addressBytes)
         {
             string username = (string)Helper.Decrypt(usernameBytes);
-            HashSet<string> password = (HashSet<string>)Helper.Decrypt(passwordBytes);
+            string password = (string)Helper.Decrypt(passwordBytes);
             int port = (int)Helper.Decrypt(portBytes);
             string addressIPv4 = (string)Helper.Decrypt(addressBytes);
 
@@ -42,7 +42,7 @@ namespace BankServer
 
             if (bankUsersFromFile.Keys.Contains(username))
             {
-                if (bankUsersFromFile[username].Password.First() == password.First())//OKK?****
+                if (bankUsersFromFile[username].Password == password)//OKK?****
                 {
                     foreach (KeyValuePair<string, User> kvp in bankUsersFromFile)
                     {

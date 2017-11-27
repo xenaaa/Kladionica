@@ -63,7 +63,7 @@ namespace BetServer
         {
 
             string username = (string)Helper.Decrypt(usernameBytes);
-            HashSet<string> password = (HashSet<string>)Helper.Decrypt(passwordBytes);
+            string password = (string)Helper.Decrypt(passwordBytes);
             int port = (int)Helper.Decrypt(portBytes);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
@@ -73,7 +73,7 @@ namespace BetServer
 
             if (betUsersFromFile.Keys.Contains(username))
             {
-                if (betUsersFromFile[username].Password.First() == password.First())
+                if (betUsersFromFile[username].Password == password)
                 {
                     Console.WriteLine("You successfully logged in!");
                     return true;
