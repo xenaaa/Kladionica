@@ -22,7 +22,7 @@ namespace BankServer
 
         }
 
-        public bool CheckIfAlive()
+        public bool CheckIfAlive(int port)
         {
             return true;
         }
@@ -67,7 +67,7 @@ namespace BankServer
         }
 
 
-        public bool CreateAccount(byte[] userBytes)
+        public bool CreateAccount(byte[] userBytes, byte[] port)
         {
             User user = (User)Helper.Decrypt(userBytes);
 
@@ -93,10 +93,11 @@ namespace BankServer
 
         }
 
-        public bool Deposit(byte[] accBytes, byte[] usernameBytes)
+        public bool Deposit(byte[] accBytes, byte[] usernameBytes, byte[] portBytes)
         {
             Account acc = (Account)Helper.Decrypt(accBytes);
             string username = (string)Helper.Decrypt(usernameBytes);
+                int port = (int)Helper.Decrypt(portBytes);
 
             Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
             Object obj = Persistance.ReadFromFile("bankUsers.txt");
@@ -128,9 +129,10 @@ namespace BankServer
                     BankServerProxy proxy;
                     byte[] encryptedAccount = Helper.Encrypt(acc);
                     byte[] encryptedUername = Helper.Encrypt(username);
+                    byte[] encryptedPort = Helper.Encrypt(port);
 
                     proxy = new BankServerProxy(binding, address);
-                    proxy.Deposit(encryptedAccount, encryptedUername);
+                    proxy.Deposit(encryptedAccount, encryptedUername,encryptedPort);
                     return true;
 
 
@@ -164,27 +166,7 @@ namespace BankServer
             }
         }
 
-        public bool IntrusionPrevention(byte[] user)
-        {
-            string username = (string)Helper.Decrypt(user);
-
-            Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("bankUsers.txt");
-            if (obj != null)
-                bankUsersFromFile = (Dictionary<string, User>)obj;
-
-            if (!bankUsersFromFile.ContainsKey(username))
-            {
-                return false;
-            }
-            else
-            {
-                DeleteUser(user);
-                return true;
-            }
-        }
-
-        private bool DeleteUser(byte[] usernameBytes)
+        private bool DeleteUser(byte[] usernameBytes, byte[] port)
         {
             string username = (string)Helper.Decrypt(usernameBytes);
 
@@ -207,5 +189,9 @@ namespace BankServer
             }
         }
 
+        public List<Dictionary<string, int>> Report()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

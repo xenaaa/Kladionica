@@ -108,6 +108,7 @@ namespace Contracts
             return addressIPv4;
         }
 
+
         public static int GetPort()
         {
             string addressIPv4 = string.Empty;

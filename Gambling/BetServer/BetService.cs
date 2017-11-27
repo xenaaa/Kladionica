@@ -29,7 +29,7 @@ namespace BetServer
         public BetService()
         { }
 
-        public bool CheckIfAlive()
+        public bool CheckIfAlive(int port)
         {
             return true;
         }
@@ -88,7 +88,7 @@ namespace BetServer
         }
 
 
-        public bool AddUser(byte[] userBytes)
+        public bool AddUser(byte[] userBytes, byte[] port)
         {
             //dekpricija
             User user = (User)Helper.Decrypt(userBytes);
@@ -122,7 +122,7 @@ namespace BetServer
 
         }
 
-        public bool DeleteUser(byte[] usernameBytes)
+        public bool DeleteUser(byte[] usernameBytes, byte[] port)
         {
             string username = (string)Helper.Decrypt(usernameBytes);
 
@@ -145,7 +145,7 @@ namespace BetServer
             }
         }
 
-        public bool EditUser(byte[] userBytes)
+        public bool EditUser(byte[] userBytes, byte[] port)
         {
             User user = (User)Helper.Decrypt(userBytes);
 
@@ -204,7 +204,7 @@ namespace BetServer
                 return false;
         }
 
-        public bool Deposit(byte[] accBytes, byte[] usernameBytes)
+        public bool Deposit(byte[] accBytes, byte[] usernameBytes, byte[] port)
         {
             string username = (string)Helper.Decrypt(usernameBytes);
             Account acc = (Account)Helper.Decrypt(accBytes);
@@ -222,36 +222,20 @@ namespace BetServer
                 User user = betUsersFromFile[username];
                 user.BetAccount.Amount += acc.Amount;
 
-                EditUser(Helper.Encrypt(user));
+                EditUser(Helper.Encrypt(user), Helper.Encrypt(Helper.GetPort()));
             }
             return true;
         }
-
-        public bool IntrusionPrevention(byte[] user)
-        {
-            string username = (string)Helper.Decrypt(user);
-
-            Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("betUsers.txt");
-            if (obj != null)
-                betUsersFromFile = (Dictionary<string, User>)obj;
-
-            if (!betUsersFromFile.ContainsKey(username))
-            {
-                return false;
-            }
-            else
-            {
-                DeleteUser(user);
-                return true;
-            }
-        }
-
 
         public bool GetServiceIP(byte[] AddressStringBytes)
         {
             throw new NotImplementedException();
         }
 
+        public List<Dictionary<string, int>> Report()
+        {
+            throw new NotImplementedException();
+        }
+ 
     }
 }

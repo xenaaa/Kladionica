@@ -52,11 +52,11 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool CheckIfAlive()
+        public bool CheckIfAlive(int port)
         {
             try
             {
-                return factory.CheckIfAlive();
+                return factory.CheckIfAlive(port);
             }
             catch (Exception e)
             {
@@ -65,11 +65,11 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool CreateAccount(byte[] user)
+        public bool CreateAccount(byte[] user, byte[] port)
         {
             try
             {
-                return factory.CreateAccount(user);
+                return factory.CreateAccount(user,port);
             }
             catch (Exception e)
             {
@@ -78,11 +78,11 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool Deposit(byte[] acc, byte[] username)
+        public bool Deposit(byte[] acc, byte[] username, byte[] port)
         {
             try
             {
-                return factory.Deposit(acc, username);
+                return factory.Deposit(acc, username,port);
             }
             catch (Exception e)
             {
@@ -91,17 +91,22 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool IntrusionPrevention(byte[] user)
+        //public bool IntrusionPrevention(byte[] user)
+        //{
+        //    try
+        //    {
+        //        return factory.IntrusionPrevention(user);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Console.WriteLine("Error {0}", e.Message);
+        //        return false;
+        //    }
+        //}
+
+        public List<Dictionary<string, int>> Report()
         {
-            try
-            {
-                return factory.IntrusionPrevention(user);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error {0}", e.Message);
-                return false;
-            }
+            throw new NotImplementedException();
         }
     }
 }

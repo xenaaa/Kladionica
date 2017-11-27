@@ -27,19 +27,6 @@ namespace Client
             }
         }
 
-        public bool CheckIfAlive()
-        {
-            try
-            {
-                return factory.CheckIfAlive();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error {0}", e.Message);
-                return false;
-            }
-        }
-
         public bool BankLogin(byte[] username, byte[] password, byte[] port, byte[] address)
         {
             try
@@ -53,12 +40,12 @@ namespace Client
             }
         }
 
-        public bool Deposit(byte[] acc, byte[] username)
+        public bool Deposit(byte[] acc, byte[] username, byte[] port)
         {
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             try
             {
-                return factory.Deposit(acc, username);
+                return factory.Deposit(acc, username,port);
             }
             catch (Exception e)
             {
@@ -67,12 +54,12 @@ namespace Client
             }
         }
 
-        public bool CreateAccount(byte[] user)
+        public bool CreateAccount(byte[] user, byte[] port)
         {
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             try
             {
-                return factory.CreateAccount(user);
+                return factory.CreateAccount(user,port);
             }
             catch (Exception e)
             {
@@ -84,6 +71,32 @@ namespace Client
         public bool IntrusionPrevention(byte[] user)
         {
             throw new NotImplementedException();
+        }
+
+        public List<Dictionary<string, int>> Report()
+        {
+            try
+            {
+                return factory.Report();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return null;
+            }
+        }
+
+        public bool CheckIfAlive(int port)
+        {
+            try
+            {
+                return factory.CheckIfAlive(port);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
         }
     }
 }

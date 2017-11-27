@@ -44,17 +44,17 @@ namespace IntegrationPlatform
             proxy = new ClientProxy(binding, address);
 
 
-            if (!Program.proxies.ContainsKey(addressIPv4))
-            {
-                Dictionary<int, ClientProxy> di = new Dictionary<int, ClientProxy>();
-                di.Add(port, proxy);
-                Program.proxies.Add(addressIPv4, di);
-            }
-            else
-            {
-                if (!Program.proxies[addressIPv4].ContainsKey(port))
-                    Program.proxies[addressIPv4].Add(port, proxy);
-            }
+            //if (!Program.proxies.ContainsKey(addressIPv4))
+            //{
+            //    Dictionary<int, ClientProxy> di = new Dictionary<int, ClientProxy>();
+            //    di.Add(port, proxy);
+            //    Program.proxies.Add(addressIPv4, di);
+            //}
+            //else
+            //{
+            //    if (!Program.proxies[addressIPv4].ContainsKey(port))
+            //        Program.proxies[addressIPv4].Add(port, proxy);
+            //}
 
 
             //if (!Program.proxies2.ContainsKey(port))

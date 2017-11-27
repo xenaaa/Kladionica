@@ -20,6 +20,7 @@ namespace IntegrationPlatform
     {
         private static readonly Logger loger = LogManager.GetLogger("Syslog");
         BankServiceProxy proxy;
+        ClientProxy clientProxy;
 
         public BankService()
         {
@@ -58,6 +59,8 @@ namespace IntegrationPlatform
 
             bool allowed = false;
             string username = (string)Helper.ByteArrayToObject(usernameBytes);
+            int port = (int)Helper.ByteArrayToObject(portBytes);
+
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("User") || principal.IsInRole("Reader") || principal.IsInRole("BankAdmin"))
             {
@@ -73,16 +76,15 @@ namespace IntegrationPlatform
 
                     Audit.AuthenticationSuccess(principal.Identity.Name.Split('\\')[1].ToString());
                     Audit.LogIn(principal.Identity.Name.Split('\\')[1].ToString());
-                    loger.Info("IP address: {0} Port: {1} - Bank login successful.", Helper.GetIP(), Helper.GetPort());
+                    loger.Info("IP address: {0} Port: {1} - Bank login successful.", Helper.GetIP(), port);
                     allowed = true;
                 }
                 else
                 {
                     Audit.LogInFailed(principal.Identity.Name.Split('\\')[1].ToString(), "wrong password");
-                    loger.Warn("IP address: {0} Port: {1} - Bank login failed.", Helper.GetIP(), Helper.GetPort());
+                    loger.Warn("IP address: {0} Port: {1} - Bank login failed.", Helper.GetIP(), port);
                     allowed = false;
                 }
-
             }
 
             else
@@ -96,39 +98,35 @@ namespace IntegrationPlatform
 
         }
 
-        public bool CheckIfAlive()
-        {
-
-            return proxy.CheckIfAlive();
-
-            return false;
-        }
-
-        public bool Deposit(byte[] accBytes, byte[] usernameBytes)
+        public bool Deposit(byte[] accBytes, byte[] usernameBytes, byte[] portBytes)
         {
             bool allowed = false;
+      
 
             Account acc = (Account)Helper.ByteArrayToObject(accBytes);
             string username = (string)Helper.ByteArrayToObject(usernameBytes);
+            int port = (int)Helper.ByteArrayToObject(portBytes);
+
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("User") || principal.IsInRole("Reader"))
             {
-                Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "Deposite");
+                Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "Deposit");
 
                 byte[] encryptedAccount = Helper.EncryptOnIntegration(accBytes);
                 byte[] encryptedUsername = Helper.EncryptOnIntegration(usernameBytes);
+                byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
 
 
-                if (proxy.Deposit(encryptedAccount, encryptedUsername))
+                if (proxy.Deposit(encryptedAccount, encryptedUsername,encryptedPort))
                 {
                     Audit.Deposit(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString());
-                    loger.Info("IP address: {0} Port: {1} - Deposit success.", Helper.GetIP(), Helper.GetPort());
+                    loger.Info("IP address: {0} Port: {1} - Deposit success.", Helper.GetIP(), port);
                     allowed = true;
                 }
                 else
                 {
                     Audit.DepositFailed(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString(), "error");
-                    loger.Warn("IP address: {0} Port: {1} - Deposit failed.", Helper.GetIP(), Helper.GetPort());
+                    loger.Warn("IP address: {0} Port: {1} - Deposit failed.", Helper.GetIP(), port);
                     allowed = false;
                 }
 
@@ -137,24 +135,27 @@ namespace IntegrationPlatform
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "Deposit", "not authorized");
                 Audit.DepositFailed(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString(), "not authorized");
-                loger.Warn("IP address: {0} : Port: {1} - Deposit failed (not authorized).", Helper.GetIP(), Helper.GetPort());
+                loger.Warn("IP address: {0} : Port: {1} - Deposit failed (not authorized).", Helper.GetIP(), port);
                 allowed = false;
             }
             return allowed;
         }
 
-        public bool CreateAccount(byte[] userBytes)
+        public bool CreateAccount(byte[] userBytes, byte[] portBytes)
         {
             bool allowed = false;
             User user = Helper.ByteArrayToObject(userBytes) as User;
+            int port = (int)Helper.ByteArrayToObject(portBytes);
+
             CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
             if (principal.IsInRole("BankAdmin"))
             {
                 Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "create account");
 
                 byte[] encryptedUser = Helper.EncryptOnIntegration(userBytes);
+                byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
 
-                if (proxy.CreateAccount(encryptedUser))
+                if (proxy.CreateAccount(encryptedUser,encryptedPort))
                 {
                     Audit.CreateAccount(principal.Identity.Name.Split('\\')[1].ToString());
                     loger.Info("IP address: {0} Port: {1} - User {2} is created.", Helper.GetIP(), Helper.GetPort(), user.Username);
@@ -181,13 +182,116 @@ namespace IntegrationPlatform
             return allowed;
         }
 
-        public bool IntrusionPrevention(byte[] user)
+        public List<Dictionary<string, int>> Report()
         {
-            byte[] encryptedUser = Helper.EncryptOnIntegration(user);
+            List<Dictionary<string, int>> returnDictionaries = new List<Dictionary<string, int>>();
+            Dictionary<string, int> addresses = new Dictionary<string, int>();
+            Dictionary<string, int> users = new Dictionary<string, int>();
 
-            return proxy.IntrusionPrevention(user);
+            string line;
+            System.IO.StreamReader file = new System.IO.StreamReader("ESB_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt");
+
+            while ((line = file.ReadLine()) != null)
+            {
+                if (line.Contains("Deposit"))
+                {
+                    int first = line.IndexOf("address: ") + "address: ".Length;
+                    int last = line.IndexOf(" Port:", first);
+                    string address = line.Substring(first, last - first);
+
+                    int first2 = line.IndexOf("\\") + "\\".Length;
+                    int last2 = line.IndexOf(" ", first2);
+                    string username = line.Substring(first2, last2 - first2);
+
+                    if (username != "adminBet" && username != "adminBank")
+                    {
+                        if (addresses.ContainsKey(address))
+                        {
+                            addresses[address]++;
+                        }
+                        else
+                        {
+                            addresses.Add(address, 1);
+                        }
+
+                        if (users.ContainsKey(username))
+                        {
+                            users[username]++;
+                        }
+                        else
+                        {
+                            users.Add(username, 1);
+                        }
+                    }
+                }
+            }
+
+            //sortiramo adrese i korisnike
+            var sortedAddressDict = from entry in addresses orderby entry.Value descending select entry;
+
+            int counter = 3;
+            if (counter > sortedAddressDict.Count())
+                counter = sortedAddressDict.Count();
+
+            foreach (var item in sortedAddressDict)
+            {
+                //    Console.WriteLine(item);
+                counter--;
+                if (counter == 0)
+                    break;
+            }
+
+            var sortedUserDict = from entry in users orderby entry.Value descending select entry;
+
+            if (counter > sortedUserDict.Count())
+                counter = sortedUserDict.Count();
+
+            foreach (var item in sortedUserDict)
+            {
+                //  Console.WriteLine(item);
+                counter--;
+                if (counter == 0)
+                    break;
+            }
+
+            file.Close();
+
+            Dictionary<string, int> result = sortedAddressDict.ToDictionary(x => x.Key, x => x.Value);
+            returnDictionaries.Add(result);
+
+            result = sortedUserDict.ToDictionary(x => x.Key, x => x.Value);
+            returnDictionaries.Add(result);
+
+            return returnDictionaries;
+
+        }
+
+        public bool CheckIfAlive(int port)
+        {
+           // int port = Helper.GetPort();
+            string addressIPv4 = Helper.GetIP();
+
+            NetTcpBinding binding = new NetTcpBinding();
 
 
+            string address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
+
+            clientProxy = new ClientProxy(binding, address);
+
+
+            if (!Program.proxies.ContainsKey(addressIPv4))
+            {
+                Dictionary<int, ClientProxy> di = new Dictionary<int, ClientProxy>();
+                di.Add(port, clientProxy);
+                Program.proxies.Add(addressIPv4, di);
+            }
+            else
+            {
+                if (!Program.proxies[addressIPv4].ContainsKey(port))
+                    Program.proxies[addressIPv4].Add(port, clientProxy);
+            }
+
+            return proxy.CheckIfAlive(port);
         }
     }
 }

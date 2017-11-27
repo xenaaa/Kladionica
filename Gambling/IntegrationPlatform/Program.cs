@@ -28,9 +28,6 @@ namespace IntegrationPlatform
 
         private static DateTime start;
 
-
-
-
         static void Main(string[] args)
         {
 
@@ -187,7 +184,6 @@ namespace IntegrationPlatform
 
                 int counter = 0;
 
-
                 StreamReader file = new StreamReader("ESB_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt");
 
                 string temp = file.ReadLine();
@@ -239,27 +235,17 @@ namespace IntegrationPlatform
                         }
                     }
                 }
-
-
-
                 file.Close();
             }
         }
 
         private static void IntrusionPrevention(string username, int port, string address)
         {
-            BetService bs = new BetService();
-            bs.IntrusionPrevention(Helper.Encrypt(username));
-            BankService bs2 = new BankService();
-            bs2.IntrusionPrevention(Helper.Encrypt(username));
-
             foreach (var item in proxies[address].Values)
             {
                 item.CloseProxy();
                 item.Close();
             }
-            // proxies[address][port].Close();
-
         }
     }
 }

@@ -53,13 +53,16 @@ namespace BetServer
         static void Main(string[] args)
         {
 
-
+            Thread.Sleep(2000);
             Persistance.EmptyBetFiles();
             string srvCertCN = "betservice";
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            string address = "net.tcp://localhost:" + FreeTcpPort() + "/BetService";
+
+            int port = FreeTcpPort();
+            Console.WriteLine(port);
+            string address = "net.tcp://localhost:" + port + "/BetService";
 
             ServiceHost host = new ServiceHost(typeof(BetService));
             host.AddServiceEndpoint(typeof(IBetService), binding, address);
@@ -343,7 +346,7 @@ namespace BetServer
                         {
                             User changeUser = user.Value;
                             BetService betService = new BetService();
-                            betService.EditUser(Helper.Encrypt(changeUser));
+                            betService.EditUser(Helper.Encrypt(changeUser), Helper.ObjectToByteArray(0)); // ne znam sta ovdje proslijediti?????
                         }
                     }
 
@@ -409,7 +412,7 @@ namespace BetServer
                 User changeUser = user;
                 BetService betService = new BetService();
                 changeUser.BetAccount.Amount += ticket.CashPrize;
-                betService.EditUser(Helper.Encrypt(changeUser));
+                betService.EditUser(Helper.Encrypt(changeUser),Helper.ObjectToByteArray(0));
 
             }
 
@@ -546,8 +549,6 @@ namespace BetServer
                             {
                                 if (!string.IsNullOrEmpty(user.Value.Address))
                                 {
-
-
                                     if (!adresses.Contains(user.Value.Address))
                                     {
                                         encryptedPort = Helper.Encrypt(user.Value.Port);
@@ -555,7 +556,6 @@ namespace BetServer
                                         encryptedPrintPort = Helper.Encrypt(user.Value.PrintPort);
                                         if (proxy.CheckIfAlive(encryptedPrintPort, encryptedAddress, Helper.Encrypt(true)))
                                         {
-
                                             proxy.SendGameResults(encryptedOffers, encryptedPrintPort, encryptedAddress);
 
                                         }

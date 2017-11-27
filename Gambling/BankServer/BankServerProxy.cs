@@ -35,17 +35,42 @@ namespace BankServer
             }
         }
 
-        public bool Deposit(byte[] acc, byte[] username)
+        public bool AddUser(byte[] user, byte[] port)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool BetLogin(byte[] username, byte[] password, byte[] port)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CheckIfAlive(int port)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool DeleteUser(byte[] username, byte[] port)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Deposit(byte[] acc, byte[] username, byte[] port)
         {
             try
             {
-                return factory.Deposit(acc, username);
+                return factory.Deposit(acc, username, port);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
+        }
+
+        public bool EditUser(byte[] user, byte[] port)
+        {
+            throw new NotImplementedException();
         }
 
         public bool GetServiceIP(byte[] AddressStringBytes)
@@ -60,36 +85,18 @@ namespace BankServer
                 return false;
             }
         }
-        public bool AddUser(byte[] user)
-        {
-            throw new NotImplementedException();
-        }
 
-        public bool BetLogin(byte[] username, byte[] password, byte[] port)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool CheckIfAlive()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool DeleteUser(byte[] username)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool EditUser(byte[] user)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool SendPort(byte[] username, byte[] port, byte[] address, byte[] printPort)
-        {
-            throw new NotImplementedException();
-        }
         public bool IntrusionPrevention(byte[] user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Dictionary<string, int>> Report()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool SendPort(byte[] username, byte[] port, byte[] address, byte[] Printport)
         {
             throw new NotImplementedException();
         }

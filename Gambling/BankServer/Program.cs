@@ -26,14 +26,16 @@ namespace BankServer
         }
         static void Main(string[] args)
         {
-
+            Thread.Sleep(4000);
             Persistance.EmptyBankFiles();
             string srvCertCN = "bankservice";
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             //  string address = "net.tcp://localhost:" + Helper.bankServicePort + "/BankService";
-            string address = "net.tcp://localhost:" + FreeTcpPort() + "/BankService";
+            int port = FreeTcpPort();
+            Console.WriteLine(port);
+            string address = "net.tcp://localhost:" + port + "/BankService";
 
 
             ServiceHost host = new ServiceHost(typeof(BankService));
@@ -64,19 +66,19 @@ namespace BankServer
                                       new X509CertificateEndpointIdentity(srvCert));
 
             BankServerProxy proxy;
-          
 
-            string IP=string.Empty;
+
+            string IP = string.Empty;
             var hostIP = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in hostIP.AddressList)
             {
                 if (ip.AddressFamily == AddressFamily.InterNetwork)
                 {
-                    IP= ip.ToString();
+                    IP = ip.ToString();
                 }
             }
 
-            address=address.Replace("localhost", IP);
+            address = address.Replace("localhost", IP);
 
             while (true)
             {
@@ -94,8 +96,6 @@ namespace BankServer
                     continue;
                 }
             }
-           
-
 
             Console.WriteLine("Bank service is started.");
             Console.WriteLine("Press <enter> to stop service...");

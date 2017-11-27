@@ -24,11 +24,11 @@ namespace Client
                 Console.WriteLine(e.Message);
             }
         }
-        public bool CheckIfAlive()
+        public bool CheckIfAlive(int port)
         {
             try
             {
-                return factory.CheckIfAlive();
+                return factory.CheckIfAlive(port);
             }
             catch (Exception e)
             {
@@ -64,11 +64,11 @@ namespace Client
             }
         }
 
-        public bool AddUser(byte[] user)
+        public bool AddUser(byte[] user, byte[] port)
         {
             try
             {
-                return factory.AddUser(user);
+                return factory.AddUser(user,port);
 
             }
             catch (Exception e)
@@ -78,11 +78,11 @@ namespace Client
             }
         }
 
-        public bool DeleteUser(byte[] username)
+        public bool DeleteUser(byte[] username, byte[] port)
         {
             try
             {
-                return factory.DeleteUser(username);
+                return factory.DeleteUser(username,port);
 
             }
             catch (Exception e)
@@ -92,11 +92,11 @@ namespace Client
             }
         }
 
-        public bool EditUser(byte[] user)
+        public bool EditUser(byte[] user, byte[] port)
         {
             try
             {
-                return factory.EditUser(user);
+                return factory.EditUser(user,port);
 
             }
             catch (Exception e)
@@ -120,7 +120,7 @@ namespace Client
 
         }
 
-        public bool Deposit(byte[] acc, byte[] username)
+        public bool Deposit(byte[] acc, byte[] username, byte[] port)
         {
             throw new NotImplementedException();
         }
@@ -134,5 +134,20 @@ namespace Client
         {
             throw new NotImplementedException();
         }
+
+
+        public List<Dictionary<string, int>> Report()
+        {
+            try
+            {
+                return factory.Report();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return null;
+            }
+        }
+
     }
 }

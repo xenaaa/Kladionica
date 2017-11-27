@@ -12,8 +12,9 @@ namespace ClientPrint
     {
         static void Main(string[] args)
         {
-
             string address = "net.tcp://localhost:" + args[0] + "/ClientPrint";
+
+            Console.WriteLine(args[0]);
 
             NetTcpBinding binding = new NetTcpBinding();
             ServiceHost host = new ServiceHost(typeof(ClientPrint));

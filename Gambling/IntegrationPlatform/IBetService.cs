@@ -11,7 +11,7 @@ namespace Contracts
     public interface IBetService
     {
         [OperationContract]
-        bool CheckIfAlive();
+        bool CheckIfAlive(int port);
 
         [OperationContract]
         bool SendPort(byte[] username, byte[] port, byte[] address, byte[] Printport);
@@ -20,23 +20,26 @@ namespace Contracts
         bool BetLogin(byte[] username, byte[] password, byte[] port);
 
         [OperationContract]
-        bool AddUser(byte[] user);
+        bool AddUser(byte[] user, byte[] port);
 
         [OperationContract]
-        bool DeleteUser(byte[] username);
+        bool DeleteUser(byte[] username, byte[] port);
 
         [OperationContract]
-        bool EditUser(byte[] user);
+        bool EditUser(byte[] user, byte[] port);
 
         [OperationContract]
         bool SendTicket(byte[] ticket, byte[] username, byte[] port);
 
         [OperationContract]
-        bool Deposit(byte[] acc, byte[] username);
+        bool Deposit(byte[] acc, byte[] username, byte[] port);
 
         [OperationContract]
         bool GetServiceIP(byte[] AddressStringBytes);
+
         [OperationContract]
-        bool IntrusionPrevention(byte[] user);
+        List<Dictionary<string, int>> Report();
+       
+
     }
 }
