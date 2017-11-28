@@ -34,9 +34,8 @@ namespace BankServer
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             //  string address = "net.tcp://localhost:" + Helper.bankServicePort + "/BankService";
             int port = FreeTcpPort();
-            Console.WriteLine(port);
-            string address = "net.tcp://localhost:" + port + "/BankService";
 
+            string address = "net.tcp://localhost:" + port + "/BankService";
 
             ServiceHost host = new ServiceHost(typeof(BankService));
             host.AddServiceEndpoint(typeof(IBankService), binding, address);

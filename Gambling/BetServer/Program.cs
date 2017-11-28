@@ -61,7 +61,7 @@ namespace BetServer
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
             int port = FreeTcpPort();
-            Console.WriteLine(port);
+
             string address = "net.tcp://localhost:" + port + "/BetService";
 
             ServiceHost host = new ServiceHost(typeof(BetService));

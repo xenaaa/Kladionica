@@ -54,12 +54,10 @@ namespace BankServer
                     }
                     Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");//*****
 
-                    Console.WriteLine("You successfully logged in!");
                     return true;
                 }
                 else
                 {
-                    Console.WriteLine("Your password is incorrect!");
                     return false;
                 }
             }
@@ -109,7 +107,6 @@ namespace BankServer
             {
                 if (bankUsersFromFile[username].BankAccount.Amount - acc.Amount < 0)
                 {
-                    Console.WriteLine("There is not enough amount on your bank account");
                     return false;
                 }
                 else
@@ -134,9 +131,6 @@ namespace BankServer
                     proxy = new BankServerProxy(binding, address);
                     proxy.Deposit(encryptedAccount, encryptedUername,encryptedPort);
                     return true;
-
-
-                    return false;
                 }
             }
             else
@@ -145,14 +139,12 @@ namespace BankServer
 
                 if (user.Key == null)
                 {
-                    Console.WriteLine("Account number doesn't exist\n");
                     return false;
                 }
                 else
                 {
                     if (bankUsersFromFile[username].BankAccount.Amount - acc.Amount < 0)
                     {
-                        Console.WriteLine("There is not enough amount on your bank account");
                         return false;
                     }
                     else
@@ -177,14 +169,12 @@ namespace BankServer
 
             if (!bankUsersFromFile.ContainsKey(username))
             {
-                Console.WriteLine("Error! There is no user {0} in BetService", username);
                 return false;
             }
             else
             {
                 bankUsersFromFile.Remove(username);
                 Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");
-                Console.WriteLine("User {0} removed from BetService", username);
                 return true;
             }
         }

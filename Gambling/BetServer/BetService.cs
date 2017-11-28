@@ -75,12 +75,10 @@ namespace BetServer
             {
                 if (betUsersFromFile[username].Password == password)
                 {
-                    Console.WriteLine("You successfully logged in!");
                     return true;
                 }
                 else
                 {
-                    Console.WriteLine("Your password is incorrect!");
                     return false;
                 }
             }
@@ -108,14 +106,10 @@ namespace BetServer
                     betUsersFromFile.Add(user.Username, user);
                     Persistance.WriteToFile(betUsersFromFile, "betUsers.txt");
                 }
-
-                Console.WriteLine("User {0} successfully added to BetUsers", user.Username);
                 return true;
             }
             else
             {
-
-                Console.WriteLine("User {0} already exists.", user.Username);
                 return false;
             }
 
@@ -133,14 +127,12 @@ namespace BetServer
 
             if (!betUsersFromFile.ContainsKey(username))
             {
-                Console.WriteLine("Error! There is no user {0} in BetService", username);
                 return false;
             }
             else
             {
                 betUsersFromFile.Remove(username);
                 Persistance.WriteToFile(betUsersFromFile, "betUsers.txt");
-                Console.WriteLine("User {0} removed from BetService", username);
                 return true;
             }
         }
@@ -156,7 +148,6 @@ namespace BetServer
 
             if (!betUsersFromFile.ContainsKey(user.Username))
             {
-                Console.WriteLine("Error! There is no user {0} in BetService", user.Username);
                 return false;
             }
             else

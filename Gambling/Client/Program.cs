@@ -102,7 +102,7 @@ namespace Client
             binding2.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
 
             WindowsIdentity clientIdentity = WindowsIdentity.GetCurrent();
-            Console.WriteLine("\n\nGRUPEEEE\n");
+            Console.WriteLine("\nGROUPS\n");
             foreach (IdentityReference group in clientIdentity.Groups)
             {
 
@@ -230,8 +230,9 @@ namespace Client
             }
             else
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("You are disconnected.\n");
-                BetDisconnected = true;
+                Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
             return true;
@@ -267,7 +268,11 @@ namespace Client
                     password = Console.ReadLine();
 
                     if (!BankProxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(GetSha512Hash(shaHash, password)), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Wrong password. Try again");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
                     else
                         break;
                 }
@@ -325,7 +330,11 @@ namespace Client
                         if (BankDisconnected)
                             break;
                         if (!BankProxy.Deposit(Helper.ObjectToByteArray(new Account(amount, accountNumber)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("Deposit failed");
+                            Console.ForegroundColor = ConsoleColor.White;
+                        }
                     }
                     else if (inputValue == 2)
                         break;
@@ -370,7 +379,11 @@ namespace Client
                     password = Console.ReadLine();
 
                     if (!BetProxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(GetSha512Hash(shaHash, password)), Helper.ObjectToByteArray(port)))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Wrong password. Try again");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
                     else
                         break;
                 }
@@ -545,7 +558,11 @@ namespace Client
 
                     password = Console.ReadLine();
                     if (!BankProxy.BankLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(GetSha512Hash(shaHash, password)), Helper.ObjectToByteArray(port), Helper.ObjectToByteArray(0)))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Wrong password. Try again");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
                     else
                         break;
                 }
@@ -600,12 +617,19 @@ namespace Client
                         if (BankDisconnected)
                             break;
                         if (!bankProxy.Deposit(Helper.ObjectToByteArray(new Account(4, 12)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
-
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("Deposit failed");
+                            Console.ForegroundColor = ConsoleColor.White;
+                        }
                         if (BankDisconnected)
                             break;
                         if (!bankProxy.Deposit(Helper.ObjectToByteArray(new Account(4, 15)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("Deposit failed");
+                            Console.ForegroundColor = ConsoleColor.White;
+                        }
 
                         //ili ovo za testiranje
                         int accountNumber = 0;
@@ -637,7 +661,11 @@ namespace Client
                         if (BankDisconnected)
                             break;
                         if (!bankProxy.Deposit(Helper.ObjectToByteArray(new Account(amount, accountNumber)), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
                             Console.WriteLine("Deposit failed");
+                            Console.ForegroundColor = ConsoleColor.White;
+                        }
                     }
 
                     else if (inputValue == 3)
@@ -729,7 +757,11 @@ namespace Client
                     password = Console.ReadLine();
 
                     if (!BetProxy.BetLogin(Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(GetSha512Hash(shaHash, password)), Helper.ObjectToByteArray(port)))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine("Wrong password. Try again");
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
                     else
                         break;
                 }
@@ -873,7 +905,10 @@ namespace Client
                 if (!BetProxy.CheckIfAlive(port))
                 {
                     BetDisconnected = true;
+
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("You are disconnected.");
+                    Console.ForegroundColor = ConsoleColor.White;
                     break;
                 }
                 Thread.Sleep(3000);
@@ -886,7 +921,9 @@ namespace Client
                 if (!BankProxy.CheckIfAlive(port))
                 {
                     BankDisconnected = true;
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("You are disconnected.");
+                    Console.ForegroundColor = ConsoleColor.White;
                     break;
                 }
                 Thread.Sleep(3000);
