@@ -215,6 +215,7 @@ namespace Client
                     }
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\nPayment: " + ticket.Payment);
                     Console.WriteLine("\nPossible win: " + ticket.CashPrize);
                     Console.WriteLine("\n*********************************************************************************");
                     Console.ForegroundColor = ConsoleColor.White;
@@ -222,7 +223,9 @@ namespace Client
 
                 else
                 {
-                    Console.WriteLine("Your ticket is not send! (You don't have permission to send ticket or you don't have enough money.");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Your ticket is not sent! (You don't have permission to send ticket or you don't have enough money).");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
             }
             else
@@ -389,6 +392,8 @@ namespace Client
                         Thread.Sleep(2000);
                     do
                     {
+                        if (BetDisconnected)
+                            break;
                         Console.WriteLine("Press 1 for new ticket.");
                         Console.WriteLine("Press 2 for logout.");
                         inputValue = (int)CheckIfNumber(Console.ReadLine());
