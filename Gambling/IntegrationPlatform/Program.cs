@@ -27,10 +27,17 @@ namespace IntegrationPlatform
         // public static Dictionary<int, ClientProxy> proxies2 = new Dictionary<int, ClientProxy>();
 
         private static DateTime start;
+        private static Dictionary<string, IntrusionTry> attempts;
+
+        public static Dictionary<string, IntrusionTry> Attempts
+        {
+            get { return attempts; }
+            set { attempts = value; }
+        }
 
         static void Main(string[] args)
         {
-
+            Attempts = new Dictionary<string, IntrusionTry>();
             start = DateTime.Now;
 
             NetTcpBinding binding = new NetTcpBinding();
@@ -184,7 +191,7 @@ namespace IntegrationPlatform
                 bool fresh = true;
 
 
-                Dictionary<string, IntrusionTry> attempts;
+                
 
                 StreamReader file = new StreamReader("ESB_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt");
 
@@ -194,7 +201,7 @@ namespace IntegrationPlatform
 
                 //  if (prev_line != null)
                 //    {
-                attempts = new Dictionary<string, IntrusionTry>();
+                
                 while ((line = file.ReadLine()) != null)
                 {
                     string time = line.Substring(0, 15);
@@ -232,34 +239,34 @@ namespace IntegrationPlatform
                             last = line.IndexOf(" Port:", first);
                             address = line.Substring(first, last - first);
 
-                            if (!attempts.ContainsKey(address))
+                            if (!Attempts.ContainsKey(address))
                             {
-                                attempts.Add(address, new IntrusionTry(1, Convert.ToDateTime(date)));
+                                Attempts.Add(address, new IntrusionTry(1, Convert.ToDateTime(date)));
                             }
                             else
                             {
                                 //if (DateTime.Now - Convert.ToDateTime(date) < TimeSpan.FromMinutes(3))
-                                if (DateTime.Now - attempts[address].LastTry < TimeSpan.FromMinutes(3))
+                                if (DateTime.Now - Attempts[address].LastTry < TimeSpan.FromMinutes(3))
                                 /*ako je unos pogresen u manje od 3 minuta, ako je razmak izmedju greske vise od 3 minuta pokusaji se vracaju na 1*/
                                 {
-                                    attempts[address].Attempt += 1;
-                                    attempts[address].LastTry = Convert.ToDateTime(date);
+                                    Attempts[address].Attempt += 1;
+                                    Attempts[address].LastTry = Convert.ToDateTime(date);
                                 }
                                 else
                                 {
-                                    attempts[address].Attempt = 1;
-                                    attempts[address].LastTry = Convert.ToDateTime(date);
+                                    Attempts[address].Attempt = 1;
+                                    Attempts[address].LastTry = Convert.ToDateTime(date);
                                 }
                             }
 
                             //prev_line = line.Substring(15, line.Length - 15);
 
                             List<string> matches;
-                            if (attempts.Values.Any(x => x.Attempt == 3))
+                            if (Attempts.Values.Any(x => x.Attempt == 3))
                             {
 
-                                matches = attempts.Where(x => x.Value.Attempt == 3).Select(x => x.Key).ToList();
-                                attempts[address].Attempt = 0;
+                                matches = Attempts.Where(x => x.Value.Attempt == 3).Select(x => x.Key).ToList();
+                                Attempts[address].Attempt = 0;
                                 //start = DateTime.Now;
                                 first = line.IndexOf("\\") + "\\".Length;
                                 last = line.IndexOf(" ", first);
@@ -291,6 +298,7 @@ namespace IntegrationPlatform
                     item.CloseProxy();
                     item.Close();
                 }
+                proxies.Remove(address);
             }
         }
     }
