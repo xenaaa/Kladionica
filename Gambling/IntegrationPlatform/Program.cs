@@ -24,7 +24,6 @@ namespace IntegrationPlatform
         private static readonly Logger loger = LogManager.GetLogger("Syslog");
 
         public static Dictionary<string, Dictionary<int, ClientProxy>> proxies = new Dictionary<string, Dictionary<int, ClientProxy>>();
-        // public static Dictionary<int, ClientProxy> proxies2 = new Dictionary<int, ClientProxy>();
 
         private static DateTime start;
 
@@ -172,11 +171,10 @@ namespace IntegrationPlatform
         }
 
 
-        public static void IntrusionDetection()//mozda dodati lock zbog preplitanja sa logom?
+        public static void IntrusionDetection()
         {
             if (File.Exists("ESB_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt"))//da ne iskace ako fajl ne postoji za novi dan
             {
-                //string prev_line;
                 string line;
                 int first;
                 int last;
@@ -190,10 +188,6 @@ namespace IntegrationPlatform
 
                 string temp = file.ReadLine();
 
-                //   prev_line = temp.Substring(15, temp.Length - 15);
-
-                //  if (prev_line != null)
-                //    {
                 attempts = new Dictionary<string, IntrusionTry>();
                 while ((line = file.ReadLine()) != null)
                 {
@@ -223,11 +217,6 @@ namespace IntegrationPlatform
                             last = line.IndexOf(".", first);
                             string add = line.Substring(first, last - first);
 
-                            //if (line.Substring(15, line.Length - 15) == prev_line)
-                            //    counter++;
-                            //else
-                            //    counter = 0;
-
                             first = line.IndexOf("address: ") + "address: ".Length;
                             last = line.IndexOf(" Port:", first);
                             address = line.Substring(first, last - first);
@@ -238,7 +227,6 @@ namespace IntegrationPlatform
                             }
                             else
                             {
-                                //if (DateTime.Now - Convert.ToDateTime(date) < TimeSpan.FromMinutes(3))
                                 if (DateTime.Now - attempts[address].LastTry < TimeSpan.FromMinutes(3))
                                 /*ako je unos pogresen u manje od 3 minuta, ako je razmak izmedju greske vise od 3 minuta pokusaji se vracaju na 1*/
                                 {
@@ -252,7 +240,6 @@ namespace IntegrationPlatform
                                 }
                             }
 
-                            //prev_line = line.Substring(15, line.Length - 15);
 
                             List<string> matches;
                             if (attempts.Values.Any(x => x.Attempt == 3))
@@ -260,22 +247,16 @@ namespace IntegrationPlatform
 
                                 matches = attempts.Where(x => x.Value.Attempt == 3).Select(x => x.Key).ToList();
                                 attempts[address].Attempt = 0;
-                                //start = DateTime.Now;
+
                                 first = line.IndexOf("\\") + "\\".Length;
                                 last = line.IndexOf(" ", first);
                                 username = line.Substring(first, last - first);
-                                //first = line.IndexOf("address: ") + "address: ".Length;
-                                //last = line.IndexOf(" Port:", first);
-                                //address = line.Substring(first, last - first);
-                                //first = line.IndexOf("Port: ") + "Port: ".Length;
-                                //last = line.IndexOf(" - ", first);
-                                //string port = line.Substring(first, last - first);
+
                                 IntrusionPrevention(matches);
                             }
                         }
 
                     }
-                    //  }
                 }
                 file.Close();
             }
@@ -284,7 +265,7 @@ namespace IntegrationPlatform
         private static void IntrusionPrevention (List<string> addresses)
         {
 
-            foreach (string address in addresses)//bice uvek samo jedna, ali ajde...
+            foreach (string address in addresses)
             {
                 foreach (var item in proxies[address].Values)
                 {
