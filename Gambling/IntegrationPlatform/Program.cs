@@ -270,7 +270,7 @@ namespace IntegrationPlatform
                                 //first = line.IndexOf("Port: ") + "Port: ".Length;
                                 //last = line.IndexOf(" - ", first);
                                 //string port = line.Substring(first, last - first);
-                                IntrusionPrevention(username/*, Convert.ToInt32(port)*/, matches);
+                                IntrusionPrevention(matches);
                             }
                         }
 
@@ -281,7 +281,7 @@ namespace IntegrationPlatform
             }
         }
 
-        private static void IntrusionPrevention(string username/*, int port*/, List<string> addresses)
+        private static void IntrusionPrevention (List<string> addresses)
         {
 
             foreach (string address in addresses)//bice uvek samo jedna, ali ajde...

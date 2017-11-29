@@ -17,7 +17,7 @@ namespace BankServer
         public BankServerProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
 
-            string cltCertCN = "bankserviceclient";
+            string cltCertCN = "bankserviceclientintegration";
 
             this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
             this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;

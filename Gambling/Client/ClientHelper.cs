@@ -77,14 +77,12 @@ namespace Client
                             Console.WriteLine(String.Format("{0,-10} {1,-10}          {2,-10}             {3,-1} : {4,-4}           {5,-5}  ", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip));
                             //   Console.ForegroundColor = ConsoleColor.White;
                         }
-
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("\nPayment: " + ticket.Payment);
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("\nWin: " + ticket.CashPrize);
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine("\n*********************************************************************************\n");
-
-
-
                     }
                     Monitor.Exit(PrintLock);
                 }
@@ -116,7 +114,10 @@ namespace Client
                             }
                         }
                         Console.ForegroundColor = ConsoleColor.White;
+                        Console.WriteLine("\nPayment: " + ticket.Payment);
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("\nWin: 0");
+                        Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine("\n**********************************************************************************\n"); ;
                     }
                     Monitor.Exit(PrintLock);

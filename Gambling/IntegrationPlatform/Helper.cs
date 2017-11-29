@@ -19,7 +19,7 @@ namespace Contracts
         //public const int bankServicePort = 15000;
         public const int integrationHostPort = 42855;
 
-        public const string integrationHostAddress = "10.1.212.159";
+        public const string integrationHostAddress = "localhost";
         public static string BetServerAddress = string.Empty;
         public static string BankServerAddress = string.Empty;
 
@@ -106,21 +106,6 @@ namespace Contracts
             }
 
             return addressIPv4;
-        }
-
-
-        public static int GetPort()
-        {
-            string addressIPv4 = string.Empty;
-
-            OperationContext oOperationContext = OperationContext.Current;
-            MessageProperties oMessageProperties = oOperationContext.IncomingMessageProperties;
-
-            RemoteEndpointMessageProperty endpoint = oMessageProperties[RemoteEndpointMessageProperty.Name] as RemoteEndpointMessageProperty;
-
-            int nPort = endpoint.Port;
-
-            return nPort;
         }
     }
 }

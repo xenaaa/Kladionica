@@ -85,7 +85,6 @@ namespace BankServer
                 User user1 = new User(user.Username, user.Password, user.Role, bankAcc, betAcc);
                 bankUsersFromFile.Add(user1.Username, user1);
                 Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");
-                Console.Write("Korisnik {0}", user1.Username);
                 return true;
             }
 

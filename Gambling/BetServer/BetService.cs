@@ -188,8 +188,6 @@ namespace BetServer
                 }
                 else
                     return false;
-
-
             }
             else
                 return false;
@@ -213,7 +211,7 @@ namespace BetServer
                 User user = betUsersFromFile[username];
                 user.BetAccount.Amount += acc.Amount;
 
-                EditUser(Helper.Encrypt(user), Helper.Encrypt(Helper.GetPort()));
+                EditUser(Helper.Encrypt(user), Helper.EncryptOnIntegration(port));
             }
             return true;
         }

@@ -307,12 +307,7 @@ namespace IntegrationPlatform
 
         public bool Deposit(byte[] accBytes, byte[] usernameBytes, byte[] port)
         {
-
             return proxy.Deposit(accBytes, usernameBytes,port);
-
-
-
-
         }
 
         public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo

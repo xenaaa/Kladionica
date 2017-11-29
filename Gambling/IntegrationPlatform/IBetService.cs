@@ -39,7 +39,5 @@ namespace Contracts
 
         [OperationContract]
         List<Dictionary<string, int>> Report();
-       
-
     }
 }

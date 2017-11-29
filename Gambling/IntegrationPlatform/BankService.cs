@@ -91,7 +91,7 @@ namespace IntegrationPlatform
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser", "not authorized");
                 Audit.LogInFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
-                loger.Warn("IP address: {0} Port: {1} - Bank login failed (not authorized).", Helper.GetIP(), Helper.GetPort());
+                loger.Warn("IP address: {0} Port: {1} - Bank login failed (not authorized).", Helper.GetIP(), port);
                 allowed = false;
             }
             return allowed;
@@ -158,13 +158,13 @@ namespace IntegrationPlatform
                 if (proxy.CreateAccount(encryptedUser,encryptedPort))
                 {
                     Audit.CreateAccount(principal.Identity.Name.Split('\\')[1].ToString());
-                    loger.Info("IP address: {0} Port: {1} - User {2} is created.", Helper.GetIP(), Helper.GetPort(), user.Username);
+                    loger.Info("IP address: {0} Port: {1} - User {2} is created.", Helper.GetIP(), port, user.Username);
                     allowed = true;
                 }
                 else
                 {
                     Audit.CreateAccountFailed(principal.Identity.Name.Split('\\')[1].ToString(), "error");
-                    loger.Warn("IP address: {0} Port: {1} - Failed to create user {2}.", Helper.GetIP(), Helper.GetPort(), user.Username);
+                    loger.Warn("IP address: {0} Port: {1} - Failed to create user {2}.", Helper.GetIP(), port, user.Username);
                     allowed = false;
                 }
 
@@ -174,7 +174,7 @@ namespace IntegrationPlatform
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "create account", "not authorized");
                 Audit.CreateAccountFailed(principal.Identity.Name.Split('\\')[1].ToString(), "not authorized");
-                loger.Warn("IP address: {0} Port: {1} - Failed to create user {2} (not authorized).", Helper.GetIP(), Helper.GetPort(), user.Username);
+                loger.Warn("IP address: {0} Port: {1} - Failed to create user {2} (not authorized).", Helper.GetIP(), port, user.Username);
             }
 
 
@@ -193,7 +193,7 @@ namespace IntegrationPlatform
 
             while ((line = file.ReadLine()) != null)
             {
-                if (line.Contains("Deposit"))
+                if (line.Contains("Deposit success"))
                 {
                     int first = line.IndexOf("address: ") + "address: ".Length;
                     int last = line.IndexOf(" Port:", first);
