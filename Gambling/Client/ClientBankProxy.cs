@@ -68,11 +68,11 @@ namespace Client
             }
         }
 
-        public List<Dictionary<string, int>> Report()
+        public List<Dictionary<string, int>> Report(int port)
         {
             try
             {
-                return factory.Report();
+                return factory.Report(port);
             }
             catch (Exception e)
             {

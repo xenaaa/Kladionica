@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Security;
@@ -50,8 +51,11 @@ namespace BetServer
             return port;
         }
 
+        public static SHA512 shaHash;
         static void Main(string[] args)
         {
+            shaHash = SHA512.Create();
+
             Persistance.EmptyBetFiles();
             string srvCertCN = "betservice";
 
@@ -123,11 +127,22 @@ namespace BetServer
                 }
             }
 
-
-
-
             BetService bs = new BetService();
 
+            if (!bs.AddFirstUsers(new User("adminBet", GetSha512Hash(shaHash, "admin"), "BetAdmin")))
+                Console.WriteLine("User already exists");
+            if (!bs.AddFirstUsers(new User("marina", GetSha512Hash(shaHash, "marina"), "User")))
+                Console.WriteLine("User already exists");
+            if (!bs.AddFirstUsers(new User("bojan", GetSha512Hash(shaHash, "bojan"), "User")))
+                Console.WriteLine("User already exists");
+            if (!bs.AddFirstUsers(new User("david", GetSha512Hash(shaHash, "david"), "User")))
+                Console.WriteLine("User already exists");
+            if (!bs.AddFirstUsers(new User("nicpa", GetSha512Hash(shaHash, "nicpa"), "User")))
+                Console.WriteLine("User already exists");
+            if (!bs.AddFirstUsers(new User("djole", GetSha512Hash(shaHash, "djole"), "Reader")))
+                Console.WriteLine("User already exists");
+
+        
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
@@ -627,6 +642,26 @@ namespace BetServer
                 }
             }
 
+        }
+
+        static string GetSha512Hash(SHA512 shaHash, string input)
+        {
+            // Convert the input string to a byte array and compute the hash.
+            byte[] data = shaHash.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+            // Create a new Stringbuilder to collect the bytes
+            // and create a string.
+            StringBuilder sBuilder = new StringBuilder();
+
+            // Loop through each byte of the hashed data 
+            // and format each one as a hexadecimal string.
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+
+            // Return the hexadecimal string.
+            return sBuilder.ToString();
         }
     }
 }

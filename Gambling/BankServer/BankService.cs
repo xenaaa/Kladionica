@@ -88,6 +88,29 @@ namespace BankServer
 
         }
 
+        public bool CreateFirstAccounts(User user)
+        {
+            Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("bankUsers.txt");
+            if (obj != null)
+                bankUsersFromFile = (Dictionary<string, User>)obj;
+
+            if (bankUsersFromFile.Keys.Contains(user.Username))
+                return false;
+            else
+            {
+                Account bankAcc = new Account(15, accNumb);
+                accNumb++;
+                Account betAcc = new Account(0, accNumb);
+                accNumb++;
+                User user1 = new User(user.Username, user.Password, user.Role, bankAcc, betAcc);
+                bankUsersFromFile.Add(user1.Username, user1);
+                Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");
+                return true;
+            }
+
+        }
+
         public bool Deposit(byte[] accBytes, byte[] usernameBytes)
         {
             Account acc = (Account)Helper.Decrypt(accBytes);

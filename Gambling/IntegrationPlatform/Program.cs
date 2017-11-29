@@ -184,7 +184,7 @@ namespace IntegrationPlatform
                 string line;
                 int first;
                 int last;
-                string username, address;
+                string address;
                 bool fresh = true;
 
                 StreamReader file = new StreamReader("ESB_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt");
@@ -232,6 +232,16 @@ namespace IntegrationPlatform
                                 type = "deposit";
                             else if (line.Contains("Failed to send ticket"))
                                 type = "ticket";
+                            else if (line.Contains("Failed to add user"))
+                                type = "add";
+                            else if (line.Contains("Failed to edit user"))
+                                type = "edit";
+                            else if (line.Contains("Failed to delete user"))
+                                type = "delete";
+                            else if (line.Contains("Failed to create user"))
+                                type = "create";
+                            else if (line.Contains("Failed to create report"))
+                                type = "report";
 
                             if (type != "")
                                 DetecetionToPrevention(type, date, address);
@@ -263,6 +273,11 @@ namespace IntegrationPlatform
                 intrusionTypes.Add("banklog", new IntrusionTry());
                 intrusionTypes.Add("deposit", new IntrusionTry());
                 intrusionTypes.Add("ticket", new IntrusionTry());
+                intrusionTypes.Add("add", new IntrusionTry());
+                intrusionTypes.Add("edit", new IntrusionTry());
+                intrusionTypes.Add("delete", new IntrusionTry());
+                intrusionTypes.Add("create", new IntrusionTry());
+                intrusionTypes.Add("report", new IntrusionTry());
 
                 intrusionTypes[type].LastTry = Convert.ToDateTime(date);
                 intrusionTypes[type].Attempt = 1;

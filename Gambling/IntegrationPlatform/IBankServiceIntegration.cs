@@ -23,6 +23,6 @@ namespace Contracts
         bool CreateAccount(byte[] user, byte[] port);
 
         [OperationContract]
-        List<Dictionary<string, int>> Report();
+        List<Dictionary<string, int>> Report(int port);
     }
 }

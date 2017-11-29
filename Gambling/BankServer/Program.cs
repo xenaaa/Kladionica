@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Security;
@@ -24,8 +25,10 @@ namespace BankServer
             l.Stop();
             return port;
         }
+        public static SHA512 shaHash;
         static void Main(string[] args)
         {
+            shaHash = SHA512.Create();
             Persistance.EmptyBankFiles();
             string srvCertCN = "bankservice";
 
@@ -97,8 +100,43 @@ namespace BankServer
             Console.WriteLine("Bank service is started.");
             Console.WriteLine("Press <enter> to stop service...");
 
+            BankService bs = new BankService();
+            if (!bs.CreateFirstAccounts(new User("adminBank", GetSha512Hash(shaHash, "admin"), "BankAdmin")))
+                Console.WriteLine("User already exists");
+            if (!bs.CreateFirstAccounts(new User("marina", GetSha512Hash(shaHash, "marina"), "User")))
+                Console.WriteLine("User already exists");
+            if (!bs.CreateFirstAccounts(new User("bojan", GetSha512Hash(shaHash, "bojan"), "User")))
+                Console.WriteLine("User already exists");
+            if (!bs.CreateFirstAccounts(new User("david", GetSha512Hash(shaHash, "david"), "User")))
+                Console.WriteLine("User already exists");
+            if (!bs.CreateFirstAccounts(new User("nicpa", GetSha512Hash(shaHash, "nicpa"), "User")))
+                Console.WriteLine("User already exists");
+            if (!bs.CreateFirstAccounts(new User("djole", GetSha512Hash(shaHash, "djole"), "Reader")))
+                Console.WriteLine("User already exists");
+
+
             Console.ReadLine();
             host.Close();
+        }
+
+        static string GetSha512Hash(SHA512 shaHash, string input)
+        {
+            // Convert the input string to a byte array and compute the hash.
+            byte[] data = shaHash.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+            // Create a new Stringbuilder to collect the bytes
+            // and create a string.
+            StringBuilder sBuilder = new StringBuilder();
+
+            // Loop through each byte of the hashed data 
+            // and format each one as a hexadecimal string.
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+
+            // Return the hexadecimal string.
+            return sBuilder.ToString();
         }
     }
 }

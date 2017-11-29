@@ -236,7 +236,7 @@ namespace IntegrationPlatform
             {
                 Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "EditUser", "not authorized");
                 Audit.EditUserFailed(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString(), "not authorized");
-                loger.Warn("IP address: {0} Port: {1} - Failed to edit user {2} (not authorized).", Helper.GetIP(), user.Port, user.Username.ToString());
+                loger.Warn("IP address: {0} Port: {1} - Failed to edit user {2} (not authorized).", Helper.GetIP(), port, user.Username.ToString());
                 allowed = false;
             }
             return allowed;
@@ -311,87 +311,100 @@ namespace IntegrationPlatform
             return true;
         }
 
-        public List<Dictionary<string, int>> Report()
+        public List<Dictionary<string, int>> Report(int port)
         {
-            List<Dictionary<string, int>> returnDictionaries = new List<Dictionary<string, int>>();
-            Dictionary<string, int> addresses = new Dictionary<string, int>();
-            Dictionary<string, int> users = new Dictionary<string, int>();
 
-            string line;
-            System.IO.StreamReader file = new System.IO.StreamReader("ESB_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt");
+            CustomPrincipal principal = Thread.CurrentPrincipal as CustomPrincipal;
 
-            while ((line = file.ReadLine()) != null)
+            if (principal.IsInRole("BetAdmin"))
             {
-                if (!line.Contains("created") && !line.Contains("Deposit"))
+                List<Dictionary<string, int>> returnDictionaries = new List<Dictionary<string, int>>();
+                Dictionary<string, int> addresses = new Dictionary<string, int>();
+                Dictionary<string, int> users = new Dictionary<string, int>();
+
+                string line;
+                System.IO.StreamReader file = new System.IO.StreamReader("ESB_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt");
+
+                while ((line = file.ReadLine()) != null)
                 {
-                    int first = line.IndexOf("address: ") + "address: ".Length;
-                    int last = line.IndexOf(" Port:", first);
-                    string address = line.Substring(first, last - first);
-
-                    int first2 = line.IndexOf("\\") + "\\".Length;
-                    int last2 = line.IndexOf(" ", first2);
-                    string username = line.Substring(first2, last2 - first2);
-
-                    if (username != "adminBet" && username != "adminBank")
+                    if (!line.Contains("created") && !line.Contains("Deposit"))
                     {
-                        if (addresses.ContainsKey(address))
-                        {
-                            addresses[address]++;
-                        }
-                        else
-                        {
-                            addresses.Add(address, 1);
-                        }
+                        int first = line.IndexOf("address: ") + "address: ".Length;
+                        int last = line.IndexOf(" Port:", first);
+                        string address = line.Substring(first, last - first);
 
-                        if (users.ContainsKey(username))
+                        int first2 = line.IndexOf("\\") + "\\".Length;
+                        int last2 = line.IndexOf(" ", first2);
+                        string username = line.Substring(first2, last2 - first2);
+
+                        if (username != "adminBet" && username != "adminBank")
                         {
-                            users[username]++;
-                        }
-                        else
-                        {
-                            users.Add(username, 1);
+                            if (addresses.ContainsKey(address))
+                            {
+                                addresses[address]++;
+                            }
+                            else
+                            {
+                                addresses.Add(address, 1);
+                            }
+
+                            if (users.ContainsKey(username))
+                            {
+                                users[username]++;
+                            }
+                            else
+                            {
+                                users.Add(username, 1);
+                            }
                         }
                     }
                 }
+
+
+                var sortedAddressDict = from entry in addresses orderby entry.Value descending select entry;
+
+                int counter = 3;
+                if (counter > sortedAddressDict.Count())
+                    counter = sortedAddressDict.Count();
+
+                foreach (var item in sortedAddressDict)
+                {
+
+                    counter--;
+                    if (counter == 0)
+                        break;
+                }
+
+                var sortedUserDict = from entry in users orderby entry.Value descending select entry;
+
+                if (counter > sortedUserDict.Count())
+                    counter = sortedUserDict.Count();
+
+                foreach (var item in sortedUserDict)
+                {
+
+                    counter--;
+                    if (counter == 0)
+                        break;
+                }
+
+                file.Close();
+
+                Dictionary<string, int> result = sortedAddressDict.ToDictionary(x => x.Key, x => x.Value);
+                returnDictionaries.Add(result);
+
+                result = sortedUserDict.ToDictionary(x => x.Key, x => x.Value);
+                returnDictionaries.Add(result);
+
+                loger.Info("IP address: {0} Port: {1} - Failed to create report.", Helper.GetIP(), port);
+                return returnDictionaries;
             }
-
-
-            var sortedAddressDict = from entry in addresses orderby entry.Value descending select entry;
-
-            int counter = 3;
-            if (counter > sortedAddressDict.Count())
-                counter = sortedAddressDict.Count();
-
-            foreach (var item in sortedAddressDict)
+            else
             {
-
-                counter--;
-                if (counter == 0)
-                    break;
+                Audit.AuthorizationFailed(principal.Identity.Name.Split('\\')[1].ToString(), "report", "not authorized");
+                loger.Warn("IP address: {0} Port: {1} - Report is created.", Helper.GetIP(), port);
+                return null;
             }
-
-            var sortedUserDict = from entry in users orderby entry.Value descending select entry;
-
-            if (counter > sortedUserDict.Count())
-                counter = sortedUserDict.Count();
-
-            foreach (var item in sortedUserDict)
-            {
-
-                counter--;
-                if (counter == 0)
-                    break;
-            }
-
-            file.Close();
-
-            Dictionary<string, int> result = sortedAddressDict.ToDictionary(x => x.Key, x => x.Value);
-            returnDictionaries.Add(result);
-
-            result = sortedUserDict.ToDictionary(x => x.Key, x => x.Value);
-            returnDictionaries.Add(result);
-
-            return returnDictionaries;
         }
     }
 }

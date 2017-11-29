@@ -114,6 +114,30 @@ namespace BetServer
 
         }
 
+
+        public bool AddFirstUsers(User user)
+        {
+
+            Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
+            Object obj = Persistance.ReadFromFile("betUsers.txt");
+            if (obj != null)
+                betUsersFromFile = (Dictionary<string, User>)obj;
+
+            if (!betUsersFromFile.ContainsKey(user.Username))
+            {
+                lock (PortLock)
+                {
+                    betUsersFromFile.Add(user.Username, user);
+                    Persistance.WriteToFile(betUsersFromFile, "betUsers.txt");
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public bool DeleteUser(byte[] usernameBytes)
         {
             string username = (string)Helper.Decrypt(usernameBytes);

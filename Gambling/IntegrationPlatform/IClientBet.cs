@@ -32,6 +32,6 @@ namespace Contracts
         bool SendTicket(byte[] ticket, byte[] username, byte[] port);
 
         [OperationContract]
-        List<Dictionary<string, int>> Report();
+        List<Dictionary<string, int>> Report(int port);
     }
 }
