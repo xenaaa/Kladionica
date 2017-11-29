@@ -11,7 +11,7 @@ namespace IntegrationPlatform
 {
     public class ClientHelper : IClientHelperIntegration
     {
-      //  IClientHelperIntegration proxy;
+        //  IClientHelperIntegration proxy;
         ClientProxy proxy;//mora 2 proksija
         ClientPrintProxy printProxy;
 
@@ -36,31 +36,24 @@ namespace IntegrationPlatform
             if (isItPrintClient)
             {
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
-                printProxy = new ClientPrintProxy(binding, address);//novo
-                return printProxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);//novo
+                printProxy = new ClientPrintProxy(binding, address);
+                return printProxy.CheckIfAlive();
             }
             else
             {
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
-                proxy = new ClientProxy(binding, address);//novo
-                return proxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);//novo
+                proxy = new ClientProxy(binding, address);
+                return proxy.CheckIfAlive();
             }
 
-
-         //   proxy = new ClientProxy(binding, address);
-
-           // return proxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
-           
         }
 
         public bool CloseProxy()
         {
-
-            //  return proxy.CloseProxy();
-            return (proxy.CloseProxy() && printProxy.CloseProxy());//novo
+            return (proxy.CloseProxy() && printProxy.CloseProxy());
         }
 
-        public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo
+        public bool GetServiceIP(byte[] AddressStringBytes)
         {
             string AddressString = Helper.Decrypt(AddressStringBytes) as string;
 
@@ -84,14 +77,9 @@ namespace IntegrationPlatform
 
             string address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
 
-            //proxy = new ClientProxy(binding, address);
+            printProxy = new ClientPrintProxy(binding, address);
 
-            // return proxy.SendGameResults(results, portBytes, addressBytes);
-
-            printProxy = new ClientPrintProxy(binding, address);//novo
-
-
-            return printProxy.SendGameResults(results, portBytes, addressBytes);//novo
+            return printProxy.SendGameResults(results);
         }
 
         public bool SendOffers(byte[] offersBytes, byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
@@ -100,15 +88,12 @@ namespace IntegrationPlatform
             byte[] offers = Helper.ObjectToByteArray(obj);
 
             obj = Helper.Decrypt(portBytes);
-            byte[] portB = Helper.ObjectToByteArray(obj);
             int port = (int)obj;
 
             obj = Helper.Decrypt(addressBytes);
-            byte[] addressb = Helper.ObjectToByteArray(obj);
             string addressIPv4 = (string)obj;
 
             obj = Helper.Decrypt(isItPrintClientBytes);
-            byte[] isItPrintClientb = Helper.ObjectToByteArray(obj);
             bool isItPrintClient = (bool)obj;
 
             NetTcpBinding binding = new NetTcpBinding();
@@ -117,19 +102,15 @@ namespace IntegrationPlatform
             if (isItPrintClient)
             {
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
-                printProxy = new ClientPrintProxy(binding, address);//novo
-                return printProxy.SendOffers(offers, portB, addressb, isItPrintClientb);//novo
+                printProxy = new ClientPrintProxy(binding, address);
+                return printProxy.SendOffers(offers);
             }
             else
             {
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
-                proxy = new ClientProxy(binding, address);//novo
-                return proxy.SendOffers(offers, portB, addressb, isItPrintClientb);//novo
+                proxy = new ClientProxy(binding, address);
+                return proxy.SendOffers(offers);
             }
-            //proxy = new ClientProxy(binding, address);
-          //  return proxy.SendOffers(offers, portB, addressb, isItPrintClientb);
-
-            
         }
 
         public bool SendTicketResults(byte[] ticketBytes, byte[] isPassedBytes, byte[] portBytes, byte[] addressBytes)
@@ -139,11 +120,9 @@ namespace IntegrationPlatform
             byte[] ticket = Helper.ObjectToByteArray(obj);
 
             obj = Helper.Decrypt(portBytes);
-            byte[] portB = Helper.ObjectToByteArray(obj);
             int port = (int)obj;
 
             obj = Helper.Decrypt(addressBytes);
-            byte[] addressB = Helper.ObjectToByteArray(obj);
             string addressIPv4 = (string)obj;
 
             obj = Helper.Decrypt(isPassedBytes);
@@ -154,7 +133,7 @@ namespace IntegrationPlatform
             string address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
 
             proxy = new ClientProxy(binding, address);
-            return proxy.SendTicketResults(ticket, isPassed, portB, addressB);
+            return proxy.SendTicketResults(ticket, isPassed);
         }
     }
 }

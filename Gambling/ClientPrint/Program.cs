@@ -18,7 +18,7 @@ namespace ClientPrint
 
             NetTcpBinding binding = new NetTcpBinding();
             ServiceHost host = new ServiceHost(typeof(ClientPrint));
-            host.AddServiceEndpoint(typeof(IClientHelper), binding, address);
+            host.AddServiceEndpoint(typeof(IClientPrint), binding, address);
             try
             {
                 host.Open();

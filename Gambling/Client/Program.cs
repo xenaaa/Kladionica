@@ -195,6 +195,13 @@ namespace Client
 
             if (!BetDisconnected)
             {
+
+                foreach (var item in bets)
+                {
+                    if (!ClientHelper.Offers.ContainsKey(item.Key))
+                        return false;
+                }
+
                 if (betProxy.SendTicket(Helper.ObjectToByteArray(ticket), Helper.ObjectToByteArray(clientIdentity.Name.Split('\\')[1]), Helper.ObjectToByteArray(port)))
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
@@ -219,8 +226,9 @@ namespace Client
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Your ticket is not sent! (You don't have permission to send ticket or you don't have enough money).");
+                    Console.WriteLine("Your ticket is not sent! (You don't have permission to send ticket, or you don't have enough money, or one of the games is already finished).");
                     Console.ForegroundColor = ConsoleColor.White;
+                    return false;
                 }
             }
             else
@@ -488,7 +496,8 @@ namespace Client
                                         } while (inputValue == -1);
 
                                         int payment = (int)inputValue;
-                                        MakeTicket(bets, payment);
+                                        if (!MakeTicket(bets, payment))
+                                            Console.WriteLine("Ticket not sent");
 
                                     }
                                     break;
@@ -528,8 +537,6 @@ namespace Client
             string password;
             if (!BankDisconnected)
             {
-                if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("adminBank", GetSha512Hash(shaHash, "admin"), "BankAdmin")), Helper.ObjectToByteArray(port)))
-                    Console.WriteLine("User already exists");
                 if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("adminBank", GetSha512Hash(shaHash, "admin"), "BankAdmin")), Helper.ObjectToByteArray(port)))
                     Console.WriteLine("User already exists");
                 if (!bankProxy.CreateAccount(Helper.ObjectToByteArray(new User("marina", GetSha512Hash(shaHash, "marina"), "User")), Helper.ObjectToByteArray(port)))

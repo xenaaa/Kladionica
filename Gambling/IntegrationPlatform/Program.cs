@@ -27,16 +27,22 @@ namespace IntegrationPlatform
 
         private static DateTime start;
 
+        private static Dictionary<string, Dictionary<string, IntrusionTry>> attempts;
+        public static Dictionary<string, Dictionary<string, IntrusionTry>> Attempts
+        {
+            get { return attempts; }
+            set { attempts = value; }
+        }
         static void Main(string[] args)
         {
-
+            Attempts = new Dictionary<string, Dictionary<string, IntrusionTry>>(); //prvo mjesto log, drugo depozit, trece tiket
             start = DateTime.Now;
 
             NetTcpBinding binding = new NetTcpBinding();
 
             string address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform";
             ServiceHost hostBet = new ServiceHost(typeof(BetService));
-            hostBet.AddServiceEndpoint(typeof(IBetService), binding, address);
+            hostBet.AddServiceEndpoint(typeof(IBetServiceIntegration), binding, address);
 
             hostBet.Authorization.ServiceAuthorizationManager = new CustomAuthorizationManager();
 
@@ -71,7 +77,7 @@ namespace IntegrationPlatform
             address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform2";
             ServiceHost hostBet2 = new ServiceHost(typeof(BetService));
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            hostBet2.AddServiceEndpoint(typeof(IBetService), binding, address);
+            hostBet2.AddServiceEndpoint(typeof(IBetServiceIntegration), binding, address);
 
 
             string srvCertCN = "bankserviceintegration";
@@ -99,7 +105,7 @@ namespace IntegrationPlatform
             binding = new NetTcpBinding();
             address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BankIntegrationPlatform";
             ServiceHost hostBank = new ServiceHost(typeof(BankService));
-            hostBank.AddServiceEndpoint(typeof(IBankService), binding, address);
+            hostBank.AddServiceEndpoint(typeof(IBankServiceIntegration), binding, address);
 
 
             hostBank.Authorization.ServiceAuthorizationManager = new CustomAuthorizationManager();
@@ -127,7 +133,7 @@ namespace IntegrationPlatform
             address = "net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/ClientIntegrationPlatform";
             ServiceHost hostClient = new ServiceHost(typeof(ClientHelper));
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            hostClient.AddServiceEndpoint(typeof(IClientHelper), binding, address);
+            hostClient.AddServiceEndpoint(typeof(IClientHelperIntegration), binding, address);
 
 
             hostClient.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
@@ -181,14 +187,10 @@ namespace IntegrationPlatform
                 string username, address;
                 bool fresh = true;
 
-
-                Dictionary<string, IntrusionTry> attempts;
-
                 StreamReader file = new StreamReader("ESB_" + DateTime.Now.ToString("yyyy-MM-dd") + ".txt");
 
                 string temp = file.ReadLine();
 
-                attempts = new Dictionary<string, IntrusionTry>();
                 while ((line = file.ReadLine()) != null)
                 {
                     string time = line.Substring(0, 15);
@@ -221,57 +223,73 @@ namespace IntegrationPlatform
                             last = line.IndexOf(" Port:", first);
                             address = line.Substring(first, last - first);
 
-                            if (!attempts.ContainsKey(address))
-                            {
-                                attempts.Add(address, new IntrusionTry(1, Convert.ToDateTime(date)));
-                            }
-                            else
-                            {
-                                if (DateTime.Now - attempts[address].LastTry < TimeSpan.FromMinutes(3))
-                                /*ako je unos pogresen u manje od 3 minuta, ako je razmak izmedju greske vise od 3 minuta pokusaji se vracaju na 1*/
-                                {
-                                    attempts[address].Attempt += 1;
-                                    attempts[address].LastTry = Convert.ToDateTime(date);
-                                }
-                                else
-                                {
-                                    attempts[address].Attempt = 1;
-                                    attempts[address].LastTry = Convert.ToDateTime(date);
-                                }
-                            }
+                            string type = "";
+                            if (line.Contains("Bet login failed"))
+                                type = "betlog";
+                            else if (line.Contains("Bank login failed"))
+                                type = "banklog";
+                            else if (line.Contains("Deposit failed"))
+                                type = "deposit";
+                            else if (line.Contains("Failed to send ticket"))
+                                type = "ticket";
 
+                            if (type != "")
+                                DetecetionToPrevention(type, date, address);
 
-                            List<string> matches;
-                            if (attempts.Values.Any(x => x.Attempt == 3))
-                            {
-
-                                matches = attempts.Where(x => x.Value.Attempt == 3).Select(x => x.Key).ToList();
-                                attempts[address].Attempt = 0;
-
-                                first = line.IndexOf("\\") + "\\".Length;
-                                last = line.IndexOf(" ", first);
-                                username = line.Substring(first, last - first);
-
-                                IntrusionPrevention(matches);
-                            }
                         }
-
                     }
                 }
                 file.Close();
             }
         }
 
-        private static void IntrusionPrevention (List<string> addresses)
+        private static void IntrusionPrevention(string address)
         {
 
-            foreach (string address in addresses)
+            foreach (var item in proxies[address].Values)
             {
-                foreach (var item in proxies[address].Values)
+                item.CloseProxy();
+                item.Close();
+            }
+            proxies.Remove(address);
+        }
+
+        private static void DetecetionToPrevention(string type, string date, string address)
+        {
+            if (!Attempts.ContainsKey(address))
+            {
+                Dictionary<string, IntrusionTry> intrusionTypes = new Dictionary<string, IntrusionTry>();
+                intrusionTypes.Add("betlog", new IntrusionTry());
+                intrusionTypes.Add("banklog", new IntrusionTry());
+                intrusionTypes.Add("deposit", new IntrusionTry());
+                intrusionTypes.Add("ticket", new IntrusionTry());
+
+                intrusionTypes[type].LastTry = Convert.ToDateTime(date);
+                intrusionTypes[type].Attempt = 1;
+
+                Attempts.Add(address, intrusionTypes);
+            }
+            else
+            {
+
+                if (DateTime.Now - Attempts[address][type].LastTry < TimeSpan.FromMinutes(3))
+                /*ako je unos pogresen u manje od 3 minuta, ako je razmak izmedju greske vise od 3 minuta pokusaji se vracaju na 1*/
                 {
-                    item.CloseProxy();
-                    item.Close();
+                    Attempts[address][type].Attempt += 1;
+                    Attempts[address][type].LastTry = Convert.ToDateTime(date);
                 }
+                else
+                {
+                    Attempts[address][type].Attempt = 1;
+                    Attempts[address][type].LastTry = Convert.ToDateTime(date);
+                }
+            }
+
+
+            if (Attempts[address].Values.Any(x => x.Attempt == 3))
+            {
+                Attempts[address][type].Attempt = 0;
+                IntrusionPrevention(address);
             }
         }
     }

@@ -68,9 +68,8 @@ namespace IntegrationPlatform
             {
                 byte[] encryptedUser = Helper.EncryptOnIntegration(usernameBytes);
                 byte[] encryptedPassword = Helper.EncryptOnIntegration(passwordBytes);
-                byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
 
-                if (proxy.BetLogin(encryptedUser, encryptedPassword, encryptedPort))
+                if (proxy.BetLogin(encryptedUser, encryptedPassword))
                 {
                     Audit.AuthenticationSuccess(principal.Identity.Name.Split('\\')[1].ToString());
                     Audit.LogIn(principal.Identity.Name.Split('\\')[1].ToString());
@@ -139,9 +138,8 @@ namespace IntegrationPlatform
                 Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "AddUser");
 
                 byte[] encryptedUser = Helper.EncryptOnIntegration(userBytes);
-                byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
 
-                if (proxy.AddUser(encryptedUser, encryptedPort))
+                if (proxy.AddUser(encryptedUser))
                 {
                     Audit.AddUser(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString());
                     loger.Info("IP address: {0} Port: {1} - User {2} is added.", Helper.GetIP(), port, user.Username);
@@ -180,9 +178,8 @@ namespace IntegrationPlatform
                 Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "DeleteUser");
 
                 byte[] encryptedUser = Helper.EncryptOnIntegration(usernameBytes);
-                byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
 
-                if (proxy.DeleteUser(encryptedUser, encryptedPort))
+                if (proxy.DeleteUser(encryptedUser))
                 {
                     Audit.DeleteUser(principal.Identity.Name.Split('\\')[1].ToString(), username);
                     loger.Info("IP address: {0} Port: {1} - User {2} is deleted.", Helper.GetIP(), port, username);
@@ -219,9 +216,8 @@ namespace IntegrationPlatform
                 Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "editUser");
 
                 byte[] encryptedUser = Helper.EncryptOnIntegration(userBytes);
-                byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
 
-                if (proxy.EditUser(encryptedUser, encryptedPort))
+                if (proxy.EditUser(encryptedUser))
                 {
                     Audit.EditUser(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString());
                     loger.Info("IP address: {0} Port: {1} - User {2} is edited.", Helper.GetIP(), port, user.Username.ToString());
@@ -276,11 +272,10 @@ namespace IntegrationPlatform
 
                 byte[] encryptedTicket = Helper.EncryptOnIntegration(ticketBytes);
                 byte[] encryptedUsername = Helper.EncryptOnIntegration(usernameBytes);
-                byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
 
                 string addressIPv4 = Helper.GetIP();
 
-                if (proxy.SendTicket(encryptedTicket, encryptedUsername, encryptedPort))
+                if (proxy.SendTicket(encryptedTicket, encryptedUsername))
                 {
                     Audit.TicketSent(principal.Identity.Name.Split('\\')[1].ToString());
                     loger.Info("IP address: {0} Port: {1} - Ticket sent.", Helper.GetIP(), port);
@@ -304,12 +299,12 @@ namespace IntegrationPlatform
             return allowed;
         }
 
-        public bool Deposit(byte[] accBytes, byte[] usernameBytes, byte[] port)
+        public bool Deposit(byte[] accBytes, byte[] usernameBytes)
         {
-            return proxy.Deposit(accBytes, usernameBytes, port);
+            return proxy.Deposit(accBytes, usernameBytes);
         }
 
-        public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo
+        public bool GetServiceIP(byte[] AddressStringBytes)
         {
             string AddressString = Helper.Decrypt(AddressStringBytes) as string;
             Helper.BankServerAddress = AddressString;

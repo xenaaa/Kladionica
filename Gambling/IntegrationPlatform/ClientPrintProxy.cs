@@ -26,12 +26,12 @@ namespace IntegrationPlatform
 
         }
 
-        public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
+        public bool CheckIfAlive()
         {
 
             try
             {
-                return factory.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
+                return factory.CheckIfAlive();
 
             }
             catch (Exception e)
@@ -57,11 +57,11 @@ namespace IntegrationPlatform
 
        
 
-        public bool SendGameResults(byte[] results, byte[] port, byte[] address)
+        public bool SendGameResults(byte[] results)
         {
             try
             {
-                return factory.SendGameResults(results, port, address);
+                return factory.SendGameResults(results);
 
             }
             catch (Exception e)
@@ -71,11 +71,11 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes, byte[] isItPrintClientBytes)
+        public bool SendOffers(byte[] offers)
         {
             try
             {
-                return factory.SendOffers(offers, port, addressBytes, isItPrintClientBytes);
+                return factory.SendOffers(offers);
             }
             catch (Exception e)
             {

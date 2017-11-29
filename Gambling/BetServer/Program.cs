@@ -162,7 +162,6 @@ namespace BetServer
 
             while (true)
             {
-
                 DateTime start = DateTime.Now;
 
                 do
@@ -261,11 +260,45 @@ namespace BetServer
                                 }
                             }
                         }
+                        else
+                        {
+                            string srvCertCN = "betserviceintegration";
+                            binding = new NetTcpBinding();
+                            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
+                            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
+                            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/ClientIntegrationPlatform"),
+                                                      new X509CertificateEndpointIdentity(srvCert));
+
+                            BetServerProxy proxy;
+
+                            proxy = new BetServerProxy(binding, address);
+
+                            Dictionary<string, User> usersFromFile = new Dictionary<string, User>();
+                            Object obj = Persistance.ReadFromFile("betUsers.txt");
+                            if (obj != null)
+                                usersFromFile = (Dictionary<string, User>)obj;
+
+                            foreach (KeyValuePair<string, User> user in usersFromFile)
+                            {
+                                if (!string.IsNullOrEmpty(user.Value.Address))
+                                {
+                                    byte[] encryptedPort = Helper.Encrypt(user.Value.Port);
+                                    byte[] encryptedAddress = Helper.Encrypt(user.Value.Address);
+                                    byte[] encryptedOffers = Helper.Encrypt(new Dictionary<int, BetOffer>());
+
+                                    if (proxy.CheckIfAlive(encryptedPort, encryptedAddress, Helper.Encrypt(false)))
+                                    {
+                                        proxy.SendOffers(encryptedOffers, encryptedPort, encryptedAddress, Helper.Encrypt(false));
+                                    }
+                                }
+                            }
+                            break;
+                        }
                     }
                 }
             }
         }
-
 
         private static bool CheckUserGames()//svake 2 sekunde proverava da li su se zavrsile sve utakmice na tiketima za svakog User-a pojedinacno. Ako su sve utakmice na tiketu zavrsene tikes se salje na proveru i brise
         {
@@ -347,7 +380,7 @@ namespace BetServer
                             {
                                 User changeUser = user.Value;
                                 BetService betService = new BetService();
-                                betService.EditUser(Helper.Encrypt(changeUser), Helper.ObjectToByteArray(0));
+                                betService.EditUser(Helper.Encrypt(changeUser));
                             }
                         }
 
@@ -412,7 +445,7 @@ namespace BetServer
                 User changeUser = user;
                 BetService betService = new BetService();
                 changeUser.BetAccount.Amount += ticket.CashPrize;
-                betService.EditUser(Helper.Encrypt(changeUser), Helper.ObjectToByteArray(0));
+                betService.EditUser(Helper.Encrypt(changeUser));
             }
 
             return true;

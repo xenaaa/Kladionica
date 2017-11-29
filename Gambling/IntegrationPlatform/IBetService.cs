@@ -17,21 +17,21 @@ namespace Contracts
         bool SendPort(byte[] username, byte[] port, byte[] address, byte[] Printport);
 
         [OperationContract]
-        bool BetLogin(byte[] username, byte[] password, byte[] port);
+        bool BetLogin(byte[] username, byte[] password);
 
         [OperationContract]
-        bool AddUser(byte[] user, byte[] port);
+        bool AddUser(byte[] user);
 
         [OperationContract]
-        bool DeleteUser(byte[] username, byte[] port);
+        bool DeleteUser(byte[] username);
 
         [OperationContract]
-        bool EditUser(byte[] user, byte[] port);
+        bool EditUser(byte[] user);
 
         [OperationContract]
-        bool SendTicket(byte[] ticket, byte[] username, byte[] port);
+        bool SendTicket(byte[] ticket, byte[] username);
 
         [OperationContract]
-        bool Deposit(byte[] acc, byte[] username, byte[] port);
+        bool Deposit(byte[] acc, byte[] username);
     }
 }

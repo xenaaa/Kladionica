@@ -28,12 +28,12 @@ namespace IntegrationPlatform
 
         }
 
-        public bool CheckIfAlive(byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
+        public bool CheckIfAlive()
         {
 
             try
             {
-                return factory.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
+                return factory.CheckIfAlive();
 
             }
             catch (Exception e)
@@ -57,29 +57,11 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool GetServiceIP(byte[] AddressStringBytes)
-        {
-            throw new NotImplementedException();
-        }
-
-        //public bool SendGameResults(byte[] results, byte[] port, byte[] address)
-        //{
-        //    try
-        //    {
-        //        return factory.SendGameResults(results, port, address);
-
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine("Error {0}", e.Message);
-        //        return false;
-        //    }
-        //}
-        public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes, byte[] isItPrintClientBytes)
+        public bool SendOffers(byte[] offers)
         {
             try
             {
-                return factory.SendOffers(offers, port, addressBytes, isItPrintClientBytes);
+                return factory.SendOffers(offers);
             }
             catch (Exception e)
             {
@@ -88,11 +70,11 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port, byte[] address)
+        public bool SendTicketResults(byte[] ticket, byte[] isPassed)
         {
             try
             {
-                return factory.SendTicketResults(ticket, isPassed, port, address);
+                return factory.SendTicketResults(ticket, isPassed);
             }
             catch (Exception e)
             {

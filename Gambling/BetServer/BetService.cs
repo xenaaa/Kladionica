@@ -59,12 +59,11 @@ namespace BetServer
 
 
 
-        public bool BetLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes)
+        public bool BetLogin(byte[] usernameBytes, byte[] passwordBytes)
         {
 
             string username = (string)Helper.Decrypt(usernameBytes);
             string password = (string)Helper.Decrypt(passwordBytes);
-            int port = (int)Helper.Decrypt(portBytes);
 
             Dictionary<string, User> betUsersFromFile = new Dictionary<string, User>();
             Object obj = Persistance.ReadFromFile("betUsers.txt");
@@ -86,7 +85,7 @@ namespace BetServer
         }
 
 
-        public bool AddUser(byte[] userBytes, byte[] port)
+        public bool AddUser(byte[] userBytes)
         {
             //dekpricija
             User user = (User)Helper.Decrypt(userBytes);
@@ -100,7 +99,6 @@ namespace BetServer
 
             if (!betUsersFromFile.ContainsKey(user.Username))
             {
-
                 lock (PortLock)
                 {
                     betUsersFromFile.Add(user.Username, user);
@@ -116,7 +114,7 @@ namespace BetServer
 
         }
 
-        public bool DeleteUser(byte[] usernameBytes, byte[] port)
+        public bool DeleteUser(byte[] usernameBytes)
         {
             string username = (string)Helper.Decrypt(usernameBytes);
 
@@ -137,7 +135,7 @@ namespace BetServer
             }
         }
 
-        public bool EditUser(byte[] userBytes, byte[] port)
+        public bool EditUser(byte[] userBytes)
         {
             User user = (User)Helper.Decrypt(userBytes);
 
@@ -166,7 +164,7 @@ namespace BetServer
         }
 
 
-        public bool SendTicket(byte[] ticketBytes, byte[] usernameBytes, byte[] portBytes)
+        public bool SendTicket(byte[] ticketBytes, byte[] usernameBytes)
         {
             Ticket ticket = (Ticket)Helper.Decrypt(ticketBytes);
             string username = (string)Helper.Decrypt(usernameBytes);
@@ -193,7 +191,7 @@ namespace BetServer
                 return false;
         }
 
-        public bool Deposit(byte[] accBytes, byte[] usernameBytes, byte[] port)
+        public bool Deposit(byte[] accBytes, byte[] usernameBytes)
         {
             string username = (string)Helper.Decrypt(usernameBytes);
             Account acc = (Account)Helper.Decrypt(accBytes);
@@ -211,7 +209,7 @@ namespace BetServer
                 User user = betUsersFromFile[username];
                 user.BetAccount.Amount += acc.Amount;
 
-                EditUser(Helper.Encrypt(user), Helper.EncryptOnIntegration(port));
+                EditUser(Helper.Encrypt(user));
             }
             return true;
         }

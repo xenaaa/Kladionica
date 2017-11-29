@@ -16,7 +16,7 @@ namespace SecurityManager
 
         public byte[] Decrypt(string key, byte[] data)
         {
-            return Encrypt(Encoding.Unicode.GetBytes(key), data);
+            return Decrypt(Encoding.Unicode.GetBytes(key), data);
         }
 
         public static byte[] Encrypt(byte[] key, byte[] data)

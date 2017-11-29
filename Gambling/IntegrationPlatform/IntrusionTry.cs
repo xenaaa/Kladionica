@@ -23,6 +23,8 @@ namespace IntegrationPlatform
             get { return lastTry; }
             set { lastTry = value; }
         }
+        public IntrusionTry()
+        { }
         public IntrusionTry(int attempt,DateTime lastTry)
         {
             Attempt = attempt;

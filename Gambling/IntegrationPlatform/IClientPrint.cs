@@ -11,13 +11,13 @@ namespace Contracts
     public interface IClientPrint
     {
         [OperationContract]
-        bool CheckIfAlive(byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes);
+        bool CheckIfAlive();
 
         [OperationContract]
-        bool SendGameResults(byte[] results, byte[] port, byte[] address);
+        bool SendGameResults(byte[] results);
 
         [OperationContract]
-        bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes, byte[] isItPrintClientBytes);       
+        bool SendOffers(byte[] offers);       
 
         [OperationContract]
         bool CloseProxy();

@@ -68,10 +68,9 @@ namespace IntegrationPlatform
 
                 byte[] encryptedUser = Helper.EncryptOnIntegration(usernameBytes);
                 byte[] encryptedPassword = Helper.EncryptOnIntegration(passwordBytes);
-                byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
                 byte[] encryptedAddress = Helper.Encrypt(Helper.GetIP());
 
-                if (proxy.BankLogin(encryptedUser, encryptedPassword, encryptedPort, encryptedAddress))
+                if (proxy.BankLogin(encryptedUser, encryptedPassword, encryptedAddress))
                 {
 
                     Audit.AuthenticationSuccess(principal.Identity.Name.Split('\\')[1].ToString());
@@ -114,10 +113,9 @@ namespace IntegrationPlatform
 
                 byte[] encryptedAccount = Helper.EncryptOnIntegration(accBytes);
                 byte[] encryptedUsername = Helper.EncryptOnIntegration(usernameBytes);
-                byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
 
 
-                if (proxy.Deposit(encryptedAccount, encryptedUsername,encryptedPort))
+                if (proxy.Deposit(encryptedAccount, encryptedUsername))
                 {
                     Audit.Deposit(principal.Identity.Name.Split('\\')[1].ToString(), acc.Number.ToString());
                     loger.Info("IP address: {0} Port: {1} - Deposit success.", Helper.GetIP(), port);
@@ -153,9 +151,8 @@ namespace IntegrationPlatform
                 Audit.AuthorizationSuccess(principal.Identity.Name.Split('\\')[1].ToString(), "create account");
 
                 byte[] encryptedUser = Helper.EncryptOnIntegration(userBytes);
-                byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
 
-                if (proxy.CreateAccount(encryptedUser,encryptedPort))
+                if (proxy.CreateAccount(encryptedUser))
                 {
                     Audit.CreateAccount(principal.Identity.Name.Split('\\')[1].ToString());
                     loger.Info("IP address: {0} Port: {1} - User {2} is created.", Helper.GetIP(), port, user.Username);

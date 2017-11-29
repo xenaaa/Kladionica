@@ -19,10 +19,9 @@ namespace IntegrationPlatform
         public BankServiceProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
             /// cltCertCN.SubjectName should be set to the client's username. .NET WindowsIdentity class provides information about Windows user running the given process
-            string cltCertCN = "bankserviceclient"; 
+            string cltCertCN = "bankserviceclient";
 
             this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
-            // this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new ClientCertValidator();
             this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
 
             /// Set appropriate client's certificate on the channel. Use CertManager class to obtain the certificate based on the "cltCertCN"
@@ -39,11 +38,11 @@ namespace IntegrationPlatform
         }
 
 
-        public bool BankLogin(byte[] username, byte[] password, byte[] port, byte[] address)
+        public bool BankLogin(byte[] username, byte[] password, byte[] address)
         {
             try
             {
-                return factory.BankLogin(username, password, port, address);
+                return factory.BankLogin(username, password, address);
             }
             catch (Exception e)
             {
@@ -65,11 +64,11 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool CreateAccount(byte[] user, byte[] port)
+        public bool CreateAccount(byte[] user)
         {
             try
             {
-                return factory.CreateAccount(user,port);
+                return factory.CreateAccount(user);
             }
             catch (Exception e)
             {
@@ -78,11 +77,11 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool Deposit(byte[] acc, byte[] username, byte[] port)
+        public bool Deposit(byte[] acc, byte[] username)
         {
             try
             {
-                return factory.Deposit(acc, username,port);
+                return factory.Deposit(acc, username);
             }
             catch (Exception e)
             {

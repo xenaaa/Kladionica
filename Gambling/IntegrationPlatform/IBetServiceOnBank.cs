@@ -11,7 +11,7 @@ namespace Contracts
     public interface IBetServiceOnBank
     {
         [OperationContract]
-        bool Deposit(byte[] acc, byte[] username, byte[] port);
+        bool Deposit(byte[] acc, byte[] username);
 
         [OperationContract]
         bool GetServiceIP(byte[] AddressStringBytes);

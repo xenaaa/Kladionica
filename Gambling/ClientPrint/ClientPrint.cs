@@ -9,7 +9,7 @@ namespace ClientPrint
 {
     public class ClientPrint : IClientPrint
     {
-        public bool SendGameResults(byte[] resultsBytes, byte[] port, byte[] address)
+        public bool SendGameResults(byte[] resultsBytes)
         {
             List<Game> results = (List<Game>)Helper.ByteArrayToObject(resultsBytes);
 
@@ -28,11 +28,11 @@ namespace ClientPrint
         }
 
 
-        public bool CheckIfAlive(byte[] port, byte[] address, byte[] isItPrintClientBytes)
+        public bool CheckIfAlive()
         {
             return true;
         }
-        public bool SendOffers(byte[] offersBytes, byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
+        public bool SendOffers(byte[] offersBytes)
         {
 
             Dictionary<int, BetOffer> offers = (Dictionary<int, BetOffer>)Helper.ByteArrayToObject(offersBytes);

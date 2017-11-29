@@ -27,11 +27,10 @@ namespace BankServer
             return true;
         }
 
-        public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes, byte[] addressBytes)
+        public bool BankLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] addressBytes)
         {
             string username = (string)Helper.Decrypt(usernameBytes);
             string password = (string)Helper.Decrypt(passwordBytes);
-            int port = (int)Helper.Decrypt(portBytes);
             string addressIPv4 = (string)Helper.Decrypt(addressBytes);
 
             Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
@@ -64,7 +63,7 @@ namespace BankServer
             return false;
         }
 
-        public bool CreateAccount(byte[] userBytes, byte[] port)
+        public bool CreateAccount(byte[] userBytes)
         {
             User user = (User)Helper.Decrypt(userBytes);
 
@@ -89,11 +88,11 @@ namespace BankServer
 
         }
 
-        public bool Deposit(byte[] accBytes, byte[] usernameBytes, byte[] portBytes)
+        public bool Deposit(byte[] accBytes, byte[] usernameBytes)
         {
             Account acc = (Account)Helper.Decrypt(accBytes);
             string username = (string)Helper.Decrypt(usernameBytes);
-                int port = (int)Helper.Decrypt(portBytes);
+
 
             Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
             Object obj = Persistance.ReadFromFile("bankUsers.txt");
@@ -124,10 +123,9 @@ namespace BankServer
                     BankServerProxy proxy;
                     byte[] encryptedAccount = Helper.Encrypt(acc);
                     byte[] encryptedUername = Helper.Encrypt(username);
-                    byte[] encryptedPort = Helper.Encrypt(port);
 
                     proxy = new BankServerProxy(binding, address);
-                    proxy.Deposit(encryptedAccount, encryptedUername,encryptedPort);
+                    proxy.Deposit(encryptedAccount, encryptedUername);
                     return true;
                 }
             }
@@ -153,27 +151,6 @@ namespace BankServer
                         return true;
                     }
                 }
-            }
-        }
-
-        private bool DeleteUser(byte[] usernameBytes, byte[] port)
-        {
-            string username = (string)Helper.Decrypt(usernameBytes);
-
-            Dictionary<string, User> bankUsersFromFile = new Dictionary<string, User>();
-            Object obj = Persistance.ReadFromFile("bankUsers.txt");
-            if (obj != null)
-                bankUsersFromFile = (Dictionary<string, User>)obj;
-
-            if (!bankUsersFromFile.ContainsKey(username))
-            {
-                return false;
-            }
-            else
-            {
-                bankUsersFromFile.Remove(username);
-                Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");
-                return true;
             }
         }
     }

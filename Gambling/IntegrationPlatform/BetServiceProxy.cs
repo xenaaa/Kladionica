@@ -38,11 +38,11 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool AddUser(byte[] user, byte[] port)
+        public bool AddUser(byte[] user)
         {
             try
             {
-                return factory.AddUser(user,port);
+                return factory.AddUser(user);
             }
             catch (Exception e)
             {
@@ -53,11 +53,11 @@ namespace IntegrationPlatform
         }
 
 
-        public bool DeleteUser(byte[] username, byte[] port)
+        public bool DeleteUser(byte[] username)
         {
             try
             {
-                return factory.DeleteUser(username,port);
+                return factory.DeleteUser(username);
 
             }
             catch (Exception e)
@@ -68,11 +68,11 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool EditUser(byte[] user, byte[] port)
+        public bool EditUser(byte[] user)
         {
             try
             {
-                return factory.EditUser(user,port);
+                return factory.EditUser(user);
             }
             catch (Exception e)
             {
@@ -82,12 +82,12 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool SendTicket(byte[] ticket, byte[] username, byte[] port)
+        public bool SendTicket(byte[] ticket, byte[] username)
         {
 
             try
             {
-                return factory.SendTicket(ticket, username, port);
+                return factory.SendTicket(ticket, username);
             }
             catch (Exception e)
             {
@@ -98,11 +98,11 @@ namespace IntegrationPlatform
 
         }
 
-        public bool BetLogin(byte[] username, byte[] password, byte[] port)
+        public bool BetLogin(byte[] username, byte[] password)
         {
             try
             {
-                return factory.BetLogin(username, password, port);
+                return factory.BetLogin(username, password);
             }
             catch (Exception e)
             {
@@ -141,11 +141,11 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool Deposit(byte[] acc, byte[] username, byte[] port)
+        public bool Deposit(byte[] acc, byte[] username)
         {
             try
             {
-                factory.Deposit(acc, username,port);
+                factory.Deposit(acc, username);
                 return true;
             }
             catch (Exception e)

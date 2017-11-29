@@ -35,11 +35,11 @@ namespace BankServer
             }
         }
 
-        public bool Deposit(byte[] acc, byte[] username, byte[] port)
+        public bool Deposit(byte[] acc, byte[] username)
         {
             try
             {
-                return factory.Deposit(acc, username, port);
+                return factory.Deposit(acc, username);
             }
             catch (Exception e)
             {

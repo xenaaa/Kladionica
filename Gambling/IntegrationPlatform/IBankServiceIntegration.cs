@@ -8,19 +8,19 @@ using System.Threading.Tasks;
 namespace Contracts
 {
     [ServiceContract]
-    public interface IBankServiceIntegration : IBankService
+    public interface IBankServiceIntegration 
     {
-        //[OperationContract]
-        //bool CheckIfAlive(int port);
+        [OperationContract]
+        bool CheckIfAlive(int port);
 
-        //[OperationContract]
-        //bool BankLogin(byte[] username, byte[] password, byte[] port, byte[] address);
+        [OperationContract]
+        bool BankLogin(byte[] username, byte[] password, byte[] port, byte[] address);
 
-        //[OperationContract]
-        //bool Deposit(byte[] acc, byte[] username, byte[] port);
+        [OperationContract]
+        bool Deposit(byte[] acc, byte[] username, byte[] port);
 
-        //[OperationContract]
-        //bool CreateAccount(byte[] user, byte[] port);
+        [OperationContract]
+        bool CreateAccount(byte[] user, byte[] port);
 
         [OperationContract]
         List<Dictionary<string, int>> Report();
