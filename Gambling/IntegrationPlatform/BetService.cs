@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace IntegrationPlatform
 {
 
-    public class BetService : IBetService
+    public class BetService : IBetServiceIntegration
     {
         private static readonly Logger loger = LogManager.GetLogger("Syslog");
         BetServiceProxy proxy;
@@ -99,7 +99,6 @@ namespace IntegrationPlatform
 
         public bool CheckIfAlive(int port)
         {
-              //   int port = Helper.GetPort();
             string addressIPv4 = Helper.GetIP();
 
             NetTcpBinding binding = new NetTcpBinding();
@@ -222,7 +221,7 @@ namespace IntegrationPlatform
                 byte[] encryptedUser = Helper.EncryptOnIntegration(userBytes);
                 byte[] encryptedPort = Helper.EncryptOnIntegration(portBytes);
 
-                if (proxy.EditUser(encryptedUser,encryptedPort))
+                if (proxy.EditUser(encryptedUser, encryptedPort))
                 {
                     Audit.EditUser(principal.Identity.Name.Split('\\')[1].ToString(), user.Username.ToString());
                     loger.Info("IP address: {0} Port: {1} - User {2} is edited.", Helper.GetIP(), port, user.Username.ToString());
@@ -307,7 +306,7 @@ namespace IntegrationPlatform
 
         public bool Deposit(byte[] accBytes, byte[] usernameBytes, byte[] port)
         {
-            return proxy.Deposit(accBytes, usernameBytes,port);
+            return proxy.Deposit(accBytes, usernameBytes, port);
         }
 
         public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo
@@ -316,14 +315,6 @@ namespace IntegrationPlatform
             Helper.BankServerAddress = AddressString;
             return true;
         }
-
-        //public bool IntrusionPrevention(byte[] user)
-        //{
-
-        //    return proxy.IntrusionPrevention(user);
-
-        //}
-
 
         public List<Dictionary<string, int>> Report()
         {
@@ -369,7 +360,7 @@ namespace IntegrationPlatform
                 }
             }
 
-            //sortiramo adrese i korisnike
+
             var sortedAddressDict = from entry in addresses orderby entry.Value descending select entry;
 
             int counter = 3;
@@ -378,7 +369,7 @@ namespace IntegrationPlatform
 
             foreach (var item in sortedAddressDict)
             {
-                //    Console.WriteLine(item);
+
                 counter--;
                 if (counter == 0)
                     break;
@@ -391,7 +382,7 @@ namespace IntegrationPlatform
 
             foreach (var item in sortedUserDict)
             {
-                //  Console.WriteLine(item);
+
                 counter--;
                 if (counter == 0)
                     break;
@@ -406,7 +397,6 @@ namespace IntegrationPlatform
             returnDictionaries.Add(result);
 
             return returnDictionaries;
-
         }
     }
 }

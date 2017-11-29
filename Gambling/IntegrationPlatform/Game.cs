@@ -14,7 +14,6 @@ namespace Contracts
         private BetOffer betOffer;
         private int homeGoalScored;
         private int awayGoalScored;
-        // private string result;
         private int tip;
         private bool won;
 
@@ -27,7 +26,6 @@ namespace Contracts
         public Game(BetOffer betOffer, int homeGoalScored, int awayGoalScored, int tip)
         {
             this.betOffer = betOffer;
-            //  this.result = result;
             this.homeGoalScored = homeGoalScored;
             this.awayGoalScored = awayGoalScored;
             this.tip = tip;
@@ -83,11 +81,5 @@ namespace Contracts
                 homeGoalScored = value;
             }
         }
-        // [DataMember]
-        //public string Result
-        //{
-        //    get { return result; }
-        //    set { result = value; }
-        //}
     }
 }

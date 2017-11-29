@@ -59,7 +59,7 @@ namespace BetServer
 
 
 
-        public bool BetLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes)//da li dopustiti istom User-u da se loguje na vise klijenata?
+        public bool BetLogin(byte[] usernameBytes, byte[] passwordBytes, byte[] portBytes)
         {
 
             string username = (string)Helper.Decrypt(usernameBytes);
@@ -215,16 +215,5 @@ namespace BetServer
             }
             return true;
         }
-
-        public bool GetServiceIP(byte[] AddressStringBytes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<Dictionary<string, int>> Report()
-        {
-            throw new NotImplementedException();
-        }
- 
     }
 }

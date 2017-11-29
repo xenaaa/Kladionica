@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    public class ClientBetProxy : ChannelFactory<IBetService>, IBetService, IDisposable
+    public class ClientBetProxy : ChannelFactory<IClientBet>, IClientBet, IDisposable
     {
-        IBetService factory;
+        IClientBet factory;
 
         public ClientBetProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
@@ -120,22 +120,6 @@ namespace Client
 
         }
 
-        public bool Deposit(byte[] acc, byte[] username, byte[] port)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool GetServiceIP(byte[] AddressStringBytes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IntrusionPrevention(byte[] user)
-        {
-            throw new NotImplementedException();
-        }
-
-
         public List<Dictionary<string, int>> Report()
         {
             try
@@ -148,6 +132,5 @@ namespace Client
                 return null;
             }
         }
-
     }
 }

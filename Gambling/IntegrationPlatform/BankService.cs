@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace IntegrationPlatform
 {
-    public class BankService : IBankService
+    public class BankService : IBankServiceIntegration
     {
         private static readonly Logger loger = LogManager.GetLogger("Syslog");
         BankServiceProxy proxy;
@@ -226,7 +226,7 @@ namespace IntegrationPlatform
                 }
             }
 
-            //sortiramo adrese i korisnike
+            
             var sortedAddressDict = from entry in addresses orderby entry.Value descending select entry;
 
             int counter = 3;
@@ -235,7 +235,6 @@ namespace IntegrationPlatform
 
             foreach (var item in sortedAddressDict)
             {
-                //    Console.WriteLine(item);
                 counter--;
                 if (counter == 0)
                     break;
@@ -248,7 +247,6 @@ namespace IntegrationPlatform
 
             foreach (var item in sortedUserDict)
             {
-                //  Console.WriteLine(item);
                 counter--;
                 if (counter == 0)
                     break;
@@ -268,7 +266,6 @@ namespace IntegrationPlatform
 
         public bool CheckIfAlive(int port)
         {
-           // int port = Helper.GetPort();
             string addressIPv4 = Helper.GetIP();
 
             NetTcpBinding binding = new NetTcpBinding();

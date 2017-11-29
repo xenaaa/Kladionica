@@ -10,21 +10,20 @@ using System.Threading.Tasks;
 
 namespace BetServer
 {
-    public class BetServerProxy : ChannelFactory<IClientHelper>, IClientHelper, IDisposable
+    public class BetServerProxy : ChannelFactory<IClientHelperIntegration>, IClientHelperIntegration, IDisposable
     {
-        IClientHelper factory;
+        IClientHelperIntegration factory;
 
         public BetServerProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
 
-            string cltCertCN = "betserviceclientintegration"; //mijenjala
+            string cltCertCN = "betserviceclientintegration";
 
             this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
             this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
 
             /// Set appropriate client's certificate on the channel. Use CertManager class to obtain the certificate based on the "cltCertCN"
             this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
-            //  Console.WriteLine(this.Credentials.ClientCertificate.Certificate.ToString());
             try
             {
                 factory = this.CreateChannel();
@@ -47,11 +46,6 @@ namespace BetServer
                 return false;
             }
 
-        }
-
-        public bool CloseProxy()
-        {
-            throw new NotImplementedException();
         }
 
         public bool GetServiceIP(byte[] AddressStringBytes)

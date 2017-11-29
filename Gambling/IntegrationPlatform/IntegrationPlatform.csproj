@@ -75,6 +75,7 @@
     <Compile Include="BetService.cs" />
     <Compile Include="BetServiceProxy.cs" />
     <Compile Include="ClientHelper.cs" />
+    <Compile Include="ClientPrintProxy.cs" />
     <Compile Include="ClientProxy.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

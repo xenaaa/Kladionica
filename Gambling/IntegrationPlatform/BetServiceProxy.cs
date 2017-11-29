@@ -20,14 +20,14 @@ namespace IntegrationPlatform
         public BetServiceProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
             /// cltCertCN.SubjectName should be set to the client's username. .NET WindowsIdentity class provides information about Windows user running the given process
-            string cltCertCN = "betserviceclient"; //mijenjala
+            string cltCertCN = "betserviceclient";
 
             this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
             this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
 
             /// Set appropriate client's certificate on the channel. Use CertManager class to obtain the certificate based on the "cltCertCN"
             this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
-            //  Console.WriteLine(this.Credentials.ClientCertificate.Certificate.ToString());
+
             try
             {
                 factory = this.CreateChannel();
@@ -154,31 +154,5 @@ namespace IntegrationPlatform
                 return false;
             }
         }
-
-
-        //public bool IntrusionPrevention(byte[] user)
-        //{
-        //    try
-        //    {
-        //        return factory.IntrusionPrevention(user);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine("Error {0}", e.Message);
-        //        return false;
-        //    }
-        //}
-
-
-        public bool GetServiceIP(byte[] AddressStringBytes)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<Dictionary<string, int>> Report()
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }

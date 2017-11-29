@@ -31,7 +31,6 @@ namespace BankServer
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            //  string address = "net.tcp://localhost:" + Helper.bankServicePort + "/BankService";
             int port = FreeTcpPort();
 
             string address = "net.tcp://localhost:" + port + "/BankService";

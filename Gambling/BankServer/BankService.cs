@@ -42,17 +42,17 @@ namespace BankServer
 
             if (bankUsersFromFile.Keys.Contains(username))
             {
-                if (bankUsersFromFile[username].Password == password)//OKK?****
+                if (bankUsersFromFile[username].Password == password)
                 {
                     foreach (KeyValuePair<string, User> kvp in bankUsersFromFile)
                     {
                         if (kvp.Key == username)
                         {
-                            kvp.Value.Address = addressIPv4;//valjda je ovo ok?
+                            kvp.Value.Address = addressIPv4;
                             break;
                         }
                     }
-                    Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");//*****
+                    Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");
 
                     return true;
                 }
@@ -63,7 +63,6 @@ namespace BankServer
             }
             return false;
         }
-
 
         public bool CreateAccount(byte[] userBytes, byte[] port)
         {
@@ -176,11 +175,6 @@ namespace BankServer
                 Persistance.WriteToFile(bankUsersFromFile, "bankUsers.txt");
                 return true;
             }
-        }
-
-        public List<Dictionary<string, int>> Report()
-        {
-            throw new NotImplementedException();
         }
     }
 }

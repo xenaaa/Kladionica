@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ClientPrint
 {
-    public class ClientPrint : IClientHelper
+    public class ClientPrint : IClientPrint
     {
         public bool SendGameResults(byte[] resultsBytes, byte[] port, byte[] address)
         {
@@ -50,16 +50,6 @@ namespace ClientPrint
 
             return true;
 
-        }
-
-        public bool SendTicketResults(byte[] tiket, byte[] prosao, byte[] port, byte[] address)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool GetServiceIP(byte[] AddressStringBytes)
-        {
-            throw new NotImplementedException();
         }
 
         public bool CloseProxy()

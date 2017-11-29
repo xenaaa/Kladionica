@@ -9,9 +9,11 @@ using System.Threading.Tasks;
 
 namespace IntegrationPlatform
 {
-    public class ClientHelper : IClientHelper
+    public class ClientHelper : IClientHelperIntegration
     {
-        ClientProxy proxy;
+      //  IClientHelperIntegration proxy;
+        ClientProxy proxy;//mora 2 proksija
+        ClientPrintProxy printProxy;
 
         public ClientHelper() { }
 
@@ -34,44 +36,28 @@ namespace IntegrationPlatform
             if (isItPrintClient)
             {
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
+                printProxy = new ClientPrintProxy(binding, address);//novo
+                return printProxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);//novo
             }
             else
             {
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
+                proxy = new ClientProxy(binding, address);//novo
+                return proxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);//novo
             }
 
 
-            proxy = new ClientProxy(binding, address);
+         //   proxy = new ClientProxy(binding, address);
 
-
-            //if (!Program.proxies.ContainsKey(addressIPv4))
-            //{
-            //    Dictionary<int, ClientProxy> di = new Dictionary<int, ClientProxy>();
-            //    di.Add(port, proxy);
-            //    Program.proxies.Add(addressIPv4, di);
-            //}
-            //else
-            //{
-            //    if (!Program.proxies[addressIPv4].ContainsKey(port))
-            //        Program.proxies[addressIPv4].Add(port, proxy);
-            //}
-
-
-            //if (!Program.proxies2.ContainsKey(port))
-            //{
-            //    Program.proxies2.Add(port, proxy);
-            //}
-
-            return proxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
-
+           // return proxy.CheckIfAlive(portBytes, addressBytes, isItPrintClientBytes);
            
         }
 
         public bool CloseProxy()
         {
 
-            return proxy.CloseProxy();
-
+            //  return proxy.CloseProxy();
+            return (proxy.CloseProxy() && printProxy.CloseProxy());//novo
         }
 
         public bool GetServiceIP(byte[] AddressStringBytes)//proveriti da li se ovo desilo
@@ -98,11 +84,14 @@ namespace IntegrationPlatform
 
             string address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
 
-            proxy = new ClientProxy(binding, address);
+            //proxy = new ClientProxy(binding, address);
 
-            return proxy.SendGameResults(results, portBytes, addressBytes);
+            // return proxy.SendGameResults(results, portBytes, addressBytes);
+
+            printProxy = new ClientPrintProxy(binding, address);//novo
 
 
+            return printProxy.SendGameResults(results, portBytes, addressBytes);//novo
         }
 
         public bool SendOffers(byte[] offersBytes, byte[] portBytes, byte[] addressBytes, byte[] isItPrintClientBytes)
@@ -126,12 +115,19 @@ namespace IntegrationPlatform
 
             string address = "";
             if (isItPrintClient)
+            {
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientPrint";
+                printProxy = new ClientPrintProxy(binding, address);//novo
+                return printProxy.SendOffers(offers, portB, addressb, isItPrintClientb);//novo
+            }
             else
+            {
                 address = "net.tcp://" + addressIPv4 + ":" + port + "/ClientHelper";
-
-            proxy = new ClientProxy(binding, address);
-            return proxy.SendOffers(offers, portB, addressb, isItPrintClientb);
+                proxy = new ClientProxy(binding, address);//novo
+                return proxy.SendOffers(offers, portB, addressb, isItPrintClientb);//novo
+            }
+            //proxy = new ClientProxy(binding, address);
+          //  return proxy.SendOffers(offers, portB, addressb, isItPrintClientb);
 
             
         }
@@ -159,10 +155,6 @@ namespace IntegrationPlatform
 
             proxy = new ClientProxy(binding, address);
             return proxy.SendTicketResults(ticket, isPassed, portB, addressB);
-
-
         }
-
-
     }
 }

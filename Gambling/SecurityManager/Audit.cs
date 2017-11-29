@@ -37,8 +37,6 @@ namespace SecurityManager
 
         public static void AuthenticationSuccess(string userName)
         {
-            // string UserAuthenticationSuccess -> read string format from .resx file
-
 
             if (customLog != null)
             {

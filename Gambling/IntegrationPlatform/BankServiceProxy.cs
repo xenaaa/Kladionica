@@ -19,7 +19,7 @@ namespace IntegrationPlatform
         public BankServiceProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
             /// cltCertCN.SubjectName should be set to the client's username. .NET WindowsIdentity class provides information about Windows user running the given process
-            string cltCertCN = "bankserviceclient";  //mijenjala
+            string cltCertCN = "bankserviceclient"; 
 
             this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
             // this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new ClientCertValidator();
@@ -89,24 +89,6 @@ namespace IntegrationPlatform
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
-        }
-
-        //public bool IntrusionPrevention(byte[] user)
-        //{
-        //    try
-        //    {
-        //        return factory.IntrusionPrevention(user);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine("Error {0}", e.Message);
-        //        return false;
-        //    }
-        //}
-
-        public List<Dictionary<string, int>> Report()
-        {
-            throw new NotImplementedException();
         }
     }
 }

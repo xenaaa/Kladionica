@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace Client
 {
 
-    public class ClientBankProxy : ChannelFactory<IBankService>, IBankService, IDisposable
+    public class ClientBankProxy : ChannelFactory<IBankServiceIntegration>, IBankServiceIntegration, IDisposable
     {
-        IBankService factory;
+        IBankServiceIntegration factory;
 
         public ClientBankProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
@@ -66,11 +66,6 @@ namespace Client
                 Console.WriteLine("Error {0}", e.Message);
                 return false;
             }
-        }
-
-        public bool IntrusionPrevention(byte[] user)
-        {
-            throw new NotImplementedException();
         }
 
         public List<Dictionary<string, int>> Report()

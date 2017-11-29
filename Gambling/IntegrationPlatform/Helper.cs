@@ -14,9 +14,6 @@ namespace Contracts
     public static class Helper
     {
         public const string key = "123456781234567812345678";
-       // public const int clientPrintPort = 60304;
-      //  public const int betServicePort = 12208;
-        //public const int bankServicePort = 15000;
         public const int integrationHostPort = 42855;
 
         public const string integrationHostAddress = "localhost";
@@ -93,9 +90,6 @@ namespace Contracts
                 return addressIPv6;
 
             addressIPv4 = addressIPv6;//ako je vracena adresa vec zapravo IPv4, moze se dasiti...
-
-
-            //byte[] encryptedAddress = Helper.Encrypt(addressIPv6);
 
             IPHostEntry ipHostEntry = Dns.GetHostEntry(ipAddress);
             foreach (IPAddress address in ipHostEntry.AddressList)

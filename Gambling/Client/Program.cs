@@ -68,16 +68,11 @@ namespace Client
             bool betAdmin = false;
             shaHash = SHA512.Create();
 
-            //proveriti da lie je jedan vec otvoren
-
 
             NetTcpBinding binding = new NetTcpBinding();
 
             port = FreeTcpPort();
 
-            //Console.WriteLine("Enter port: ");
-            //int port = Convert.ToInt32(Console.ReadLine());
-            //int port = Convert.ToInt32(args[0]);
             string address = "net.tcp://localhost:" + port + "/ClientHelper";
 
             ServiceHost host = new ServiceHost(typeof(ClientHelper));
@@ -470,7 +465,7 @@ namespace Client
                                         g.BetOffer = ClientHelper.Offers[code];
 
                                         if (!bets.ContainsKey(code))
-                                            bets.Add(code, g);//proveriti ako dodaje istu utakmicu
+                                            bets.Add(code, g);
                                     }
                                     else
                                     {

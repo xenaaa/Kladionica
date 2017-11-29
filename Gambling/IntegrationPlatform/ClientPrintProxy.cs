@@ -1,21 +1,19 @@
 ﻿using Contracts;
-using SecurityManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace IntegrationPlatform
 {
-    public class ClientProxy : ChannelFactory<IClientHelper>, IClientHelper, IDisposable
+    public class ClientPrintProxy : ChannelFactory<IClientPrint>, IClientPrint, IDisposable
     {
-        IClientHelper factory;
+        IClientPrint factory;
 
-        public ClientProxy() { }
-        public ClientProxy(NetTcpBinding binding, string address) : base(binding, address)
+        public ClientPrintProxy() { }
+        public ClientPrintProxy(NetTcpBinding binding, string address) : base(binding, address)
         {
             try
             {
@@ -57,24 +55,22 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool GetServiceIP(byte[] AddressStringBytes)
+       
+
+        public bool SendGameResults(byte[] results, byte[] port, byte[] address)
         {
-            throw new NotImplementedException();
+            try
+            {
+                return factory.SendGameResults(results, port, address);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error {0}", e.Message);
+                return false;
+            }
         }
 
-        //public bool SendGameResults(byte[] results, byte[] port, byte[] address)
-        //{
-        //    try
-        //    {
-        //        return factory.SendGameResults(results, port, address);
-
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Console.WriteLine("Error {0}", e.Message);
-        //        return false;
-        //    }
-        //}
         public bool SendOffers(byte[] offers, byte[] port, byte[] addressBytes, byte[] isItPrintClientBytes)
         {
             try
@@ -88,17 +84,6 @@ namespace IntegrationPlatform
             }
         }
 
-        public bool SendTicketResults(byte[] ticket, byte[] isPassed, byte[] port, byte[] address)
-        {
-            try
-            {
-                return factory.SendTicketResults(ticket, isPassed, port, address);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error {0}", e.Message);
-                return false;
-            }
-        }
+        
     }
 }

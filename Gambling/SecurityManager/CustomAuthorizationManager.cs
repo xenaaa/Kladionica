@@ -13,25 +13,6 @@ namespace SecurityManager
         protected override bool CheckAccessCore(OperationContext operationContext)
         {
             return true;
-            //bool authorized = false;
-
-            //IPrincipal principal = operationContext.ServiceSecurityContext.AuthorizationContext.Properties["Principal"] as IPrincipal;
-
-            //if (principal != null)
-            //{
-            //    authorized = (principal as CustomPrincipal).IsInRole(Permissions.View.ToString());
-
-            //    if (authorized == false)
-            //    {
-            //        /// audit authorization failed event					
-            //    }
-            //    else
-            //    {
-            //        /// audit successfull authorization event
-            //    }
-            //}
-
-            //return authorized;
         }
     }
 }

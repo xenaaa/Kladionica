@@ -47,8 +47,14 @@
     <Compile Include="Game.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="IBankService.cs" />
+    <Compile Include="IBankServiceIntegration.cs" />
     <Compile Include="IBetService.cs" />
+    <Compile Include="IBetServiceIntegration.cs" />
+    <Compile Include="IBetServiceOnBank.cs" />
+    <Compile Include="IClientBet.cs" />
     <Compile Include="IClientHelper.cs" />
+    <Compile Include="IClientHelperIntegration.cs" />
+    <Compile Include="IClientPrint.cs" />
     <Compile Include="IntrusionTry.cs" />
     <Compile Include="Persistance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

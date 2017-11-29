@@ -91,7 +91,6 @@ namespace BetServer
                                       new X509CertificateEndpointIdentity(srvCert));
 
             BetServerProxy proxy;
-            // proxy = new BetServerProxy(binding, address2);
 
 
             string IP = string.Empty;
@@ -135,7 +134,6 @@ namespace BetServer
                 SendOffers();
             }).Start();
 
-            //Thread.Sleep(15000);
 
             new Thread(() =>
             {
@@ -149,23 +147,14 @@ namespace BetServer
                 CheckUserGames();
             }).Start();
 
-            //while (true)
-            //{
-
-            //    if (checkUserGames)
-            //        CheckUserGames();
-            //    else
-            //        Thread.Sleep();
-            //}
-
             Console.WriteLine("Bet service is started.");
             Console.WriteLine("Press <enter> to stop service...");
 
             Console.ReadLine();
-            host.Close();//nece se host zatvoriti
+            host.Close();
         }
 
-        private static void SendOffers() //slanje ponude kijentu svakih 5 minuta
+        private static void SendOffers()
         {
             NetTcpBinding binding = new NetTcpBinding();
 
@@ -174,10 +163,7 @@ namespace BetServer
             while (true)
             {
 
-                // Thread.Sleep(15000);
-
                 DateTime start = DateTime.Now;
-                //   DateTime now;
 
                 do
                 {
@@ -286,7 +272,6 @@ namespace BetServer
             while (true)
             {
                 DateTime start = DateTime.Now;
-                //   DateTime now;
 
                 while (true)
                 {
@@ -316,10 +301,8 @@ namespace BetServer
                     resultsFromFile = (Dictionary<int, Game>)obj;
 
 
-                //    if (BetService.BetUsers.Count > 0 && BetService.Rezultati.Count > 0)
                 if (betUsersFromFile.Count > 0 && resultsFromFile.Count > 0)
                 {
-                    //  foreach (KeyValuePair<string, User> user in BetService.BetUsers)
                     foreach (KeyValuePair<string, User> user in betUsersFromFile)
                     {
                         if (user.Value.Tickets.Count > 0)
@@ -349,7 +332,7 @@ namespace BetServer
                                 if (allGamesDone)
                                 {
                                     SendTicketResults2(user.Value, ticket);
-                                    tickets.Add(ticket); //
+                                    tickets.Add(ticket);
                                 }
                             }
 
@@ -364,7 +347,7 @@ namespace BetServer
                             {
                                 User changeUser = user.Value;
                                 BetService betService = new BetService();
-                                betService.EditUser(Helper.Encrypt(changeUser), Helper.ObjectToByteArray(0)); // ne znam sta ovdje proslijediti?????
+                                betService.EditUser(Helper.Encrypt(changeUser), Helper.ObjectToByteArray(0));
                             }
                         }
 
@@ -415,16 +398,16 @@ namespace BetServer
             encryptedPort = Helper.Encrypt(user.Port);
             encryptedAddress = Helper.Encrypt(user.Address);
 
-            if (proxy.CheckIfAlive(encryptedPort, encryptedAddress, Helper.Encrypt(false)))//ako vrati false obrisati tog user-a?
+            if (proxy.CheckIfAlive(encryptedPort, encryptedAddress, Helper.Encrypt(false)))
             {
                 byte[] encryptedTicket = Helper.Encrypt(ticket);
                 byte[] encryptedWon = Helper.Encrypt(won);
 
-                proxy.SendTicketResults(encryptedTicket, encryptedWon, encryptedPort, encryptedAddress); // treba port od klijenta kom salje
+                proxy.SendTicketResults(encryptedTicket, encryptedWon, encryptedPort, encryptedAddress);
             }
 
 
-            if (won)//koja je svrha
+            if (won)
             {
                 User changeUser = user;
                 BetService betService = new BetService();

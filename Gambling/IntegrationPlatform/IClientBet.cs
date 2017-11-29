@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Contracts
 {
     [ServiceContract]
-    public interface IBetService
+    public interface IClientBet
     {
         [OperationContract]
         bool CheckIfAlive(int port);
@@ -32,6 +32,6 @@ namespace Contracts
         bool SendTicket(byte[] ticket, byte[] username, byte[] port);
 
         [OperationContract]
-        bool Deposit(byte[] acc, byte[] username, byte[] port);
+        List<Dictionary<string, int>> Report();
     }
 }

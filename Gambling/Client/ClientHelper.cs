@@ -72,10 +72,9 @@ namespace Client
 
                         foreach (KeyValuePair<int, Game> item in ticket.Bets)
                         {
-                            //SVE ZELENO
+                            
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.WriteLine(String.Format("{0,-10} {1,-10}          {2,-10}             {3,-1} : {4,-4}           {5,-5}  ", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip));
-                            //   Console.ForegroundColor = ConsoleColor.White;
                         }
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine("\nPayment: " + ticket.Payment);
@@ -102,12 +101,12 @@ namespace Client
 
                         foreach (KeyValuePair<int, Game> item in ticket.Bets)
                         {
-                            if (item.Value.Won)//zelena boja
+                            if (item.Value.Won)
                             {
                                 Console.ForegroundColor = ConsoleColor.Green;
                                 Console.WriteLine(String.Format("{0,-10} {1,-10}          {2,-10}           {3,-1} : {4,-4}           {5,-5}  ", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip));
                             }
-                            else //crvena boja
+                            else
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
                                 Console.WriteLine(String.Format("{0,-10} {1,-10}          {2,-10}           {3,-1} : {4,-4}           {5,-5}  ", item.Key, item.Value.BetOffer.Home, item.Value.BetOffer.Away, item.Value.HomeGoalScored, item.Value.AwayGoalScored, item.Value.Tip));
@@ -125,11 +124,6 @@ namespace Client
 
             }
             return true;
-        }
-
-        public bool GetServiceIP(byte[] AddressStringBytes)
-        {
-            throw new NotImplementedException();
         }
 
         public bool CloseProxy()
