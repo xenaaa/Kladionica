@@ -118,7 +118,7 @@ namespace BankServer
                     NetTcpBinding binding = new NetTcpBinding();
                     binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
-                    X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
+                    X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
                     EndpointAddress address = new EndpointAddress(new Uri("net.tcp://" + Helper.integrationHostAddress + ":" + Helper.integrationHostPort + "/BetIntegrationPlatform2"),
                                               new X509CertificateEndpointIdentity(srvCert));
 
