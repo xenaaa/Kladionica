@@ -66,7 +66,7 @@ namespace Client
         {
             shaHash = SHA512.Create();
 
-
+            Console.ForegroundColor = ConsoleColor.White;
             NetTcpBinding binding = new NetTcpBinding();
 
             port = FreeTcpPort();
