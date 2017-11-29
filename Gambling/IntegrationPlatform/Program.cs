@@ -258,8 +258,15 @@ namespace IntegrationPlatform
 
             foreach (var item in proxies[address].Values)
             {
-                item.CloseProxy();
-                item.Close();
+                try
+                {
+                    item.CloseProxy();
+                    item.Close();
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error {0}", e.Message);
+                }
             }
             proxies.Remove(address);
         }
